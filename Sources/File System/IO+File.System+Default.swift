@@ -1,16 +1,16 @@
 public import Executors
-public import IO
+public import IO_Kernel
 public import Kernel
 
-extension IO where Capabilities == File.System.IO.Capabilities {
+extension IO.Kernel where Capabilities == File.System.IO.Capabilities {
 
     public static func `default`(
-        on executor: Kernel.Thread.Executor
-    ) -> IO<File.System.IO.Capabilities> {
+        on executor: Kernel::Kernel.Thread.Executor
+    ) -> IO.Kernel<File.System.IO.Capabilities> {
         #if os(Linux)
-            if Kernel.IO.Uring.isSupported {
+            if Kernel::Kernel.IO.Uring.isSupported {
                 let proactor: Completion.Actor?
-                do throws(Kernel.Completion.Error) {
+                do throws(Kernel::Kernel.Completion.Error) {
                     proactor = try Completion.Actor.shared()
                 } catch {
                     proactor = nil

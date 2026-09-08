@@ -1,11 +1,11 @@
 import Executors
 import File_System
 import File_System_Test_Support
-import IO
+import IO_Kernel
 @_spi(Syscall) import Kernel
 import Kernel_Test_Support
 import Memory
-import Span_Raw
+import Span_Byte
 import Testing
 
 @Suite
@@ -16,7 +16,7 @@ struct `File.System.IO — smoke tests` {
         let executor = Kernel.Thread.Executor()
         defer { executor.shutdown() }
 
-        let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
+        let io: IO.Kernel<File.System.IO.Capabilities> = .blocking(on: executor)
 
         let pathString = Kernel.Temporary.filePath(prefix: "fs-io-test")
         let path = try File.Path(pathString)
@@ -44,7 +44,7 @@ struct `File.System.IO — smoke tests` {
     func `default() chain returns a working IO on the host`() async throws {
         let executor = Kernel.Thread.Executor()
         defer { executor.shutdown() }
-        let io: IO<File.System.IO.Capabilities> = .default(on: executor)
+        let io: IO.Kernel<File.System.IO.Capabilities> = .default(on: executor)
 
         let pathString = Kernel.Temporary.filePath(prefix: "fs-io-default")
         let path = try File.Path(pathString)
@@ -72,7 +72,7 @@ struct `File.System.IO — smoke tests` {
         let executor = Kernel.Thread.Executor()
         defer { executor.shutdown() }
 
-        let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
+        let io: IO.Kernel<File.System.IO.Capabilities> = .blocking(on: executor)
 
         let pathString = Kernel.Temporary.filePath(prefix: "fs-io-rw")
         let path = try File.Path(pathString)

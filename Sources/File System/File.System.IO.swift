@@ -1,4 +1,4 @@
-import IO
+import IO_Kernel
 
 extension File.System {
 

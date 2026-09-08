@@ -1,5 +1,5 @@
 public import Glob
-public import IO
+public import IO_Kernel
 import Kernel
 public import Thread_Pool
 

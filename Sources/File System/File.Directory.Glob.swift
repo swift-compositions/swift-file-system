@@ -1,5 +1,5 @@
 public import Glob
-public import IO
+public import IO_Kernel
 
 extension File.Directory {
 

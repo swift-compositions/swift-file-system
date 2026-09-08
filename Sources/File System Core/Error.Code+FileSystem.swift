@@ -1,6 +1,6 @@
 internal import Error
 
-extension Error.Error.Code {
+extension Error::Error.Code {
 
     internal static var _io: Self {
         #if os(Windows)

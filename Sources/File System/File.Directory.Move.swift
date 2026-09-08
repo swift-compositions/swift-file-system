@@ -1,4 +1,4 @@
-public import IO
+public import IO_Kernel
 public import Thread_Pool
 
 extension File.Directory {

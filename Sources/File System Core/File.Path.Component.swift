@@ -1,4 +1,3 @@
-import ASCII
 public import Paths
 public import Strings
 

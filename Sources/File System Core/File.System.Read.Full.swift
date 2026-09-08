@@ -157,7 +157,7 @@ extension File.System.Read.Full {
 
                 #if !os(Windows)
                     if case .platform(let kernelError) = error,
-                        kernelError.code == Error.Error.Code.POSIX.EINTR
+                        kernelError.code == Error::Error.Code.POSIX.EINTR
                     {
                         continue
                     }

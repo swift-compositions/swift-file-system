@@ -1,19 +1,19 @@
 #if os(Linux)
 
     public import Executors
-    public import IO
+    public import IO_Kernel
     public import Kernel
     public import Memory
-    public import Span_Raw
+    public import Span_Byte
     public import Thread_Actor
 
-    extension IO where Capabilities == File.System.IO.Capabilities {
+    extension IO.Kernel where Capabilities == File.System.IO.Capabilities {
 
         public static func completions(
             on completion: Completion.Actor,
-            blockingOn executor: Kernel.Thread.Executor
-        ) -> IO<File.System.IO.Capabilities> {
-            let thread = Kernel.Thread.Actor(executor: executor)
+            blockingOn executor: Kernel::Kernel.Thread.Executor
+        ) -> IO.Kernel<File.System.IO.Capabilities> {
+            let thread = Kernel::Kernel.Thread.Actor(executor: executor)
             let capabilities = File.System.IO.Capabilities(
                 open: { path, mode throws(File.System.IO.Error) in
                     try await thread.open(path, mode: mode)
@@ -23,9 +23,9 @@
                 },
                 read: { fd, buf throws(File.System.IO.Error) -> Int in
                     let raw = unsafe buf.base.nonNull
-                    let descriptor: Kernel.Descriptor?
-                    do throws(Kernel.Descriptor.Duplicate.Error) {
-                        descriptor = try Kernel.Descriptor.Duplicate.duplicate(fd)
+                    let descriptor: Kernel::Kernel.Descriptor?
+                    do throws(Kernel::Kernel.Descriptor.Duplicate.Error) {
+                        descriptor = try Kernel::Kernel.Descriptor.Duplicate.duplicate(fd)
                     } catch {
                         throw .platform(error.code)
                     }
@@ -47,9 +47,9 @@
                 },
                 write: { fd, buf throws(File.System.IO.Error) -> Int in
                     let raw = unsafe buf.base.nonNull
-                    let descriptor: Kernel.Descriptor?
-                    do throws(Kernel.Descriptor.Duplicate.Error) {
-                        descriptor = try Kernel.Descriptor.Duplicate.duplicate(fd)
+                    let descriptor: Kernel::Kernel.Descriptor?
+                    do throws(Kernel::Kernel.Descriptor.Duplicate.Error) {
+                        descriptor = try Kernel::Kernel.Descriptor.Duplicate.duplicate(fd)
                     } catch {
                         throw .platform(error.code)
                     }
@@ -77,7 +77,7 @@
                 executor: { completion.unownedExecutor },
                 shutdown: {}
             )
-            return IO(capabilities: capabilities, runner: runner)
+            return IO.Kernel(capabilities: capabilities, runner: runner)
         }
     }
 

@@ -254,7 +254,7 @@ extension File.System.Write.Atomic {
                     on: descriptor
                 )
             } catch {
-                let code: Error.Error.Code
+                let code: Error::Error.Code
                 switch error {
                 case .platform(let e): code = e.code
                 case .permission: code = ._accessDenied
@@ -278,7 +278,7 @@ extension File.System.Write.Atomic {
                 )
             } catch {
                 if strict {
-                    let code: Error.Error.Code
+                    let code: Error::Error.Code
                     switch error {
                     case .platform(let e): code = e.code
                     case .permission: code = ._accessDenied

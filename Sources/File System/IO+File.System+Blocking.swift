@@ -1,13 +1,13 @@
 public import Executors
-public import IO
+public import IO_Kernel
 import Thread_Actor
 
-extension IO where Capabilities == File.System.IO.Capabilities {
+extension IO.Kernel where Capabilities == File.System.IO.Capabilities {
 
     public static func blocking(
-        on executor: Kernel.Thread.Executor
-    ) -> IO<File.System.IO.Capabilities> {
-        let actor = Kernel.Thread.Actor(executor: executor)
+        on executor: Kernel::Kernel.Thread.Executor
+    ) -> IO.Kernel<File.System.IO.Capabilities> {
+        let actor = Kernel::Kernel.Thread.Actor(executor: executor)
         let capabilities = File.System.IO.Capabilities(
             open: { path, mode throws(File.System.IO.Error) in
                 try await actor.open(path, mode: mode)
@@ -31,6 +31,6 @@ extension IO where Capabilities == File.System.IO.Capabilities {
 
             }
         )
-        return IO(capabilities: capabilities, runner: runner)
+        return IO.Kernel(capabilities: capabilities, runner: runner)
     }
 }

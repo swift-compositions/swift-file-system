@@ -1,6 +1,6 @@
 public import Kernel
 import Memory
-public import Span_Raw
+public import Span_Byte
 
 extension File.System.IO {
 

@@ -16,12 +16,11 @@ let package = Package(
         .library(name: "File System Test Support", targets: ["File System Test Support"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-compositions/swift-ascii.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-environment.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-paths.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-strings.git", branch: "main"),
-        .package(url: "https://github.com/swift-compositions/swift-io.git", branch: "main"),
+        .package(url: "https://github.com/swift-compositions/swift-io-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
         .package(
             url: "https://github.com/swift-molecules/swift-either.git",
@@ -32,7 +31,7 @@ let package = Package(
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-span.git",
+            url: "https://github.com/swift-molecules/swift-span-byte.git",
             branch: "main"
         ),
         .package(
@@ -60,7 +59,6 @@ let package = Package(
                 .product(name: "Strings", package: "swift-strings"),
                 .product(name: "Either", package: "swift-either"),
                 .product(name: "Binary", package: "swift-binary"),
-                .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
             ]
         ),
@@ -69,8 +67,8 @@ let package = Package(
             dependencies: [
                 "File System Core",
                 .product(name: "Glob", package: "swift-glob"),
-                .product(name: "IO", package: "swift-io"),
-                .product(name: "Span Raw", package: "swift-span"),
+                .product(name: "IO Kernel", package: "swift-io-kernel"),
+                .product(name: "Span Byte", package: "swift-span-byte"),
                 .product(name: "Thread Pool", package: "swift-threads"),
                 .product(name: "Thread Actor", package: "swift-threads"),
             ]
@@ -92,7 +90,7 @@ let package = Package(
                 "File System Test Support",
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(
-                    name: "Tagged Standard Library Integration",
+                    name: "Tagged",
                     package: "swift-tagged"
                 ),
             ]
@@ -104,7 +102,7 @@ let package = Package(
                 "File System Test Support",
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(
-                    name: "Tagged Standard Library Integration",
+                    name: "Tagged",
                     package: "swift-tagged"
                 ),
             ]

@@ -1,6 +1,6 @@
 #if !os(Windows)
 
-    public import IO
+    public import IO_Kernel
 
     extension Completion.Failure {
 
