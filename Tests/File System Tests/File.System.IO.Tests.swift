@@ -5,7 +5,7 @@ import IO_Kernel
 @_spi(Syscall) import Kernel
 import Kernel_Test_Support
 import Memory
-import Span_Byte
+import Span
 import Testing
 
 @Suite

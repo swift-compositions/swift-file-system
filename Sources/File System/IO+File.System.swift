@@ -1,7 +1,7 @@
 public import IO_Kernel
 public import Kernel
 import Memory
-public import Span_Byte
+public import Span
 
 extension IO.Kernel where Capabilities == File.System.IO.Capabilities {
 

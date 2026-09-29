@@ -4,7 +4,7 @@
     public import IO_Kernel
     public import Kernel
     public import Memory
-    public import Span_Byte
+    public import Span
     public import Thread_Actor
 
     extension IO.Kernel where Capabilities == File.System.IO.Capabilities {

@@ -23,30 +23,24 @@ let package = Package(
         .package(url: "https://github.com/swift-compositions/swift-io-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
         .package(
-            url: "https://github.com/swift-molecules/swift-either.git",
+            url: "https://github.com/swift-atoms/swift-either.git",
+            branch: "main"
+        ),
+        .package(url: "https://github.com/swift-atoms/swift-binary.git", branch: "main", traits: ["Serializer"]),
+        .package(
+            url: "https://github.com/swift-atoms/swift-glob.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-binary.git",
+            url: "https://github.com/swift-atoms/swift-path.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-span-byte.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-glob.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-path.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-tagged.git",
+            url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
         ),
         .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-span.git", branch: "main", traits: ["Byte"]),
     ],
     targets: [
         .target(
@@ -68,9 +62,9 @@ let package = Package(
                 "File System Core",
                 .product(name: "Glob", package: "swift-glob"),
                 .product(name: "IO Kernel", package: "swift-io-kernel"),
-                .product(name: "Span Byte", package: "swift-span-byte"),
                 .product(name: "Thread Pool", package: "swift-threads"),
                 .product(name: "Thread Actor", package: "swift-threads"),
+                .product(name: "Span", package: "swift-span"),
             ]
         ),
         .target(
@@ -105,6 +99,7 @@ let package = Package(
                     name: "Tagged",
                     package: "swift-tagged"
                 ),
+                .product(name: "Span", package: "swift-span"),
             ]
         ),
     ],
