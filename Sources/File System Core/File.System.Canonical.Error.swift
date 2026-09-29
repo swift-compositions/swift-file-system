@@ -4,7 +4,7 @@ extension File.System.Canonical {
 
     public enum Error: Swift.Error, Sendable, Equatable {
 
-        case resolution(Path.Path.Canonical.Error)
+        case resolution(Path::Path.Canonical.Error)
 
         case representation(File.Path.Error)
     }

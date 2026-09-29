@@ -41,7 +41,7 @@ extension File.System.Write.Atomic {
 
     public static func write(
         _ bytes: borrowing Swift.Span<Byte>,
-        to path: borrowing Path.Path.Borrowed,
+        to path: borrowing Path::Path.Borrowed,
         options: borrowing Options = Options()
     ) throws(Error) {
         let pathString = Swift.String(path)
