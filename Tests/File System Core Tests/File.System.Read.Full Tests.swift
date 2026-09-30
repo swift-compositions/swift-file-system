@@ -54,7 +54,7 @@ extension File.System.Read.Full.Test.Unit {
 
             let readString = try File.System.Read.Full.read(from: filePath) { span in
                 span.withUnsafeBytes { buffer in
-                    Swift.String(decoding: [UInt8](buffer), as: UTF8.self)
+                    unsafe Swift.String(decoding: [UInt8](buffer), as: UTF8.self)
                 }
             }
             #expect(readString == text)

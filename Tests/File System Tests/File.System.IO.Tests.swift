@@ -98,7 +98,7 @@ struct `File.System.IO — smoke tests` {
         defer { unsafe writePtr.deallocate() }
         for (i, byte) in payload.enumerated() { unsafe writePtr[i] = byte.underlying }
 
-        let written = try await io.write(
+        let written = unsafe try await io.write(
             to: fd,
             from: unsafe .init(UnsafeRawBufferPointer(writePtr))
         )

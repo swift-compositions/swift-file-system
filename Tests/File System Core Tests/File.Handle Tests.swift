@@ -315,13 +315,13 @@ extension File.Handle.Test.Unit {
 
             let bytes1: [Byte] = ([0x41, 0x41, 0x41, 0x41] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes1.withUnsafeBytes { buffer in
-                let written = try handle.pwrite(buffer, at: 0)
+                let written = unsafe try handle.pwrite(buffer, at: 0)
                 #expect(written == 4)
             }
 
             let bytes2: [Byte] = ([0x42, 0x42, 0x42, 0x42] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes2.withUnsafeBytes { buffer in
-                let written = try handle.pwrite(buffer, at: 4)
+                let written = unsafe try handle.pwrite(buffer, at: 4)
                 #expect(written == 4)
             }
 
@@ -349,7 +349,7 @@ extension File.Handle.Test.Unit {
 
             let bytes: [Byte] = ([0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes.withUnsafeBytes { buffer in
-                _ = try handle.pwrite(buffer, at: 4)
+                _ = unsafe try handle.pwrite(buffer, at: 4)
             }
 
             let pos2 = try handle.seek(to: 0, from: .current)
@@ -371,7 +371,7 @@ extension File.Handle.Test.Unit {
 
             let bytes: [Byte] = ([0x59, 0x59, 0x59, 0x59] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes.withUnsafeBytes { buffer in
-                _ = try handle.pwrite(buffer, at: 2)
+                _ = unsafe try handle.pwrite(buffer, at: 2)
             }
 
             try handle.close()
@@ -392,7 +392,7 @@ extension File.Handle.Test.Unit {
 
             let empty: [Byte] = []
             try empty.withUnsafeBytes { buffer in
-                let written = try handle.pwrite(buffer, at: 0)
+                let written = unsafe try handle.pwrite(buffer, at: 0)
                 #expect(written == 0)
             }
 
@@ -413,7 +413,7 @@ extension File.Handle.Test.Unit {
 
             let data = [Byte](repeating: Byte(bitPattern: 0xAB), count: 10_000)
             try data.withUnsafeBytes { buffer in
-                try handle.pwriteAll(buffer, at: 0)
+                unsafe try handle.pwriteAll(buffer, at: 0)
             }
 
             try handle.close()
@@ -438,7 +438,7 @@ extension File.Handle.Test.Unit {
 
             let data: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try data.withUnsafeBytes { buffer in
-                try handle.pwriteAll(buffer, at: 50)
+                unsafe try handle.pwriteAll(buffer, at: 50)
             }
 
             try handle.close()

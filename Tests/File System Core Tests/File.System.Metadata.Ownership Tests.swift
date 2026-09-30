@@ -46,7 +46,7 @@ extension File.System.Metadata.Ownership.Test.Unit {
                 #expect(ownership.uid.underlying == getuid())
 
                 var statBuf = stat()
-                _ = stat(Swift.String(filePath), &statBuf)
+                _ = unsafe stat(Swift.String(filePath), &statBuf)
                 #expect(ownership.gid.underlying == statBuf.st_gid)
             }
         }

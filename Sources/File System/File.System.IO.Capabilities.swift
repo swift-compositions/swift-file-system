@@ -4,6 +4,8 @@ public import Span
 
 extension File.System.IO {
 
+    @safe
+
     public struct Capabilities: Sendable {
 
         public let open:
@@ -55,8 +57,8 @@ extension File.System.IO {
         ) {
             self.open = open
             self.close = close
-            self.read = read
-            self.write = write
+            unsafe self.read = unsafe read
+            unsafe self.write = unsafe write
             self.stat = stat
         }
     }

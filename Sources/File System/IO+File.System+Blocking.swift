@@ -8,7 +8,7 @@ extension IO where Capabilities == File.System.IO.Capabilities {
         on executor: Kernel::Kernel.Thread.Executor
     ) -> IO<File.System.IO.Capabilities> {
         let actor = Kernel::Kernel.Thread.Actor(executor: executor)
-        let capabilities = File.System.IO.Capabilities(
+        let capabilities = unsafe File.System.IO.Capabilities(
             open: { path, mode throws(File.System.IO.Error) in
                 try await actor.open(path, mode: mode)
             },
@@ -16,10 +16,10 @@ extension IO where Capabilities == File.System.IO.Capabilities {
                 await actor.close(consume fd)
             },
             read: { fd, buf throws(File.System.IO.Error) in
-                try await actor.read(from: fd, into: buf)
+                unsafe try await actor.read(from: fd, into: buf)
             },
             write: { fd, buf throws(File.System.IO.Error) in
-                try await actor.write(to: fd, from: buf)
+                unsafe try await actor.write(to: fd, from: buf)
             },
             stat: { path throws(File.System.IO.Error) in
                 try await actor.stat(path)

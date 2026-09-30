@@ -78,7 +78,7 @@ extension File.System.Test.Unit {
 
             var buffer = [Byte](repeating: Byte(bitPattern: 0), count: 1024)
             let bytesRead = try buffer.withUnsafeMutableBytes { ptr in
-                try readHandle.read(into: ptr)
+                unsafe try readHandle.read(into: ptr)
             }
 
             try readHandle.close()
@@ -254,7 +254,7 @@ extension File.System.Test.Unit {
 
             var readBuffer = [Byte](repeating: Byte(bitPattern: 0), count: 5)
             let bytesRead = try readBuffer.withUnsafeMutableBytes { ptr in
-                try handle.read(into: ptr)
+                unsafe try handle.read(into: ptr)
             }
 
             try handle.close()
@@ -487,7 +487,7 @@ extension File.System.Test.Unit {
 
             var buffer = [Byte](repeating: Byte(bitPattern: 0), count: 5)
             let bytesRead = try buffer.withUnsafeMutableBytes { ptr in
-                try handle2.read(into: ptr)
+                unsafe try handle2.read(into: ptr)
             }
 
             try handle1.close()
@@ -516,7 +516,7 @@ extension File.System.Test.Unit {
 
             var emptyBuffer: [Byte] = []
             let bytesRead = try emptyBuffer.withUnsafeMutableBytes { ptr in
-                try handle.read(into: ptr)
+                unsafe try handle.read(into: ptr)
             }
 
             try handle.close()
@@ -546,7 +546,7 @@ extension File.System.Test.Unit {
 
             while true {
                 let bytesRead = try buffer.withUnsafeMutableBytes { ptr in
-                    try handle.read(into: ptr)
+                    unsafe try handle.read(into: ptr)
                 }
                 if bytesRead == 0 { break }
                 allRead.append(contentsOf: buffer[..<bytesRead])
@@ -580,8 +580,8 @@ extension File.System.Test.Unit {
                 )
                 try handle.close()
 
-                chmod(path, 0o000)
-                defer { chmod(path, 0o644) }
+                unsafe chmod(path, 0o000)
+                defer { unsafe chmod(path, 0o644) }
 
                 #expect(throws: Kernel.File.Open.Error.self) {
                     _ = try File.Handle.open(filePath, mode: .read)
