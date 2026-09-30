@@ -30,7 +30,7 @@ extension File.Write {
         _ string: Swift.String,
         options: File.System.Write.Atomic.Options = .init()
     ) throws(File.System.Write.Atomic.Error) {
-        let utf8 = [Byte](string.utf8)
+        let utf8 = [Byte](utf8: string)
         try atomic(utf8.span, options: options)
     }
 
@@ -50,7 +50,7 @@ extension File.Write {
     ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Atomic.Error>) {
         let path = self.path
         try await Kernel.Thread.Pool.shared.run { () throws(File.System.Write.Atomic.Error) in
-            let utf8 = [Byte](string.utf8)
+            let utf8 = [Byte](utf8: string)
             try File.System.Write.Atomic.write(utf8.span, to: path, options: options)
         }
     }
@@ -75,7 +75,7 @@ extension File.Write {
 
     @inlinable
     public func append(_ string: Swift.String) throws(File.System.Write.Append.Error) {
-        let utf8 = [Byte](string.utf8)
+        let utf8 = [Byte](utf8: string)
         try append(utf8.span)
     }
 
@@ -85,7 +85,7 @@ extension File.Write {
     ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Write.Append.Error>) {
         let path = self.path
         try await Kernel.Thread.Pool.shared.run { () throws(File.System.Write.Append.Error) in
-            let utf8 = [Byte](string.utf8)
+            let utf8 = [Byte](utf8: string)
             try File.System.Write.Append.append(utf8.span, to: path)
         }
     }

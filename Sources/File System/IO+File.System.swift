@@ -3,7 +3,7 @@ public import Kernel
 import Memory
 public import Span
 
-extension IO.Kernel where Capabilities == File.System.IO.Capabilities {
+extension IO where Capabilities == File.System.IO.Capabilities {
 
     @inlinable
     public func open(

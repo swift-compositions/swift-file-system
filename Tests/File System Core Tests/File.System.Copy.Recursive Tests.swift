@@ -30,7 +30,8 @@ struct `File.System.Copy.recursive` {
 
             try File.System.Create.Directory.create(at: sourcePath)
             let filePath = sourcePath / "test.txt"
-            try File.System.Write.Atomic.write([1, 2, 3, 4, 5].span, to: filePath)
+            let fileBytes = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
             try File.System.Copy.recursive(from: sourcePath, to: destPath)
 
@@ -40,9 +41,9 @@ struct `File.System.Copy.recursive` {
             #expect(File.System.Stat.exists(at: copiedFile))
 
             let copiedData = try File.System.Read.Full.read(from: copiedFile) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(copiedData == [1, 2, 3, 4, 5])
+            #expect(copiedData == ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -61,10 +62,12 @@ struct `File.System.Copy.recursive` {
             )
 
             let filePath = dirB / "c.txt"
-            try File.System.Write.Atomic.write([10, 20, 30].span, to: filePath)
+            let fileBytes = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
             let rootFile = sourcePath / "root.txt"
-            try File.System.Write.Atomic.write([99].span, to: rootFile)
+            let rootFileBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(rootFileBytes.span, to: rootFile)
 
             try File.System.Copy.recursive(from: sourcePath, to: destPath)
 
@@ -75,14 +78,14 @@ struct `File.System.Copy.recursive` {
             #expect(File.System.Stat.exists(at: destPath / "root.txt"))
 
             let copiedData = try File.System.Read.Full.read(from: destPath / "a" / "b" / "c.txt") {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(copiedData == [10, 20, 30])
+            #expect(copiedData == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
 
             let rootData = try File.System.Read.Full.read(from: destPath / "root.txt") {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(rootData == [99])
+            #expect(rootData == ([99] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -94,7 +97,8 @@ struct `File.System.Copy.recursive` {
 
             try File.System.Create.Directory.create(at: sourcePath)
             let filePath = sourcePath / "test.txt"
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: filePath)
+            let fileBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
             try File.System.Copy.recursive(from: sourcePath, to: destPath)
 
@@ -110,10 +114,12 @@ struct `File.System.Copy.recursive` {
             let destPath = dir.path / "dest"
 
             try File.System.Create.Directory.create(at: sourcePath)
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath / "new.txt")
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath / "new.txt")
 
             try File.System.Create.Directory.create(at: destPath)
-            try File.System.Write.Atomic.write([99].span, to: destPath / "old.txt")
+            let destBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath / "old.txt")
 
             let options = File.System.Copy.Options(overwrite: true)
             try File.System.Copy.recursive(from: sourcePath, to: destPath, options: options)
@@ -180,15 +186,17 @@ struct `File.System.Copy.recursive` {
             let sourcePath = dir.path / "source.txt"
             let destPath = dir.path / "dest.txt"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
             try File.System.Copy.recursive(from: sourcePath, to: destPath)
 
             #expect(File.System.Stat.exists(at: destPath))
             let data = try File.System.Read.Full.read(from: destPath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(data == [1, 2, 3])
+            #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -212,7 +220,7 @@ struct `File.System.Copy.recursive` {
                 let filePath = destPath / "file\(i).txt"
                 #expect(File.System.Stat.exists(at: filePath))
                 let data = try File.System.Read.Full.read(from: filePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 #expect(data == [Byte(UInt8(i))])
             }
@@ -235,7 +243,8 @@ struct `File.System.Copy.recursive` {
                 at: currentPath,
                 createIntermediates: true
             )
-            try File.System.Write.Atomic.write([42].span, to: currentPath / "file.txt")
+            let currentBytes = ([42] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(currentBytes.span, to: currentPath / "file.txt")
 
             try File.System.Copy.recursive(from: sourcePath, to: destPath)
 

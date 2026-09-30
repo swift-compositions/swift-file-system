@@ -262,6 +262,6 @@ extension File.Name: Binary.Serializable {
     ) where Buffer.Element == Byte {
         var tmp: [UInt8] = []
         value.rawBytes.appendUTF8(into: &tmp)
-        buffer.append(contentsOf: tmp)
+        buffer.append(contentsOf: tmp.map(Byte.init(bitPattern:)))
     }
 }

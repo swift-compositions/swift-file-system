@@ -16,18 +16,18 @@ extension File.System.Metadata {
 extension File.System.Metadata.Kind: RawRepresentable {
     public var rawValue: Byte {
         switch self {
-        case .regular: return 0
-        case .directory: return 1
-        case .symbolicLink: return 2
-        case .blockDevice: return 3
-        case .characterDevice: return 4
-        case .fifo: return 5
-        case .socket: return 6
+        case .regular: return Byte(bitPattern: 0)
+        case .directory: return Byte(bitPattern: 1)
+        case .symbolicLink: return Byte(bitPattern: 2)
+        case .blockDevice: return Byte(bitPattern: 3)
+        case .characterDevice: return Byte(bitPattern: 4)
+        case .fifo: return Byte(bitPattern: 5)
+        case .socket: return Byte(bitPattern: 6)
         }
     }
 
     public init?(rawValue: Byte) {
-        switch rawValue {
+        switch rawValue.bitPattern {
         case 0: self = .regular
         case 1: self = .directory
         case 2: self = .symbolicLink

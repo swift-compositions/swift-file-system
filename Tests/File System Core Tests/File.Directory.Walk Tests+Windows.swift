@@ -38,13 +38,13 @@ import Testing
             try File.Directory.temporary { dir in
 
                 let filePath = dir.path / "file.txt"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let subPath = dir.path / "subdir"
                 try File.System.Create.Directory.create(at: subPath)
 
                 let nestedPath = subPath / "nested.txt"
-                try File.System.Write.Atomic.write([2], to: nestedPath)
+                try File.System.Write.Atomic.write(([2] as [UInt8]).map(Byte.init(bitPattern:)), to: nestedPath)
 
                 let entries = try dir.walk()
                 #expect(entries.count == 3)
@@ -62,7 +62,7 @@ import Testing
                 try File.System.Create.Directory.create(at: sub2Path)
 
                 let filePath = sub2Path / "deep.txt"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let options0 = File.Directory.Walk.Options(maxDepth: 0)
                 let entries0 = try dir.walk(options: options0)
@@ -79,10 +79,10 @@ import Testing
             try File.Directory.temporary { dir in
 
                 let visiblePath = dir.path / "visible.txt"
-                try File.System.Write.Atomic.write([1], to: visiblePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: visiblePath)
 
                 let hiddenPath = dir.path / ".hidden"
-                try File.System.Write.Atomic.write([2], to: hiddenPath)
+                try File.System.Write.Atomic.write(([2] as [UInt8]).map(Byte.init(bitPattern:)), to: hiddenPath)
 
                 let optionsNoHidden = File.Directory.Walk.Options(includeHidden: false)
                 let entriesNoHidden = try dir.walk(options: optionsNoHidden)
@@ -101,7 +101,7 @@ import Testing
                 try File.System.Create.Directory.create(at: subPath)
 
                 let filePath = subPath / "file.txt"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let entries = try dir.walk()
                 #expect(entries.count == 2)
@@ -113,7 +113,7 @@ import Testing
             try File.Directory.temporary { dir in
                 let spaceName = "file with spaces.txt"
                 let filePath = dir.path / "\(spaceName)"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let entries = try dir.walk()
                 #expect(entries.count == 1)
@@ -137,7 +137,7 @@ import Testing
                 }
 
                 let filePath = currentPath / "deep.txt"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let entries = try dir.walk()
                 #expect(entries.count == depth + 1)

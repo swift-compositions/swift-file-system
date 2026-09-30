@@ -19,13 +19,13 @@ extension File.System.Read.Full.Test.Unit {
 
     @Test
     func `Read small file`() throws {
-        let content: [Byte] = [72, 101, 108, 108, 111]
+        let content: [Byte] = ([72, 101, 108, 108, 111] as [UInt8]).map(Byte.init(bitPattern:))
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent == content)
         }
@@ -38,7 +38,7 @@ extension File.System.Read.Full.Test.Unit {
             try File.System.Write.Atomic.write([Byte]().span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent.isEmpty)
         }
@@ -49,7 +49,7 @@ extension File.System.Read.Full.Test.Unit {
         let text = "Hello, World!"
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            let bytes: [Byte] = Array(text.utf8).map(Byte.init)
+            let bytes: [Byte] = Array(text.utf8).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(bytes, to: filePath)
 
             let readString = try File.System.Read.Full.read(from: filePath) { span in
@@ -64,13 +64,13 @@ extension File.System.Read.Full.Test.Unit {
     @Test
     func `Read binary data`() throws {
 
-        let content: [Byte] = [0x00, 0x01, 0xFF, 0xFE, 0x7F, 0x80]
+        let content: [Byte] = ([0x00, 0x01, 0xFF, 0xFE, 0x7F, 0x80] as [UInt8]).map(Byte.init(bitPattern:))
         try File.Directory.temporary { dir in
             let filePath = dir.path / "binary.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent == content)
         }
@@ -79,13 +79,13 @@ extension File.System.Read.Full.Test.Unit {
     @Test
     func `Read larger file`() throws {
 
-        let content = [Byte](repeating: 0xAB, count: 64 * 1024)
+        let content = [Byte](repeating: Byte(bitPattern: 0xAB), count: 64 * 1024)
         try File.Directory.temporary { dir in
             let filePath = dir.path / "large.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent.count == 64 * 1024)
             #expect(readContent == content)
@@ -101,7 +101,7 @@ extension File.System.Read.Full.Test.Unit {
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent == content)
         }
@@ -114,7 +114,7 @@ extension File.System.Read.Full.Test.Unit {
 
             #expect(throws: Either<File.System.Read.Full.Error, Never>.self) {
                 try File.System.Read.Full.read(from: filePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
             }
         }
@@ -125,7 +125,7 @@ extension File.System.Read.Full.Test.Unit {
         try File.Directory.temporary { dir in
             #expect(throws: Either<File.System.Read.Full.Error, Never>.self) {
                 try File.System.Read.Full.read(from: dir.path) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
             }
         }
@@ -133,13 +133,13 @@ extension File.System.Read.Full.Test.Unit {
 
     @Test
     func `Async read file`() async throws {
-        let content: [Byte] = [1, 2, 3, 4, 5]
+        let content: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
         try File.Directory.temporary { dir in
             let filePath = dir.path / "async.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent == content)
         }
@@ -152,7 +152,7 @@ extension File.System.Read.Full.Test.Unit {
             try File.System.Write.Atomic.write([Byte]().span, to: filePath)
 
             let readContent = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readContent.isEmpty)
         }
@@ -162,7 +162,8 @@ extension File.System.Read.Full.Test.Unit {
     func `Throwing-body read returning nil preserves the Optional injection`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "throwing-body-nil.bin"
-            try File.System.Write.Atomic.write([Byte]([1, 2, 3]).span, to: filePath)
+            let payload = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(payload.span, to: filePath)
 
             let result: Int? = try File.System.Read.Full.read(from: filePath) {
                 (_: Swift.Span<Byte>) throws(Never) -> Int? in
@@ -178,7 +179,8 @@ extension File.System.Read.Full.Test.Unit {
 
         try File.Directory.temporary { dir in
             let filePath = dir.path / "throwing-body-throws.bin"
-            try File.System.Write.Atomic.write([Byte]([1, 2, 3]).span, to: filePath)
+            let payload = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(payload.span, to: filePath)
 
             do {
                 let _: Int = try File.System.Read.Full.read(from: filePath) {

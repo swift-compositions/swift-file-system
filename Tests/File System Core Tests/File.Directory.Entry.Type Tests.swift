@@ -16,22 +16,22 @@ struct `File.Directory.Entry.Kind Tests` {
 
         @Test
         func `rawValue for .file`() {
-            #expect(File.Directory.Entry.Kind.file.rawValue == 0)
+            #expect(File.Directory.Entry.Kind.file.rawValue.bitPattern == 0)
         }
 
         @Test
         func `rawValue for .directory`() {
-            #expect(File.Directory.Entry.Kind.directory.rawValue == 1)
+            #expect(File.Directory.Entry.Kind.directory.rawValue.bitPattern == 1)
         }
 
         @Test
         func `rawValue for .symbolicLink`() {
-            #expect(File.Directory.Entry.Kind.symbolicLink.rawValue == 2)
+            #expect(File.Directory.Entry.Kind.symbolicLink.rawValue.bitPattern == 2)
         }
 
         @Test
         func `rawValue for .other`() {
-            #expect(File.Directory.Entry.Kind.other.rawValue == 3)
+            #expect(File.Directory.Entry.Kind.other.rawValue.bitPattern == 3)
         }
 
         @Test
@@ -66,19 +66,19 @@ struct `File.Directory.Entry.Kind Tests` {
         func `Binary.Serializable - serialize produces correct byte`() {
             var buffer: [Byte] = []
             File.Directory.Entry.Kind.serialize(.file, into: &buffer)
-            #expect(buffer == [0])
+            #expect(buffer == ([0] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.Directory.Entry.Kind.serialize(.directory, into: &buffer)
-            #expect(buffer == [1])
+            #expect(buffer == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.Directory.Entry.Kind.serialize(.symbolicLink, into: &buffer)
-            #expect(buffer == [2])
+            #expect(buffer == ([2] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.Directory.Entry.Kind.serialize(.other, into: &buffer)
-            #expect(buffer == [3])
+            #expect(buffer == ([3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -86,12 +86,12 @@ struct `File.Directory.Entry.Kind Tests` {
     struct `EdgeCase` {
         @Test
         func `invalid rawValue returns nil`() {
-            #expect(File.Directory.Entry.Kind(rawValue: 255) == nil)
+            #expect(File.Directory.Entry.Kind(rawValue: Byte(bitPattern: 255)) == nil)
         }
 
         @Test
         func `boundary rawValue (just past valid)`() {
-            #expect(File.Directory.Entry.Kind(rawValue: 4) == nil)
+            #expect(File.Directory.Entry.Kind(rawValue: Byte(bitPattern: 4)) == nil)
         }
 
         @Test

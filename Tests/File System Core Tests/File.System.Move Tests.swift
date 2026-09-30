@@ -22,10 +22,12 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([10, 20, 30, 40].span, to: sourcePath)
+            let sourceBytes = ([10, 20, 30, 40] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
             let originalData = try File.System.Read.Full.read(from: sourcePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
 
             try File.System.Move.move(from: sourcePath, to: destPath)
@@ -33,7 +35,7 @@ extension File.System.Move.Test.Unit {
             #expect(File.System.Stat.exists(at: destPath))
 
             let destData = try File.System.Read.Full.read(from: destPath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(originalData == destData)
         }
@@ -45,7 +47,9 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
             try File.System.Move.move(from: sourcePath, to: destPath)
 
@@ -75,7 +79,9 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "renamed.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
             try File.System.Move.move(from: sourcePath, to: destPath)
 
@@ -90,16 +96,19 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99, 99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99, 99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             let options = File.System.Move.Options(overwrite: true)
             try File.System.Move.move(from: sourcePath, to: destPath, options: options)
 
             let destData = try File.System.Read.Full.read(from: destPath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(destData == [1, 2, 3])
+            #expect(destData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -109,8 +118,11 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99, 99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99, 99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             let options = File.System.Move.Options(overwrite: false)
             #expect(throws: File.System.Move.Error.self) {
@@ -149,8 +161,11 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             do throws(File.System.Move.Error) {
                 try File.System.Move.move(from: sourcePath, to: destPath)
@@ -183,8 +198,11 @@ extension File.System.Move.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             do throws(File.System.Move.Error) {
                 try File.System.Move.move(from: sourcePath, to: destPath)

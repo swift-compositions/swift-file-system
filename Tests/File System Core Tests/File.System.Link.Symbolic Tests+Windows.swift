@@ -17,7 +17,7 @@ import Testing
             }
             do {
 
-                try File.System.Write.Atomic.write([1, 2, 3], to: testFile)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: testFile)
                 try File.System.Link.Symbolic.create(at: testLink, pointingTo: testFile)
 
                 let info = try File.System.Stat.info(at: testLink, followSymlinks: false)
@@ -36,7 +36,7 @@ import Testing
                 }
 
                 let targetPath = dir.path / "target.txt"
-                try File.System.Write.Atomic.write([1, 2, 3], to: targetPath)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: targetPath)
 
                 let linkPath = dir.path / "link.txt"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -44,9 +44,9 @@ import Testing
                 #expect(File.System.Stat.exists(at: linkPath))
 
                 let data = try File.System.Read.Full.read(from: linkPath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(data == [1, 2, 3])
+                #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -61,7 +61,7 @@ import Testing
                 try File.System.Create.Directory.create(at: targetPath)
 
                 let filePath = targetPath / "file.txt"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let linkPath = dir.path / "link_dir"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -70,9 +70,9 @@ import Testing
 
                 let linkedFilePath = linkPath / "file.txt"
                 let data = try File.System.Read.Full.read(from: linkedFilePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(data == [1])
+                #expect(data == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -84,7 +84,7 @@ import Testing
                 }
 
                 let targetPath = dir.path / "target.txt"
-                try File.System.Write.Atomic.write([1, 2, 3], to: targetPath)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: targetPath)
 
                 let linkPath = dir.path / "link.txt"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -103,7 +103,7 @@ import Testing
                 }
 
                 let targetPath = dir.path / "target.txt"
-                try File.System.Write.Atomic.write([1, 2, 3, 4, 5], to: targetPath)
+                try File.System.Write.Atomic.write(([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)), to: targetPath)
 
                 let linkPath = dir.path / "link.txt"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -122,7 +122,7 @@ import Testing
                 }
 
                 let targetPath = dir.path / "target.txt"
-                try File.System.Write.Atomic.write([1, 2, 3, 4, 5], to: targetPath)
+                try File.System.Write.Atomic.write(([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)), to: targetPath)
 
                 let linkPath = dir.path / "link.txt"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -136,7 +136,7 @@ import Testing
         func `Read target of non-symlink fails`() throws {
             try File.Directory.temporary { dir in
                 let filePath = dir.path / "regular.txt"
-                try File.System.Write.Atomic.write([1], to: filePath)
+                try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 do throws(File.System.Link.Read.Target.Error) {
                     _ = try File.System.Link.Read.Target.target(of: filePath)

@@ -20,7 +20,7 @@ extension File.System.Delete.Test.Unit {
     func `Delete existing file`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             try File.System.Delete.delete(at: filePath)
 
@@ -56,7 +56,7 @@ extension File.System.Delete.Test.Unit {
         try File.Directory.temporary { dir in
             let subdir = dir.path / "subdir"
             try File.System.Create.Directory.create(at: subdir)
-            try File.System.Write.Atomic.write(Array("content".utf8), to: subdir / "file.txt")
+            try File.System.Write.Atomic.write([Byte](utf8: "content"), to: subdir / "file.txt")
 
             #expect(throws: File.System.Delete.Error.self) {
                 try File.System.Delete.delete(at: subdir)
@@ -73,11 +73,11 @@ extension File.System.Delete.Test.Unit {
             let nested = dir.path / "a" / "b" / "c"
             try File.System.Create.Directory.create(at: nested, createIntermediates: true)
             try File.System.Write.Atomic.write(
-                Array("file1".utf8),
+                [Byte](utf8: "file1"),
                 to: dir.path / "a" / "file1.txt"
             )
             try File.System.Write.Atomic.write(
-                Array("file2".utf8),
+                [Byte](utf8: "file2"),
                 to: dir.path / "a" / "b" / "file2.txt"
             )
 
@@ -97,7 +97,7 @@ extension File.System.Delete.Test.Unit {
     func `Delete file variant`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "variant.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             try File.System.Delete.delete(at: filePath)
 
@@ -111,7 +111,7 @@ extension File.System.Delete.Test.Unit {
             let nested = dir.path / "nested" / "deep"
             try File.System.Create.Directory.create(at: nested, createIntermediates: true)
             try File.System.Write.Atomic.write(
-                Array("content".utf8),
+                [Byte](utf8: "content"),
                 to: dir.path / "nested" / "file.txt"
             )
 
@@ -142,7 +142,7 @@ extension File.System.Delete.Test.Unit {
         try File.Directory.temporary { dir in
             let subdir = dir.path / "nonempty"
             try File.System.Create.Directory.create(at: subdir)
-            try File.System.Write.Atomic.write(Array("content".utf8), to: subdir / "file.txt")
+            try File.System.Write.Atomic.write([Byte](utf8: "content"), to: subdir / "file.txt")
 
             do throws(File.System.Delete.Error) {
                 try File.System.Delete.delete(at: subdir)
@@ -179,7 +179,7 @@ extension File.System.Delete.Test.`Edge Case` {
                 try File.System.Create.Directory.create(at: targetDir)
                 let targetFile = targetDir / "keep-me.txt"
                 try File.System.Write.Atomic.write(
-                    Array("preserved".utf8).map(Byte.init),
+                    [Byte](utf8: "preserved"),
                     to: targetFile
                 )
 
@@ -202,7 +202,7 @@ extension File.System.Delete.Test.`Edge Case` {
                 try File.System.Create.Directory.create(at: targetDir)
                 let targetFile = targetDir / "keep-me.txt"
                 try File.System.Write.Atomic.write(
-                    Array("preserved".utf8).map(Byte.init),
+                    [Byte](utf8: "preserved"),
                     to: targetFile
                 )
 
@@ -237,14 +237,14 @@ extension File.System.Delete.Test.`Edge Case` {
                 try File.System.Create.Directory.create(at: targetDir)
                 let targetFile = targetDir / "keep-me.txt"
                 try File.System.Write.Atomic.write(
-                    Array("preserved".utf8).map(Byte.init),
+                    [Byte](utf8: "preserved"),
                     to: targetFile
                 )
 
                 let tree = dir.path / "tree"
                 try File.System.Create.Directory.create(at: tree)
                 try File.System.Write.Atomic.write(
-                    Array("data".utf8).map(Byte.init),
+                    [Byte](utf8: "data"),
                     to: tree / "file.txt"
                 )
 

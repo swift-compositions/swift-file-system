@@ -24,17 +24,19 @@ extension File.System.Link.Hard {
                 let existingPath = dir.path / "source.bin"
                 let linkPath = dir.path / "link.bin"
 
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: existingPath)
+                let existingBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                try File.System.Write.Atomic.write(existingBytes.span, to: existingPath)
 
                 try File.System.Link.Hard.create(at: linkPath, to: existingPath)
 
                 #expect(File.System.Stat.exists(at: linkPath))
 
                 let existingData = try File.System.Read.Full.read(from: existingPath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 let linkData = try File.System.Read.Full.read(from: linkPath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 #expect(existingData == linkData)
             }
@@ -46,7 +48,9 @@ extension File.System.Link.Hard {
                 let existingPath = dir.path / "source.bin"
                 let linkPath = dir.path / "link.bin"
 
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: existingPath)
+                let existingBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                try File.System.Write.Atomic.write(existingBytes.span, to: existingPath)
 
                 try File.System.Link.Hard.create(at: linkPath, to: existingPath)
 
@@ -63,18 +67,21 @@ extension File.System.Link.Hard {
                 let existingPath = dir.path / "source.bin"
                 let linkPath = dir.path / "link.bin"
 
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: existingPath)
+                let existingBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                try File.System.Write.Atomic.write(existingBytes.span, to: existingPath)
 
                 try File.System.Link.Hard.create(at: linkPath, to: existingPath)
 
                 var handle = try File.Handle.open(linkPath, mode: .write, options: [.truncate])
-                try handle.write([10, 20, 30].span)
+                let contents = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
+                try handle.write(contents.span)
                 try handle.close()
 
                 let originalData = try File.System.Read.Full.read(from: existingPath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(originalData == [10, 20, 30])
+                #expect(originalData == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -84,7 +91,9 @@ extension File.System.Link.Hard {
                 let existingPath = dir.path / "source.bin"
                 let linkPath = dir.path / "link.bin"
 
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: existingPath)
+                let existingBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                try File.System.Write.Atomic.write(existingBytes.span, to: existingPath)
 
                 try File.System.Link.Hard.create(at: linkPath, to: existingPath)
 
@@ -92,9 +101,9 @@ extension File.System.Link.Hard {
 
                 #expect(File.System.Stat.exists(at: linkPath))
                 let data = try File.System.Read.Full.read(from: linkPath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(data == [1, 2, 3])
+                #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -119,8 +128,11 @@ extension File.System.Link.Hard {
                 let existingPath = dir.path / "source.bin"
                 let linkPath = dir.path / "link.bin"
 
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: existingPath)
-                try File.System.Write.Atomic.write([4, 5, 6].span, to: linkPath)
+                let existingBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                try File.System.Write.Atomic.write(existingBytes.span, to: existingPath)
+                let linkBytes = ([4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(linkBytes.span, to: linkPath)
 
                 do throws(File.System.Link.Hard.Error) {
                     try File.System.Link.Hard.create(at: linkPath, to: existingPath)

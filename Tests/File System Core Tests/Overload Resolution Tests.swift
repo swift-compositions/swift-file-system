@@ -130,7 +130,7 @@ extension `Overload Resolution`.`Non Throwing Closure` {
     func `Read full infers Never`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "payload.bin"
-            let content: [Byte] = [1, 2, 3, 4, 5]
+            let content: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(content.span, to: path)
 
             #expect(try byteCount(at: path) == content.count)
@@ -171,7 +171,8 @@ extension `Overload Resolution`.`Throwing Closure` {
     func `Read full propagates the closure error`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "payload.bin"
-            try File.System.Write.Atomic.write([Byte]([1, 2, 3]).span, to: path)
+            let payload = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(payload.span, to: path)
 
             do throws(Either<File.System.Read.Full.Error, Sentinel>) {
                 _ = try readThrowing(at: path)

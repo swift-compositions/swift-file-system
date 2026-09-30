@@ -39,7 +39,7 @@ extension File.System.Write {
             } catch {
                 throw .random("CSPRNG syscall failed: \(error)")
             }
-            return unsafe hexEncode(Array(buffer).map(Byte.init))
+            return unsafe hexEncode(Array(buffer).map(Byte.init(bitPattern:)))
         }
     }
 

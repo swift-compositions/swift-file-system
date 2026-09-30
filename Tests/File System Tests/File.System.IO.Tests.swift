@@ -16,7 +16,7 @@ struct `File.System.IO — smoke tests` {
         let executor = Kernel.Thread.Executor()
         defer { executor.shutdown() }
 
-        let io: IO.Kernel<File.System.IO.Capabilities> = .blocking(on: executor)
+        let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
 
         let pathString = Kernel.Temporary.filePath(prefix: "fs-io-test")
         let path = try File.Path(pathString)
@@ -44,7 +44,7 @@ struct `File.System.IO — smoke tests` {
     func `default() chain returns a working IO on the host`() async throws {
         let executor = Kernel.Thread.Executor()
         defer { executor.shutdown() }
-        let io: IO.Kernel<File.System.IO.Capabilities> = .default(on: executor)
+        let io: IO<File.System.IO.Capabilities> = .default(on: executor)
 
         let pathString = Kernel.Temporary.filePath(prefix: "fs-io-default")
         let path = try File.Path(pathString)
@@ -72,7 +72,7 @@ struct `File.System.IO — smoke tests` {
         let executor = Kernel.Thread.Executor()
         defer { executor.shutdown() }
 
-        let io: IO.Kernel<File.System.IO.Capabilities> = .blocking(on: executor)
+        let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
 
         let pathString = Kernel.Temporary.filePath(prefix: "fs-io-rw")
         let path = try File.Path(pathString)
@@ -90,7 +90,7 @@ struct `File.System.IO — smoke tests` {
             )
         }
 
-        let payload: [Byte] = [0xDE, 0xAD, 0xBE, 0xEF]
+        let payload: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
         let writePtr = unsafe UnsafeMutableRawBufferPointer.allocate(
             byteCount: payload.count,
             alignment: 1

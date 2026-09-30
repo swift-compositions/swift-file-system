@@ -36,7 +36,7 @@ extension `File Read Overload Resolution` {
     func `Non-throwing closure infers Never`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "payload.bin"
-            let content: [Byte] = [1, 2, 3, 4, 5]
+            let content: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(content.span, to: path)
 
             #expect(try byteCount(of: File(path)) == content.count)
@@ -47,7 +47,8 @@ extension `File Read Overload Resolution` {
     func `Throwing closure propagates the closure error`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "payload.bin"
-            try File.System.Write.Atomic.write([Byte]([1, 2, 3]).span, to: path)
+            let payload = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(payload.span, to: path)
 
             do throws(Either<File.System.Read.Full.Error, Sentinel>) {
                 _ = try readThrowing(of: File(path))
@@ -73,7 +74,7 @@ extension `File Read Overload Resolution` {
     func `Async non-throwing closure infers Never`() async throws {
         try await File.Directory.temporary { dir in
             let path = dir.path / "payload.bin"
-            let content: [Byte] = [7, 8, 9]
+            let content: [Byte] = ([7, 8, 9] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(content.span, to: path)
 
             let count = try await byteCountAsync(of: File(path))

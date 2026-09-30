@@ -22,7 +22,8 @@ extension File.System.Link.Read.Target.Test.Unit {
         func `Read target of symlink to file`() throws {
             try File.Directory.temporary { dir in
                 let targetPath = dir.path / "target.bin"
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: targetPath)
+                let targetBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                 let linkPath = dir.path / "link"
                 try File.System.Link.Symbolic.create(
@@ -90,7 +91,8 @@ extension File.System.Link.Read.Target.Test.Unit {
     func `Read target of regular file throws error with isNotASymlink`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "file.bin"
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: filePath)
+            let fileBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
             do throws(File.System.Link.Read.Target.Error) {
                 _ = try File.System.Link.Read.Target.target(of: filePath)

@@ -4,7 +4,7 @@ import Testing
 
 @testable import File_System_Core
 
-#if canImport(Foundation)
+#if os(Linux) && canImport(Foundation)
     import Foundation
 #endif
 
@@ -26,17 +26,19 @@ extension File.System.Copy.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([10, 20, 30, 40].span, to: sourcePath)
+            let sourceBytes = ([10, 20, 30, 40] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
             try File.System.Copy.copy(from: sourcePath, to: destPath)
 
             #expect(File.System.Stat.exists(at: destPath))
 
             let sourceData = try File.System.Read.Full.read(from: sourcePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             let destData = try File.System.Read.Full.read(from: destPath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(sourceData == destData)
         }
@@ -48,7 +50,9 @@ extension File.System.Copy.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
             try File.System.Copy.copy(from: sourcePath, to: destPath)
 
@@ -78,16 +82,19 @@ extension File.System.Copy.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99, 99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99, 99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             let options = File.System.Copy.Options(overwrite: true)
             try File.System.Copy.copy(from: sourcePath, to: destPath, options: options)
 
             let destData = try File.System.Read.Full.read(from: destPath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(destData == [1, 2, 3])
+            #expect(destData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -97,8 +104,11 @@ extension File.System.Copy.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99, 99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99, 99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             let options = File.System.Copy.Options(overwrite: false)
             #expect(throws: File.System.Copy.Error.self) {
@@ -145,8 +155,11 @@ extension File.System.Copy.Test.Unit {
             let sourcePath = dir.path / "source.bin"
             let destPath = dir.path / "dest.bin"
 
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-            try File.System.Write.Atomic.write([99].span, to: destPath)
+            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+            let destBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(destBytes.span, to: destPath)
 
             #expect(throws: File.System.Copy.Error.destinationExists) {
                 try File.System.Copy.copy(from: sourcePath, to: destPath)
@@ -232,17 +245,19 @@ extension File.System.Copy.Test.Unit {
             @Suite
             struct `EdgeCase` {
 
+                private func bytes(_ values: UInt8...) -> [Byte] {
+                    values.map(Byte.init(bitPattern:))
+                }
+
                 @Test
                 func `Overwrite when destination is directory fails appropriately`() throws {
                     try File.Directory.temporary { dir in
                         let sourcePath = dir.path / "source.bin"
                         let destDir = dir.path / "dest-dir"
 
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
-                        try FileManager.default.createDirectory(
-                            atPath: Swift.String(destDir),
-                            withIntermediateDirectories: false
-                        )
+                        let source = bytes(1, 2, 3)
+                        try File.System.Write.Atomic.write(source.span, to: sourcePath)
+                        try CopyFixture.createDirectory(Swift.String(destDir))
 
                         let options = File.System.Copy.Options(overwrite: true)
 
@@ -254,7 +269,7 @@ extension File.System.Copy.Test.Unit {
                             )
                         }
 
-                        #expect(FileManager.default.fileExists(atPath: Swift.String(destDir)))
+                        #expect(CopyFixture.exists(Swift.String(destDir)))
                     }
                 }
 
@@ -265,13 +280,12 @@ extension File.System.Copy.Test.Unit {
                         let targetPath = dir.path / "target.bin"
                         let symlinkPath = dir.path / "symlink.link"
 
-                        try File.System.Write.Atomic.write([10, 20, 30].span, to: sourcePath)
-                        try File.System.Write.Atomic.write([99].span, to: targetPath)
+                        let source = bytes(10, 20, 30)
+                        let target = bytes(99)
+                        try File.System.Write.Atomic.write(source.span, to: sourcePath)
+                        try File.System.Write.Atomic.write(target.span, to: targetPath)
 
-                        try FileManager.default.createSymbolicLink(
-                            atPath: Swift.String(symlinkPath),
-                            withDestinationPath: Swift.String(targetPath)
-                        )
+                        try CopyFixture.link(Swift.String(symlinkPath), to: Swift.String(targetPath))
 
                         let options = File.System.Copy.Options(overwrite: true)
                         try File.System.Copy.copy(
@@ -280,21 +294,8 @@ extension File.System.Copy.Test.Unit {
                             options: options
                         )
 
-                        var isSymlink: ObjCBool = false
-                        FileManager.default.fileExists(
-                            atPath: Swift.String(symlinkPath),
-                            isDirectory: &isSymlink
-                        )
-
-                        let destData = try Data(
-                            contentsOf: URL(fileURLWithPath: Swift.String(symlinkPath))
-                        )
-                        #expect(destData == Data([10, 20, 30]))
-
-                        let targetData = try Data(
-                            contentsOf: URL(fileURLWithPath: Swift.String(targetPath))
-                        )
-                        #expect(targetData == Data([99]))
+                        #expect(try CopyFixture.contents(Swift.String(symlinkPath)) == [10, 20, 30])
+                        #expect(try CopyFixture.contents(Swift.String(targetPath)) == [99])
                     }
                 }
 
@@ -305,25 +306,16 @@ extension File.System.Copy.Test.Unit {
                         let symlinkPath = dir.path / "source-symlink.link"
                         let destPath = dir.path / "dest-symlink.link"
 
-                        try File.System.Write.Atomic.write([99, 88, 77].span, to: targetPath)
+                        let target = bytes(99, 88, 77)
+                        try File.System.Write.Atomic.write(target.span, to: targetPath)
 
-                        try FileManager.default.createSymbolicLink(
-                            atPath: Swift.String(symlinkPath),
-                            withDestinationPath: Swift.String(targetPath)
-                        )
+                        try CopyFixture.link(Swift.String(symlinkPath), to: Swift.String(targetPath))
 
                         let options = File.System.Copy.Options(followSymlinks: false)
                         try File.System.Copy.copy(from: symlinkPath, to: destPath, options: options)
 
-                        let destAttributes = try FileManager.default.attributesOfItem(
-                            atPath: Swift.String(destPath)
-                        )
-                        #expect(destAttributes[.type] as? FileAttributeType == .typeSymbolicLink)
-
-                        let destTarget = try FileManager.default.destinationOfSymbolicLink(
-                            atPath: Swift.String(destPath)
-                        )
-                        #expect(destTarget == Swift.String(targetPath))
+                        #expect(try CopyFixture.isSymbolicLink(Swift.String(destPath)))
+                        #expect(try CopyFixture.destination(Swift.String(destPath)) == Swift.String(targetPath))
                     }
                 }
 
@@ -333,35 +325,26 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([1, 2, 3, 4, 5].span, to: sourcePath)
+                        let source = bytes(1, 2, 3, 4, 5)
+                        try File.System.Write.Atomic.write(source.span, to: sourcePath)
 
-                        let testDate = Date(timeIntervalSince1970: 1_000_000_000)
-                        try FileManager.default.setAttributes(
-                            [.posixPermissions: 0o644, .modificationDate: testDate],
-                            ofItemAtPath: Swift.String(sourcePath)
-                        )
+                        try CopyFixture.setPermissions(0o644, Swift.String(sourcePath))
+                        try CopyFixture.setModification(1_000_000_000, Swift.String(sourcePath))
 
                         let options = File.System.Copy.Options(copyAttributes: true)
                         try File.System.Copy.copy(from: sourcePath, to: destPath, options: options)
 
-                        let sourceAttrs = try FileManager.default.attributesOfItem(
-                            atPath: Swift.String(sourcePath)
-                        )
-                        let destAttrs = try FileManager.default.attributesOfItem(
-                            atPath: Swift.String(destPath)
-                        )
-
                         #expect(
-                            sourceAttrs[.posixPermissions] as? Int == destAttrs[.posixPermissions]
-                                as? Int
+                            try CopyFixture.permissions(Swift.String(sourcePath))
+                                == CopyFixture.permissions(Swift.String(destPath))
                         )
 
-                        let sourceDate = sourceAttrs[.modificationDate] as? Date
-                        let destDate = destAttrs[.modificationDate] as? Date
+                        let sourceDate = try CopyFixture.modification(Swift.String(sourcePath))
+                        let destDate = try CopyFixture.modification(Swift.String(destPath))
                         #expect(sourceDate != nil)
                         #expect(destDate != nil)
                         if let sd = sourceDate, let dd = destDate {
-                            #expect(abs(sd.timeIntervalSince(dd)) < 1.0)
+                            #expect(abs(sd - dd) < 1.0)
                         }
                     }
                 }
@@ -372,34 +355,18 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([10, 20, 30, 40].span, to: sourcePath)
+                        let source = bytes(10, 20, 30, 40)
+                        try File.System.Write.Atomic.write(source.span, to: sourcePath)
 
-                        try FileManager.default.setAttributes(
-                            [.posixPermissions: 0o600],
-                            ofItemAtPath: Swift.String(sourcePath)
-                        )
+                        try CopyFixture.setPermissions(0o600, Swift.String(sourcePath))
 
                         let options = File.System.Copy.Options(copyAttributes: false)
                         try File.System.Copy.copy(from: sourcePath, to: destPath, options: options)
 
-                        let destData = try Data(
-                            contentsOf: URL(fileURLWithPath: Swift.String(destPath))
-                        )
-                        #expect(destData == Data([10, 20, 30, 40]))
+                        #expect(try CopyFixture.contents(Swift.String(destPath)) == [10, 20, 30, 40])
 
-                        let sourceAttrs = try FileManager.default.attributesOfItem(
-                            atPath: Swift.String(sourcePath)
-                        )
-                        let destAttrs = try FileManager.default.attributesOfItem(
-                            atPath: Swift.String(destPath)
-                        )
-
-                        let sourcePerms = sourceAttrs[.posixPermissions] as? Int
-                        let destPerms = destAttrs[.posixPermissions] as? Int
-
-                        #expect(sourcePerms == 0o600)
-
-                        #expect(destPerms != nil)
+                        #expect(try CopyFixture.permissions(Swift.String(sourcePath)) == 0o600)
+                        #expect(try CopyFixture.permissions(Swift.String(destPath)) != nil)
                     }
                 }
 
@@ -411,7 +378,7 @@ extension File.System.Copy.Test.Unit {
                         var largeContent = [Byte]()
                         largeContent.reserveCapacity(largeSize)
                         for i in 0..<largeSize {
-                            largeContent.append(Byte(UInt8(i % 256)))
+                            largeContent.append(Byte(bitPattern: UInt8(i % 256)))
                         }
 
                         let sourcePath = dir.path / "large-source.bin"
@@ -419,17 +386,14 @@ extension File.System.Copy.Test.Unit {
 
                         try File.System.Write.Atomic.write(largeContent.span, to: sourcePath)
 
-                        let startTime = Date()
+                        let startTime = CopyFixture.now()
                         try File.System.Copy.copy(from: sourcePath, to: destPath)
-                        let elapsed = Date().timeIntervalSince(startTime)
+                        let elapsed = CopyFixture.now() - startTime
 
-                        let sourceData = try Data(
-                            contentsOf: URL(fileURLWithPath: Swift.String(sourcePath))
+                        #expect(
+                            try CopyFixture.contents(Swift.String(sourcePath))
+                                == CopyFixture.contents(Swift.String(destPath))
                         )
-                        let destData = try Data(
-                            contentsOf: URL(fileURLWithPath: Swift.String(destPath))
-                        )
-                        #expect(sourceData == destData)
 
                         #expect(
                             elapsed < 0.5,
@@ -562,7 +526,9 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destDirPath = dir.path / "dest-dir"
 
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+                        let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
                         try FileManager.default.createDirectory(
                             atPath: Swift.String(destDirPath),
@@ -603,7 +569,9 @@ extension File.System.Copy.Test.Unit {
                         let linkPath = dir.path / "link.link"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([10, 20, 30].span, to: targetPath)
+                        let targetBytes = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                         try FileManager.default.createSymbolicLink(
                             atPath: Swift.String(linkPath),
@@ -619,7 +587,7 @@ extension File.System.Copy.Test.Unit {
                         let destData = try Data(
                             contentsOf: URL(fileURLWithPath: Swift.String(destPath))
                         )
-                        #expect(Array(destData) == [10, 20, 30])
+                        #expect(Array(destData) == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
 
                         let destAttrs = try FileManager.default.attributesOfItem(
                             atPath: Swift.String(destPath)
@@ -635,7 +603,9 @@ extension File.System.Copy.Test.Unit {
                         let linkPath = dir.path / "link.link"
                         let destPath = dir.path / "dest.link"
 
-                        try File.System.Write.Atomic.write([10, 20, 30].span, to: targetPath)
+                        let targetBytes = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                         try FileManager.default.createSymbolicLink(
                             atPath: Swift.String(linkPath),
@@ -662,8 +632,11 @@ extension File.System.Copy.Test.Unit {
                         let targetPath = dir.path / "target.bin"
                         let linkPath = dir.path / "link.link"
 
-                        try File.System.Write.Atomic.write([100, 200].span, to: sourcePath)
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: targetPath)
+                        let sourceBytes = ([100, 200] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+                        let targetBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                        try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                         try FileManager.default.createSymbolicLink(
                             atPath: Swift.String(linkPath),
@@ -679,7 +652,7 @@ extension File.System.Copy.Test.Unit {
                         let destData = try Data(
                             contentsOf: URL(fileURLWithPath: Swift.String(linkPath))
                         )
-                        #expect(Array(destData) == [100, 200])
+                        #expect(Array(destData) == ([100, 200] as [UInt8]).map(Byte.init(bitPattern:)))
 
                         let destAttrs = try FileManager.default.attributesOfItem(
                             atPath: Swift.String(linkPath)
@@ -719,7 +692,9 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+                        let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
                         try FileManager.default.setAttributes(
                             [.posixPermissions: 0o600],
@@ -754,7 +729,9 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+                        let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
                         let oldDate = Date(timeIntervalSince1970: 1_000_000_000)
                         try FileManager.default.setAttributes(
@@ -794,7 +771,9 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+                        let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
                         try FileManager.default.setAttributes(
                             [.posixPermissions: 0o755],
@@ -828,7 +807,9 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([1, 2, 3].span, to: sourcePath)
+                        let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
                         let oldDate = Date(timeIntervalSince1970: 1_000_000_000)
                         try FileManager.default.setAttributes(
@@ -865,7 +846,9 @@ extension File.System.Copy.Test.Unit {
                         let sourcePath = dir.path / "source.bin"
                         let destPath = dir.path / "dest.bin"
 
-                        try File.System.Write.Atomic.write([1, 2, 3, 4, 5].span, to: sourcePath)
+                        let sourceBytes = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
+
+                        try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
 
                         try File.System.Copy.copy(from: sourcePath, to: destPath)
 

@@ -39,12 +39,12 @@ import Testing
             try File.Directory.temporary { dir in
                 let filePath = dir.path / "crlf.txt"
 
-                let content: [Byte] = Array("Hello\r\nWorld\r\n".utf8).map(Byte.init)
+                let content: [Byte] = [Byte](utf8: "Hello\r\nWorld\r\n")
 
                 try File.System.Write.Atomic.write(content, to: filePath)
 
                 let readBack = try File.System.Read.Full.read(from: filePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 #expect(readBack == content)
             }
@@ -57,13 +57,13 @@ import Testing
                 let longName = Swift.String(repeating: "a", count: 100) + ".txt"
                 let filePath = dir.path / "\(longName)"
 
-                try File.System.Write.Atomic.write([1, 2, 3], to: filePath)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
                 #expect(File.System.Stat.exists(at: filePath))
 
                 let readBack = try File.System.Read.Full.read(from: filePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(readBack == [1, 2, 3])
+                #expect(readBack == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -72,13 +72,13 @@ import Testing
             try File.Directory.temporary { dir in
                 let filePath = dir.path / "file with spaces.txt"
 
-                try File.System.Write.Atomic.write([1, 2, 3], to: filePath)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
                 #expect(File.System.Stat.exists(at: filePath))
 
                 let readBack = try File.System.Read.Full.read(from: filePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(readBack == [1, 2, 3])
+                #expect(readBack == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -86,7 +86,7 @@ import Testing
         func `File stat returns valid info on Windows`() throws {
             try File.Directory.temporary { dir in
                 let filePath = dir.path / "test.txt"
-                let testData: [Byte] = [1, 2, 3, 4, 5]
+                let testData: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
                 try File.System.Write.Atomic.write(testData, to: filePath)
 
                 let info = try File.System.Stat.info(at: filePath)
@@ -113,7 +113,7 @@ import Testing
         func `File deletion works on Windows`() throws {
             try File.Directory.temporary { dir in
                 let filePath = dir.path / "deleteme.txt"
-                try File.System.Write.Atomic.write([1, 2, 3], to: filePath)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 #expect(File.System.Stat.exists(at: filePath))
 

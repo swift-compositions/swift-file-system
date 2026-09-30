@@ -19,37 +19,37 @@ struct `File.System.Metadata.Kind Tests` {
 
         @Test
         func `rawValue for .regular`() {
-            #expect(File.System.Metadata.Kind.regular.rawValue == 0)
+            #expect(File.System.Metadata.Kind.regular.rawValue.bitPattern == 0)
         }
 
         @Test
         func `rawValue for .directory`() {
-            #expect(File.System.Metadata.Kind.directory.rawValue == 1)
+            #expect(File.System.Metadata.Kind.directory.rawValue.bitPattern == 1)
         }
 
         @Test
         func `rawValue for .symbolicLink`() {
-            #expect(File.System.Metadata.Kind.symbolicLink.rawValue == 2)
+            #expect(File.System.Metadata.Kind.symbolicLink.rawValue.bitPattern == 2)
         }
 
         @Test
         func `rawValue for .blockDevice`() {
-            #expect(File.System.Metadata.Kind.blockDevice.rawValue == 3)
+            #expect(File.System.Metadata.Kind.blockDevice.rawValue.bitPattern == 3)
         }
 
         @Test
         func `rawValue for .characterDevice`() {
-            #expect(File.System.Metadata.Kind.characterDevice.rawValue == 4)
+            #expect(File.System.Metadata.Kind.characterDevice.rawValue.bitPattern == 4)
         }
 
         @Test
         func `rawValue for .fifo`() {
-            #expect(File.System.Metadata.Kind.fifo.rawValue == 5)
+            #expect(File.System.Metadata.Kind.fifo.rawValue.bitPattern == 5)
         }
 
         @Test
         func `rawValue for .socket`() {
-            #expect(File.System.Metadata.Kind.socket.rawValue == 6)
+            #expect(File.System.Metadata.Kind.socket.rawValue.bitPattern == 6)
         }
 
         @Test
@@ -68,31 +68,31 @@ struct `File.System.Metadata.Kind Tests` {
         func `Binary.Serializable - serialize produces correct bytes`() {
             var buffer: [Byte] = []
             File.System.Metadata.Kind.serialize(.regular, into: &buffer)
-            #expect(buffer == [0])
+            #expect(buffer == ([0] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.System.Metadata.Kind.serialize(.directory, into: &buffer)
-            #expect(buffer == [1])
+            #expect(buffer == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.System.Metadata.Kind.serialize(.symbolicLink, into: &buffer)
-            #expect(buffer == [2])
+            #expect(buffer == ([2] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.System.Metadata.Kind.serialize(.blockDevice, into: &buffer)
-            #expect(buffer == [3])
+            #expect(buffer == ([3] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.System.Metadata.Kind.serialize(.characterDevice, into: &buffer)
-            #expect(buffer == [4])
+            #expect(buffer == ([4] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.System.Metadata.Kind.serialize(.fifo, into: &buffer)
-            #expect(buffer == [5])
+            #expect(buffer == ([5] as [UInt8]).map(Byte.init(bitPattern:)))
 
             buffer = []
             File.System.Metadata.Kind.serialize(.socket, into: &buffer)
-            #expect(buffer == [6])
+            #expect(buffer == ([6] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -100,12 +100,12 @@ struct `File.System.Metadata.Kind Tests` {
     struct `EdgeCase` {
         @Test
         func `invalid rawValue returns nil`() {
-            #expect(File.System.Metadata.Kind(rawValue: 255) == nil)
+            #expect(File.System.Metadata.Kind(rawValue: Byte(bitPattern: 255)) == nil)
         }
 
         @Test
         func `boundary rawValue (just past valid)`() {
-            #expect(File.System.Metadata.Kind(rawValue: 7) == nil)
+            #expect(File.System.Metadata.Kind(rawValue: Byte(bitPattern: 7)) == nil)
         }
 
         @Test

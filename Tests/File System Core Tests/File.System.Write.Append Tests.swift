@@ -20,15 +20,15 @@ extension File.System.Write.Append.Test.Unit {
     func `Append to existing file`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "test.bin"
-            try File.System.Write.Atomic.write([1, 2, 3], to: path)
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: path)
 
-            let appendData: [Byte] = [4, 5, 6]
+            let appendData: [Byte] = ([4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Append.append(appendData.span, to: path)
 
             let data = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(data == [1, 2, 3, 4, 5, 6])
+            #expect(data == ([1, 2, 3, 4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -37,15 +37,15 @@ extension File.System.Write.Append.Test.Unit {
         try File.Directory.temporary { dir in
             let path = dir.path / "new.bin"
 
-            let appendData: [Byte] = [10, 20, 30]
+            let appendData: [Byte] = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Append.append(appendData.span, to: path)
 
             #expect(File.System.Stat.exists(at: path))
 
             let data = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(data == [10, 20, 30])
+            #expect(data == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -53,15 +53,15 @@ extension File.System.Write.Append.Test.Unit {
     func `Append empty data`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "test.bin"
-            try File.System.Write.Atomic.write([1, 2, 3], to: path)
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: path)
 
             let emptyData: [Byte] = []
             try File.System.Write.Append.append(emptyData.span, to: path)
 
             let data = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(data == [1, 2, 3])
+            #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -72,17 +72,17 @@ extension File.System.Write.Append.Test.Unit {
             let empty: [Byte] = []
             try File.System.Write.Atomic.write(empty, to: path)
 
-            let data1: [Byte] = [1, 2]
-            let data2: [Byte] = [3, 4]
-            let data3: [Byte] = [5, 6]
+            let data1: [Byte] = ([1, 2] as [UInt8]).map(Byte.init(bitPattern:))
+            let data2: [Byte] = ([3, 4] as [UInt8]).map(Byte.init(bitPattern:))
+            let data3: [Byte] = ([5, 6] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Append.append(data1.span, to: path)
             try File.System.Write.Append.append(data2.span, to: path)
             try File.System.Write.Append.append(data3.span, to: path)
 
             let data = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(data == [1, 2, 3, 4, 5, 6])
+            #expect(data == ([1, 2, 3, 4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -93,13 +93,13 @@ extension File.System.Write.Append.Test.Unit {
             let empty: [Byte] = []
             try File.System.Write.Atomic.write(empty, to: path)
 
-            let appendData: [Byte] = [1, 2, 3]
+            let appendData: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Append.append(appendData.span, to: path)
 
             let data = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(data == [1, 2, 3])
+            #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -110,11 +110,11 @@ extension File.System.Write.Append.Test.Unit {
             let empty: [Byte] = []
             try File.System.Write.Atomic.write(empty, to: path)
 
-            let largeData = [Byte](repeating: 42, count: 100_000)
+            let largeData = [Byte](repeating: Byte(bitPattern: 42), count: 100_000)
             try File.System.Write.Append.append(largeData.span, to: path)
 
             let data = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(data.count == 100_000)
         }
@@ -126,7 +126,7 @@ extension File.System.Write.Append.Test.Unit {
             let path = dir.path
 
             #expect(throws: File.System.Write.Append.Error.self) {
-                let bytes: [Byte] = [1, 2, 3]
+                let bytes: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
                 try File.System.Write.Append.append(bytes.span, to: path)
             }
         }

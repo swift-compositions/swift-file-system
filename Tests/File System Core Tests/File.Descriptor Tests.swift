@@ -21,7 +21,8 @@ extension File.Descriptor.Test.Unit {
     func `Open file in read mode`() throws {
         try File.Directory.temporary { dir in
             let file = dir["test.bin"]
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: file.path)
+            let pathBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(pathBytes.span, to: file.path)
 
             let descriptor = try File.Descriptor.open(file.path, mode: .read)
             let isValid = descriptor.isValid
@@ -84,7 +85,8 @@ extension File.Descriptor.Test.Unit {
     func `Open with truncate option truncates file`() throws {
         try File.Directory.temporary { dir in
             let file = dir["test.bin"]
-            try File.System.Write.Atomic.write([1, 2, 3, 4, 5].span, to: file.path)
+            let pathBytes = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(pathBytes.span, to: file.path)
 
             let descriptor = try File.Descriptor.open(file.path, mode: .write, options: [.truncate])
             try descriptor.close()

@@ -22,7 +22,8 @@ extension File.System.Link.Symbolic {
         func `Create symlink to file`() throws {
             try File.Directory.temporary { dir in
                 let targetPath = dir.path / "target.bin"
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: targetPath)
+                let targetBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                 let linkPath = dir.path / "link"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -52,15 +53,16 @@ extension File.System.Link.Symbolic {
         func `Symlink points to correct target`() throws {
             try File.Directory.temporary { dir in
                 let targetPath = dir.path / "target.bin"
-                try File.System.Write.Atomic.write([10, 20, 30].span, to: targetPath)
+                let targetBytes = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                 let linkPath = dir.path / "link"
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
 
                 let data = try File.System.Read.Full.read(from: linkPath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(data == [10, 20, 30])
+                #expect(data == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
 
@@ -81,10 +83,12 @@ extension File.System.Link.Symbolic {
         func `Create symlink at existing path throws error with isAlreadyExists`() throws {
             try File.Directory.temporary { dir in
                 let targetPath = dir.path / "target.bin"
-                try File.System.Write.Atomic.write([1, 2, 3].span, to: targetPath)
+                let targetBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(targetBytes.span, to: targetPath)
 
                 let linkPath = dir.path / "existing.bin"
-                try File.System.Write.Atomic.write([4, 5, 6].span, to: linkPath)
+                let linkBytes = ([4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(linkBytes.span, to: linkPath)
 
                 do throws(File.System.Link.Symbolic.Error) {
                     try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)

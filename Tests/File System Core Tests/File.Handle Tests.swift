@@ -27,7 +27,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Open file for reading`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3, 4, 5]
+            let content: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -112,7 +112,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Read bytes from file`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [10, 20, 30, 40, 50]
+            let content: [Byte] = ([10, 20, 30, 40, 50] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -126,17 +126,17 @@ extension File.Handle.Test.Unit {
     @Test
     func `Read partial bytes`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let content: [Byte] = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
             var handle = try File.Handle.open(filePath, mode: .read)
 
             let firstPart = try handle.read(count: 5)
-            #expect(firstPart == [1, 2, 3, 4, 5])
+            #expect(firstPart == ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)))
 
             let secondPart = try handle.read(count: 5)
-            #expect(secondPart == [6, 7, 8, 9, 10])
+            #expect(secondPart == ([6, 7, 8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:)))
             try handle.close()
         }
     }
@@ -144,7 +144,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Read at EOF returns empty`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3]
+            let content: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -160,7 +160,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Read more than available returns available`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3]
+            let content: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -180,12 +180,12 @@ extension File.Handle.Test.Unit {
 
             var handle = try File.Handle.open(filePath, mode: .write, options: [.truncate])
 
-            let data: [Byte] = [100, 101, 102, 103, 104]
+            let data: [Byte] = ([100, 101, 102, 103, 104] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
             try handle.close()
 
             let readBack = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readBack == data)
         }
@@ -195,7 +195,8 @@ extension File.Handle.Test.Unit {
     func `Write empty data`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.bin"
-            try File.System.Write.Atomic.write([1, 2, 3].span, to: filePath)
+            let fileBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
             var handle = try File.Handle.open(filePath, mode: .write, options: [.truncate])
 
@@ -204,7 +205,7 @@ extension File.Handle.Test.Unit {
             try handle.close()
 
             let readBack = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readBack.isEmpty)
         }
@@ -213,7 +214,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Seek from start`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let content: [Byte] = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -223,7 +224,7 @@ extension File.Handle.Test.Unit {
             #expect(newPos == 5)
 
             let readData = try handle.read(count: 3)
-            #expect(readData == [6, 7, 8])
+            #expect(readData == ([6, 7, 8] as [UInt8]).map(Byte.init(bitPattern:)))
             try handle.close()
         }
     }
@@ -231,7 +232,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Seek from current`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let content: [Byte] = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -242,7 +243,7 @@ extension File.Handle.Test.Unit {
             #expect(newPos == 5)
 
             let readData = try handle.read(count: 1)
-            #expect(readData == [6])
+            #expect(readData == ([6] as [UInt8]).map(Byte.init(bitPattern:)))
             try handle.close()
         }
     }
@@ -250,7 +251,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Seek from end`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let content: [Byte] = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -260,7 +261,7 @@ extension File.Handle.Test.Unit {
             #expect(newPos == 7)
 
             let readData = try handle.read(count: 3)
-            #expect(readData == [8, 9, 10])
+            #expect(readData == ([8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:)))
             try handle.close()
         }
     }
@@ -268,7 +269,7 @@ extension File.Handle.Test.Unit {
     @Test
     func `Get current position`() throws {
         try File.Directory.temporary { dir in
-            let content: [Byte] = [1, 2, 3, 4, 5]
+            let content: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             let filePath = dir.path / "test.bin"
             try File.System.Write.Atomic.write(content.span, to: filePath)
 
@@ -289,7 +290,7 @@ extension File.Handle.Test.Unit {
             let filePath = dir.path / "test.txt"
             var handle = try File.Handle.open(filePath, mode: .write, options: [.create])
 
-            let data: [Byte] = [1, 2, 3]
+            let data: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
             try handle.sync()
             try handle.close()
@@ -312,13 +313,13 @@ extension File.Handle.Test.Unit {
                 options: [.create, .truncate]
             )
 
-            let bytes1: [Byte] = [0x41, 0x41, 0x41, 0x41]
+            let bytes1: [Byte] = ([0x41, 0x41, 0x41, 0x41] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes1.withUnsafeBytes { buffer in
                 let written = try handle.pwrite(buffer, at: 0)
                 #expect(written == 4)
             }
 
-            let bytes2: [Byte] = [0x42, 0x42, 0x42, 0x42]
+            let bytes2: [Byte] = ([0x42, 0x42, 0x42, 0x42] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes2.withUnsafeBytes { buffer in
                 let written = try handle.pwrite(buffer, at: 4)
                 #expect(written == 4)
@@ -327,9 +328,9 @@ extension File.Handle.Test.Unit {
             try handle.close()
 
             let content = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(content == [0x41, 0x41, 0x41, 0x41, 0x42, 0x42, 0x42, 0x42])
+            #expect(content == ([0x41, 0x41, 0x41, 0x41, 0x42, 0x42, 0x42, 0x42] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -338,7 +339,7 @@ extension File.Handle.Test.Unit {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "pwrite_pos_test.bin"
 
-            let initial: [Byte] = [0, 0, 0, 0, 0, 0, 0, 0]
+            let initial: [Byte] = ([0, 0, 0, 0, 0, 0, 0, 0] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(initial.span, to: filePath)
 
             var handle = try File.Handle.open(filePath, mode: .readWrite)
@@ -346,7 +347,7 @@ extension File.Handle.Test.Unit {
             let pos1 = try handle.seek(to: 0, from: .current)
             #expect(pos1 == 0)
 
-            let bytes: [Byte] = [0xFF, 0xFF]
+            let bytes: [Byte] = ([0xFF, 0xFF] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes.withUnsafeBytes { buffer in
                 _ = try handle.pwrite(buffer, at: 4)
             }
@@ -363,12 +364,12 @@ extension File.Handle.Test.Unit {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "pwrite_overwrite.bin"
 
-            let initial: [Byte] = [0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58]
+            let initial: [Byte] = ([0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58, 0x58] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(initial.span, to: filePath)
 
             var handle = try File.Handle.open(filePath, mode: .write)
 
-            let bytes: [Byte] = [0x59, 0x59, 0x59, 0x59]
+            let bytes: [Byte] = ([0x59, 0x59, 0x59, 0x59] as [UInt8]).map(Byte.init(bitPattern:))
             try bytes.withUnsafeBytes { buffer in
                 _ = try handle.pwrite(buffer, at: 2)
             }
@@ -376,9 +377,9 @@ extension File.Handle.Test.Unit {
             try handle.close()
 
             let content = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(content == [0x58, 0x58, 0x59, 0x59, 0x59, 0x59, 0x58, 0x58])
+            #expect(content == ([0x58, 0x58, 0x59, 0x59, 0x59, 0x59, 0x58, 0x58] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -410,7 +411,7 @@ extension File.Handle.Test.Unit {
                 options: [.create, .truncate]
             )
 
-            let data = [Byte](repeating: 0xAB, count: 10_000)
+            let data = [Byte](repeating: Byte(bitPattern: 0xAB), count: 10_000)
             try data.withUnsafeBytes { buffer in
                 try handle.pwriteAll(buffer, at: 0)
             }
@@ -418,10 +419,10 @@ extension File.Handle.Test.Unit {
             try handle.close()
 
             let content = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(content.count == 10_000)
-            #expect(content.allSatisfy { $0 == 0xAB })
+            #expect(content.allSatisfy { $0 == Byte(bitPattern: 0xAB) })
         }
     }
 
@@ -430,12 +431,12 @@ extension File.Handle.Test.Unit {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "pwriteall_offset.bin"
 
-            let initial = [Byte](repeating: 0, count: 100)
+            let initial = [Byte](repeating: Byte(bitPattern: 0), count: 100)
             try File.System.Write.Atomic.write(initial.span, to: filePath)
 
             var handle = try File.Handle.open(filePath, mode: .write)
 
-            let data: [Byte] = [1, 2, 3, 4, 5]
+            let data: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try data.withUnsafeBytes { buffer in
                 try handle.pwriteAll(buffer, at: 50)
             }
@@ -443,13 +444,13 @@ extension File.Handle.Test.Unit {
             try handle.close()
 
             let content = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(content[50] == 1)
-            #expect(content[51] == 2)
-            #expect(content[52] == 3)
-            #expect(content[53] == 4)
-            #expect(content[54] == 5)
+            #expect(content[50] == Byte(bitPattern: 1))
+            #expect(content[51] == Byte(bitPattern: 2))
+            #expect(content[52] == Byte(bitPattern: 3))
+            #expect(content[53] == Byte(bitPattern: 4))
+            #expect(content[54] == Byte(bitPattern: 5))
         }
     }
 

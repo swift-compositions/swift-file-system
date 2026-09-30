@@ -49,7 +49,7 @@ extension File.Handle {
         )
 
         return unsafe Array(UnsafeRawBufferPointer(start: rawBuffer.baseAddress, count: bytesRead))
-            .map(Byte.init)
+            .map(Byte.init(bitPattern:))
     }
 
     @inlinable

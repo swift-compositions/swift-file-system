@@ -76,7 +76,7 @@ extension File.System.Test.Unit {
 
             var readHandle = try File.Handle.open(filePath, mode: .read)
 
-            var buffer = [Byte](repeating: 0, count: 1024)
+            var buffer = [Byte](repeating: Byte(bitPattern: 0), count: 1024)
             let bytesRead = try buffer.withUnsafeMutableBytes { ptr in
                 try readHandle.read(into: ptr)
             }
@@ -247,12 +247,12 @@ extension File.System.Test.Unit {
                 options: [.create, .execClose]
             )
 
-            let data: [Byte] = [1, 2, 3, 4, 5]
+            let data: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
 
             _ = try handle.seek(to: 0, from: .start)
 
-            var readBuffer = [Byte](repeating: 0, count: 5)
+            var readBuffer = [Byte](repeating: Byte(bitPattern: 0), count: 5)
             let bytesRead = try readBuffer.withUnsafeMutableBytes { ptr in
                 try handle.read(into: ptr)
             }
@@ -278,7 +278,7 @@ extension File.System.Test.Unit {
 
             var handle = try File.Handle.open(filePath, mode: .read)
 
-            let data: [Byte] = [1, 2, 3]
+            let data: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             #expect(throws: (any Swift.Error).self) {
                 try handle.write(data.span)
             }
@@ -324,7 +324,7 @@ extension File.System.Test.Unit {
 
             _ = try handle.seek(to: 1000, from: .start)
 
-            let data: [Byte] = [42]
+            let data: [Byte] = ([42] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
 
             try handle.close()
@@ -345,7 +345,7 @@ extension File.System.Test.Unit {
                 options: [.create, .execClose]
             )
 
-            let data: [Byte] = [1, 2, 3, 4, 5]
+            let data: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
 
             let pos = try handle.seek(to: 0, from: .end)
@@ -480,12 +480,12 @@ extension File.System.Test.Unit {
                 mode: .readWrite,
                 options: [.create, .execClose]
             )
-            let data: [Byte] = [1, 2, 3, 4, 5]
+            let data: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
             try handle1.write(data.span)
 
             var handle2 = try File.Handle.open(filePath, mode: .read)
 
-            var buffer = [Byte](repeating: 0, count: 5)
+            var buffer = [Byte](repeating: Byte(bitPattern: 0), count: 5)
             let bytesRead = try buffer.withUnsafeMutableBytes { ptr in
                 try handle2.read(into: ptr)
             }
@@ -509,7 +509,7 @@ extension File.System.Test.Unit {
                 options: [.create, .execClose]
             )
 
-            let data: [Byte] = [1, 2, 3]
+            let data: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
 
             _ = try handle.seek(to: 0, from: .start)
@@ -536,13 +536,13 @@ extension File.System.Test.Unit {
                 options: [.create, .execClose]
             )
 
-            let data: [Byte] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let data: [Byte] = ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as [UInt8]).map(Byte.init(bitPattern:))
             try handle.write(data.span)
 
             _ = try handle.seek(to: 0, from: .start)
 
             var allRead: [Byte] = []
-            var buffer = [Byte](repeating: 0, count: 3)
+            var buffer = [Byte](repeating: Byte(bitPattern: 0), count: 3)
 
             while true {
                 let bytesRead = try buffer.withUnsafeMutableBytes { ptr in
@@ -596,7 +596,7 @@ extension File.System.Test.Unit {
                 let path = try File.Path(devNull)
                 var handle = try File.Handle.open(path, mode: .write)
 
-                let data: [Byte] = [1, 2, 3, 4, 5]
+                let data: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
                 try handle.write(data.span)
                 try handle.close()
 
@@ -638,7 +638,7 @@ extension File.System.Test.Unit {
                 mode: .write,
                 options: [.create, .execClose]
             )
-            let srcData: [Byte] = [1, 2, 3]
+            let srcData: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             try srcHandle.write(srcData.span)
             try srcHandle.close()
 
@@ -647,7 +647,7 @@ extension File.System.Test.Unit {
                 mode: .write,
                 options: [.create, .execClose]
             )
-            let dstData: [Byte] = [4, 5, 6, 7, 8]
+            let dstData: [Byte] = ([4, 5, 6, 7, 8] as [UInt8]).map(Byte.init(bitPattern:))
             try dstHandle.write(dstData.span)
             try dstHandle.close()
 

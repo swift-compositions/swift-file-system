@@ -7,12 +7,12 @@
     public import Span
     public import Thread_Actor
 
-    extension IO.Kernel where Capabilities == File.System.IO.Capabilities {
+    extension IO where Capabilities == File.System.IO.Capabilities {
 
         public static func completions(
             on completion: Completion.Actor,
             blockingOn executor: Kernel::Kernel.Thread.Executor
-        ) -> IO.Kernel<File.System.IO.Capabilities> {
+        ) -> IO<File.System.IO.Capabilities> {
             let thread = Kernel::Kernel.Thread.Actor(executor: executor)
             let capabilities = File.System.IO.Capabilities(
                 open: { path, mode throws(File.System.IO.Error) in
@@ -77,7 +77,7 @@
                 executor: { completion.unownedExecutor },
                 shutdown: {}
             )
-            return IO.Kernel(capabilities: capabilities, runner: runner)
+            return IO(capabilities: capabilities, runner: runner)
         }
     }
 

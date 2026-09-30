@@ -21,7 +21,7 @@ extension File.System.Stat.Test.Unit {
     func `exists returns true for existing file`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             #expect(File.System.Stat.exists(at: filePath) == true)
         }
@@ -49,7 +49,7 @@ extension File.System.Stat.Test.Unit {
     func `info returns regular type for file`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             let info = try File.System.Stat.info(at: filePath)
             #expect(info.type == .regular)
@@ -85,7 +85,7 @@ extension File.System.Stat.Test.Unit {
                 let linkPath = dir.path / "link"
 
                 try File.System.Write.Atomic.write(
-                    Array("test".utf8).map(Byte.init),
+                    [Byte](utf8: "test"),
                     to: targetPath
                 )
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -100,7 +100,7 @@ extension File.System.Stat.Test.Unit {
     func `info(followSymlinks: false) returns regular type for file (not symlink)`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             let info = try File.System.Stat.info(at: filePath, followSymlinks: false)
             #expect(info.type == .regular)
@@ -123,7 +123,7 @@ extension File.System.Stat.Test.Unit {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
             try File.System.Write.Atomic.write(
-                Array("Hello, World!".utf8).map(Byte.init),
+                [Byte](utf8: "Hello, World!"),
                 to: filePath
             )
 
@@ -154,7 +154,7 @@ extension File.System.Stat.Test.Unit {
                 let linkPath = dir.path / "link"
 
                 try File.System.Write.Atomic.write(
-                    Array("test".utf8).map(Byte.init),
+                    [Byte](utf8: "test"),
                     to: targetPath
                 )
                 try File.System.Link.Symbolic.create(at: linkPath, pointingTo: targetPath)
@@ -170,7 +170,7 @@ extension File.System.Stat.Test.Unit {
     func `async exists works`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             let exists = File.System.Stat.exists(at: filePath)
             #expect(exists == true)
@@ -181,7 +181,7 @@ extension File.System.Stat.Test.Unit {
     func `async info returns regular type for file`() throws {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
-            try File.System.Write.Atomic.write(Array("test".utf8).map(Byte.init), to: filePath)
+            try File.System.Write.Atomic.write([Byte](utf8: "test"), to: filePath)
 
             let info = try File.System.Stat.info(at: filePath)
             #expect(info.type == .regular)
@@ -204,7 +204,7 @@ extension File.System.Stat.Test.Unit {
                     options: [.create, .execClose]
                 )
                 do {
-                    let bytes: [Byte] = Array("test".utf8).map(Byte.init)
+                    let bytes: [Byte] = [Byte](utf8: "test")
                     try handle.write(bytes.span)
                 }
                 try handle.close()
@@ -231,7 +231,7 @@ extension File.System.Stat.Test.Unit {
                     options: [.create, .execClose]
                 )
                 do {
-                    let bytes: [Byte] = Array("test".utf8).map(Byte.init)
+                    let bytes: [Byte] = [Byte](utf8: "test")
                     try handle.write(bytes.span)
                 }
                 try handle.close()
@@ -261,7 +261,7 @@ extension File.System.Stat.Test.Unit {
                 options: [.create, .execClose]
             )
             do {
-                let bytes: [Byte] = Array("test content".utf8).map(Byte.init)
+                let bytes: [Byte] = [Byte](utf8: "test content")
                 try handle.write(bytes.span)
             }
             try handle.close()

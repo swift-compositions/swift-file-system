@@ -19,13 +19,13 @@ extension File.System.Write.Atomic.Test.Unit {
     @Test
     func `Write and read back bytes`() throws {
         try File.Directory.temporary { dir in
-            let testData: [Byte] = [72, 101, 108, 108, 111]
+            let testData: [Byte] = ([72, 101, 108, 108, 111] as [UInt8]).map(Byte.init(bitPattern:))
             let path = dir.path / "test.txt"
 
             try File.System.Write.Atomic.write(testData, to: path)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData == testData)
         }
@@ -40,7 +40,7 @@ extension File.System.Write.Atomic.Test.Unit {
             try File.System.Write.Atomic.write(empty, to: path)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData.isEmpty)
         }
@@ -50,12 +50,12 @@ extension File.System.Write.Atomic.Test.Unit {
     func `Write binary data`() throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "test.bin"
-            let binaryData: [Byte] = [0x00, 0x01, 0xFF, 0xFE, 0x7F, 0x80]
+            let binaryData: [Byte] = ([0x00, 0x01, 0xFF, 0xFE, 0x7F, 0x80] as [UInt8]).map(Byte.init(bitPattern:))
 
             try File.System.Write.Atomic.write(binaryData, to: path)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData == binaryData)
         }
@@ -66,12 +66,12 @@ extension File.System.Write.Atomic.Test.Unit {
         try File.Directory.temporary { dir in
             let path = dir.path / "large.txt"
 
-            let largeData = [Byte](repeating: 0xAB, count: 64 * 1024)
+            let largeData = [Byte](repeating: Byte(bitPattern: 0xAB), count: 64 * 1024)
 
             try File.System.Write.Atomic.write(largeData, to: path)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData == largeData)
         }
@@ -81,7 +81,7 @@ extension File.System.Write.Atomic.Test.Unit {
     func `Invalid path - empty`() {
         let emptyPath: Swift.String = ""
         #expect(throws: File.Path.Error.self) {
-            try File.System.Write.Atomic.write([1, 2, 3], to: try File.Path(emptyPath))
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: try File.Path(emptyPath))
         }
     }
 
@@ -89,7 +89,7 @@ extension File.System.Write.Atomic.Test.Unit {
     func `Invalid path - contains control characters`() {
         let invalidPath: Swift.String = "/tmp/test\0file.txt"
         #expect(throws: File.Path.Error.self) {
-            try File.System.Write.Atomic.write([1, 2, 3], to: try File.Path(invalidPath))
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: try File.Path(invalidPath))
         }
     }
 
@@ -100,13 +100,13 @@ extension File.System.Write.Atomic.Test.Unit {
             try File.Directory.temporary { dir in
                 let path = dir.path / "replace.txt"
 
-                try File.System.Write.Atomic.write([1, 2, 3], to: path)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: path)
 
-                let newData: [Byte] = [4, 5, 6, 7, 8]
+                let newData: [Byte] = ([4, 5, 6, 7, 8] as [UInt8]).map(Byte.init(bitPattern:))
                 try File.System.Write.Atomic.write(newData, to: path)
 
                 let readData = try File.System.Read.Full.read(from: path) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 #expect(readData == newData)
             }
@@ -117,14 +117,14 @@ extension File.System.Write.Atomic.Test.Unit {
             try File.Directory.temporary { dir in
                 let path = dir.path / "explicit.txt"
 
-                try File.System.Write.Atomic.write([1, 2, 3], to: path)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: path)
 
                 let options = File.System.Write.Atomic.Options(strategy: .replaceExisting)
-                let newData: [Byte] = [7, 8, 9]
+                let newData: [Byte] = ([7, 8, 9] as [UInt8]).map(Byte.init(bitPattern:))
                 try File.System.Write.Atomic.write(newData, to: path, options: options)
 
                 let readData = try File.System.Read.Full.read(from: path) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 #expect(readData == newData)
             }
@@ -136,17 +136,17 @@ extension File.System.Write.Atomic.Test.Unit {
         try File.Directory.temporary { dir in
             let path = dir.path / "noclobber.txt"
 
-            try File.System.Write.Atomic.write([1, 2, 3], to: path)
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: path)
 
             let options = File.System.Write.Atomic.Options(strategy: .noClobber)
             #expect(throws: File.System.Write.Atomic.Error.self) {
-                try File.System.Write.Atomic.write([4, 5, 6], to: path, options: options)
+                try File.System.Write.Atomic.write(([4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:)), to: path, options: options)
             }
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -156,11 +156,11 @@ extension File.System.Write.Atomic.Test.Unit {
             let path = dir.path / "newfile.txt"
 
             let options = File.System.Write.Atomic.Options(strategy: .noClobber)
-            let data: [Byte] = [1, 2, 3]
+            let data: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
             try File.System.Write.Atomic.write(data, to: path, options: options)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData == data)
         }
@@ -203,13 +203,13 @@ extension File.System.Write.Atomic.Test.Unit {
     func `Async write and read back`() async throws {
         try File.Directory.temporary { dir in
             let path = dir.path / "async.txt"
-            let testData: [Byte] = [10, 20, 30, 40, 50]
+            let testData: [Byte] = ([10, 20, 30, 40, 50] as [UInt8]).map(Byte.init(bitPattern:))
 
             let bytes = testData
             try File.System.Write.Atomic.write(bytes.span, to: path)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData == testData)
         }
@@ -221,12 +221,12 @@ extension File.System.Write.Atomic.Test.Unit {
             let path = dir.path / "asyncopt.txt"
 
             let options = File.System.Write.Atomic.Options(strategy: .noClobber)
-            let data: [Byte] = [1, 2, 3]
+            let data: [Byte] = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
 
             try File.System.Write.Atomic.write(data.span, to: path, options: options)
 
             let readData = try File.System.Read.Full.read(from: path) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData == data)
         }
@@ -337,12 +337,12 @@ extension File.System.Write.Atomic.Test.Integration {
         try File.Directory.temporary { dir in
             let nested = dir.path / "subdir" / "file.txt"
 
-            try File.System.Write.Atomic.write([1, 2, 3], to: nested, createIntermediates: true)
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: nested, createIntermediates: true)
 
             let readData = try File.System.Read.Full.read(from: nested) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
 
             let parentPath = dir.path / "subdir"
             let permissions = try File.System.Metadata.Permissions(at: parentPath)
@@ -363,17 +363,17 @@ extension File.System.Write.Atomic.Test.Integration {
             let first = dir.path / "newdir" / "first.txt"
             let second = dir.path / "newdir" / "second.txt"
 
-            try File.System.Write.Atomic.write([1], to: first, createIntermediates: true)
-            try File.System.Write.Atomic.write([2], to: second, createIntermediates: true)
+            try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: first, createIntermediates: true)
+            try File.System.Write.Atomic.write(([2] as [UInt8]).map(Byte.init(bitPattern:)), to: second, createIntermediates: true)
 
             let firstData = try File.System.Read.Full.read(from: first) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             let secondData = try File.System.Read.Full.read(from: second) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(firstData == [1])
-            #expect(secondData == [2])
+            #expect(firstData == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
+            #expect(secondData == ([2] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -382,12 +382,12 @@ extension File.System.Write.Atomic.Test.Integration {
         try File.Directory.temporary { dir in
             let nested = dir.path / "a" / "b" / "c" / "file.txt"
 
-            try File.System.Write.Atomic.write([1, 2, 3], to: nested, createIntermediates: true)
+            try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: nested, createIntermediates: true)
 
             let readData = try File.System.Read.Full.read(from: nested) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -397,7 +397,7 @@ extension File.System.Write.Atomic.Test.Integration {
             let nested = dir.path / "nonexistent" / "file.txt"
 
             #expect(throws: File.System.Write.Atomic.Error.self) {
-                try File.System.Write.Atomic.write([1, 2, 3], to: nested)
+                try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: nested)
             }
         }
     }
@@ -408,19 +408,19 @@ extension File.System.Write.Atomic.Test.Integration {
             let subdir = dir.path / "existing"
             try File.System.Create.Directory.create(at: subdir)
             let existingFile = subdir / "old.txt"
-            try File.System.Write.Atomic.write([1], to: existingFile)
+            try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: existingFile)
 
             let newFile = subdir / "new.txt"
-            try File.System.Write.Atomic.write([2], to: newFile, createIntermediates: true)
+            try File.System.Write.Atomic.write(([2] as [UInt8]).map(Byte.init(bitPattern:)), to: newFile, createIntermediates: true)
 
             let oldData = try File.System.Read.Full.read(from: existingFile) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             let newData = try File.System.Read.Full.read(from: newFile) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(oldData == [1])
-            #expect(newData == [2])
+            #expect(oldData == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
+            #expect(newData == ([2] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -431,16 +431,16 @@ extension File.System.Write.Atomic.Test.Integration {
             let options = File.System.Write.Atomic.Options(strategy: .noClobber)
 
             try File.System.Write.Atomic.write(
-                [1, 2, 3],
+                ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)),
                 to: nested,
                 options: options,
                 createIntermediates: true
             )
 
             let readData = try File.System.Read.Full.read(from: nested) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -457,16 +457,16 @@ extension File.System.Write.Atomic.Test.Integration {
             for (options, name) in configurations {
                 let nested = dir.path / name / "file.txt"
                 try File.System.Write.Atomic.write(
-                    [1],
+                    ([1] as [UInt8]).map(Byte.init(bitPattern:)),
                     to: nested,
                     options: options,
                     createIntermediates: true
                 )
 
                 let readData = try File.System.Read.Full.read(from: nested) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(readData == [1], "Failed for configuration: \(name)")
+                #expect(readData == ([1] as [UInt8]).map(Byte.init(bitPattern:)), "Failed for configuration: \(name)")
             }
         }
     }

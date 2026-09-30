@@ -4,6 +4,10 @@ import Testing
 
 @testable import File_System_Core
 
+private func byteChunks(_ chunks: [UInt8]...) -> [[Byte]] {
+    chunks.map { $0.map(Byte.init(bitPattern:)) }
+}
+
 extension File.System.Write.Streaming {
     @Suite
     struct Test {
@@ -19,19 +23,19 @@ extension File.System.Write.Streaming.Test.Unit {
     @Test
     func `Write multiple chunks and read back`() throws {
         try File.Directory.temporary { dir in
-            let chunks: [[Byte]] = [
+            let chunks: [[Byte]] = byteChunks(
                 [72, 101, 108, 108, 111],
                 [32],
-                [87, 111, 114, 108, 100],
-            ]
+                [87, 111, 114, 108, 100]
+            )
 
             let filePath = dir.path / "test.txt"
             try File.System.Write.Streaming.write(chunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100])
+            #expect(readData == ([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -44,7 +48,7 @@ extension File.System.Write.Streaming.Test.Unit {
             try File.System.Write.Streaming.write(chunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData.isEmpty)
         }
@@ -53,34 +57,34 @@ extension File.System.Write.Streaming.Test.Unit {
     @Test
     func `Write single chunk`() throws {
         try File.Directory.temporary { dir in
-            let chunks: [[Byte]] = [[1, 2, 3, 4, 5]]
+            let chunks: [[Byte]] = byteChunks([1, 2, 3, 4, 5])
 
             let filePath = dir.path / "test.txt"
             try File.System.Write.Streaming.write(chunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3, 4, 5])
+            #expect(readData == ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
     @Test
     func `Write chunks with empty chunk in middle`() throws {
         try File.Directory.temporary { dir in
-            let chunks: [[Byte]] = [
+            let chunks: [[Byte]] = byteChunks(
                 [1, 2, 3],
                 [],
-                [4, 5, 6],
-            ]
+                [4, 5, 6]
+            )
 
             let filePath = dir.path / "test.txt"
             try File.System.Write.Streaming.write(chunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3, 4, 5, 6])
+            #expect(readData == ([1, 2, 3, 4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -90,14 +94,14 @@ extension File.System.Write.Streaming.Test.Unit {
 
             let chunkSize = 64 * 1024
             let chunks: [[Byte]] = (0..<4).map { i in
-                [Byte](repeating: Byte(UInt8(truncatingIfNeeded: i)), count: chunkSize)
+                [Byte](repeating: Byte(bitPattern: UInt8(truncatingIfNeeded: i)), count: chunkSize)
             }
 
             let filePath = dir.path / "test.bin"
             try File.System.Write.Streaming.write(chunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData.count == 4 * chunkSize)
         }
@@ -108,41 +112,41 @@ extension File.System.Write.Streaming.Test.Unit {
         try File.Directory.temporary { dir in
 
             let lazyChunks = (0..<3).lazy.map { i -> [Byte] in
-                [Byte](repeating: Byte(UInt8(i)), count: 10)
+                [Byte](repeating: Byte(bitPattern: UInt8(i)), count: 10)
             }
 
             let filePath = dir.path / "test.bin"
             try File.System.Write.Streaming.write(lazyChunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             #expect(readData.count == 30)
-            #expect(readData[0..<10] == ArraySlice([Byte](repeating: 0, count: 10)))
-            #expect(readData[10..<20] == ArraySlice([Byte](repeating: 1, count: 10)))
-            #expect(readData[20..<30] == ArraySlice([Byte](repeating: 2, count: 10)))
+            #expect(readData[0..<10] == ArraySlice([Byte](repeating: Byte(bitPattern: 0), count: 10)))
+            #expect(readData[10..<20] == ArraySlice([Byte](repeating: Byte(bitPattern: 1), count: 10)))
+            #expect(readData[20..<30] == ArraySlice([Byte](repeating: Byte(bitPattern: 2), count: 10)))
         }
     }
 
     @Test
     func `Atomic write (default) creates file`() throws {
         try File.Directory.temporary { dir in
-            let chunks: [[Byte]] = [[1, 2, 3]]
+            let chunks: [[Byte]] = byteChunks([1, 2, 3])
             let filePath = dir.path / "test.txt"
 
             try File.System.Write.Streaming.write(chunks, to: filePath)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
     @Test
     func `Atomic write with explicit options`() throws {
         try File.Directory.temporary { dir in
-            let chunks: [[Byte]] = [[4, 5, 6]]
+            let chunks: [[Byte]] = byteChunks([4, 5, 6])
             let filePath = dir.path / "test.txt"
 
             let options = File.System.Write.Streaming.Options(
@@ -151,16 +155,16 @@ extension File.System.Write.Streaming.Test.Unit {
             try File.System.Write.Streaming.write(chunks, to: filePath, options: options)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [4, 5, 6])
+            #expect(readData == ([4, 5, 6] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
     @Test
     func `Direct write creates file`() throws {
         try File.Directory.temporary { dir in
-            let chunks: [[Byte]] = [[7, 8, 9]]
+            let chunks: [[Byte]] = byteChunks([7, 8, 9])
             let filePath = dir.path / "test.txt"
 
             let options = File.System.Write.Streaming.Options(
@@ -169,9 +173,9 @@ extension File.System.Write.Streaming.Test.Unit {
             try File.System.Write.Streaming.write(chunks, to: filePath, options: options)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [7, 8, 9])
+            #expect(readData == ([7, 8, 9] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -180,19 +184,19 @@ extension File.System.Write.Streaming.Test.Unit {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
 
-            try File.System.Write.Streaming.write([[1, 2, 3]], to: filePath)
+            try File.System.Write.Streaming.write(byteChunks([1, 2, 3]), to: filePath)
 
             let options = File.System.Write.Streaming.Options(
                 commit: .atomic(.init(strategy: .noClobber))
             )
             #expect(throws: File.System.Write.Streaming.Error.self) {
-                try File.System.Write.Streaming.write([[4, 5, 6]], to: filePath, options: options)
+                try File.System.Write.Streaming.write(byteChunks([4, 5, 6]), to: filePath, options: options)
             }
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -205,7 +209,7 @@ extension File.System.Write.Streaming.Test.Unit {
                 commit: .direct(.init(strategy: .truncate))
             )
             try File.System.Write.Streaming.write(
-                [[1, 2, 3]],
+                byteChunks([1, 2, 3]),
                 to: filePath,
                 options: createOptions
             )
@@ -214,7 +218,7 @@ extension File.System.Write.Streaming.Test.Unit {
                 commit: .direct(.init(strategy: .create))
             )
             #expect(throws: File.System.Write.Streaming.Error.self) {
-                try File.System.Write.Streaming.write([[4, 5, 6]], to: filePath, options: options)
+                try File.System.Write.Streaming.write(byteChunks([4, 5, 6]), to: filePath, options: options)
             }
         }
     }
@@ -224,24 +228,24 @@ extension File.System.Write.Streaming.Test.Unit {
         try File.Directory.temporary { dir in
             let filePath = dir.path / "test.txt"
 
-            try File.System.Write.Streaming.write([[1, 2, 3]], to: filePath)
+            try File.System.Write.Streaming.write(byteChunks([1, 2, 3]), to: filePath)
 
             let options = File.System.Write.Streaming.Options(
                 commit: .direct(.init(strategy: .truncate))
             )
-            try File.System.Write.Streaming.write([[4, 5, 6, 7]], to: filePath, options: options)
+            try File.System.Write.Streaming.write(byteChunks([4, 5, 6, 7]), to: filePath, options: options)
 
             let readData = try File.System.Read.Full.read(from: filePath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [4, 5, 6, 7])
+            #expect(readData == ([4, 5, 6, 7] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
     @Test
     func `parentNotFound error for invalid path`() {
         #expect(throws: File.System.Write.Streaming.Error.self) {
-            let chunks: [[Byte]] = [[1, 2, 3]]
+            let chunks: [[Byte]] = byteChunks([1, 2, 3])
             let filePath = File.Path("/nonexistent/directory/file.txt")
             try File.System.Write.Streaming.write(chunks, to: filePath)
         }
@@ -350,15 +354,15 @@ extension File.System.Write.Streaming.Test.Integration {
             let nested = dir.path / "subdir" / "file.txt"
 
             try File.System.Write.Streaming.write(
-                [[1, 2, 3]],
+                byteChunks([1, 2, 3]),
                 to: nested,
                 createIntermediates: true
             )
 
             let readData = try File.System.Read.Full.read(from: nested) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
 
             let parentPath = dir.path / "subdir"
             let permissions = try File.System.Metadata.Permissions(at: parentPath)
@@ -379,17 +383,17 @@ extension File.System.Write.Streaming.Test.Integration {
             let first = dir.path / "newdir" / "first.txt"
             let second = dir.path / "newdir" / "second.txt"
 
-            try File.System.Write.Streaming.write([[1]], to: first, createIntermediates: true)
-            try File.System.Write.Streaming.write([[2]], to: second, createIntermediates: true)
+            try File.System.Write.Streaming.write(byteChunks([1]), to: first, createIntermediates: true)
+            try File.System.Write.Streaming.write(byteChunks([2]), to: second, createIntermediates: true)
 
             let firstData = try File.System.Read.Full.read(from: first) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             let secondData = try File.System.Read.Full.read(from: second) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(firstData == [1])
-            #expect(secondData == [2])
+            #expect(firstData == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
+            #expect(secondData == ([2] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -399,15 +403,15 @@ extension File.System.Write.Streaming.Test.Integration {
             let nested = dir.path / "a" / "b" / "c" / "file.txt"
 
             try File.System.Write.Streaming.write(
-                [[1, 2, 3]],
+                byteChunks([1, 2, 3]),
                 to: nested,
                 createIntermediates: true
             )
 
             let readData = try File.System.Read.Full.read(from: nested) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -417,7 +421,7 @@ extension File.System.Write.Streaming.Test.Integration {
             let nested = dir.path / "nonexistent" / "file.txt"
 
             #expect(throws: File.System.Write.Streaming.Error.self) {
-                try File.System.Write.Streaming.write([[1, 2, 3]], to: nested)
+                try File.System.Write.Streaming.write(byteChunks([1, 2, 3]), to: nested)
             }
         }
     }
@@ -428,19 +432,19 @@ extension File.System.Write.Streaming.Test.Integration {
             let subdir = dir.path / "existing"
             try File.System.Create.Directory.create(at: subdir)
             let existingFile = subdir / "old.txt"
-            try File.System.Write.Streaming.write([[1]], to: existingFile)
+            try File.System.Write.Streaming.write(byteChunks([1]), to: existingFile)
 
             let newFile = subdir / "new.txt"
-            try File.System.Write.Streaming.write([[2]], to: newFile, createIntermediates: true)
+            try File.System.Write.Streaming.write(byteChunks([2]), to: newFile, createIntermediates: true)
 
             let oldData = try File.System.Read.Full.read(from: existingFile) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
             let newData = try File.System.Read.Full.read(from: newFile) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(oldData == [1])
-            #expect(newData == [2])
+            #expect(oldData == ([1] as [UInt8]).map(Byte.init(bitPattern:)))
+            #expect(newData == ([2] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -453,16 +457,16 @@ extension File.System.Write.Streaming.Test.Integration {
             )
 
             try File.System.Write.Streaming.write(
-                [[1, 2, 3]],
+                byteChunks([1, 2, 3]),
                 to: nested,
                 options: options,
                 createIntermediates: true
             )
 
             let readData = try File.System.Read.Full.read(from: nested) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
             }
-            #expect(readData == [1, 2, 3])
+            #expect(readData == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
 
@@ -482,16 +486,16 @@ extension File.System.Write.Streaming.Test.Integration {
             for (options, name) in configurations {
                 let nested = dir.path / name / "file.txt"
                 try File.System.Write.Streaming.write(
-                    [[1]],
+                    byteChunks([1]),
                     to: nested,
                     options: options,
                     createIntermediates: true
                 )
 
                 let readData = try File.System.Read.Full.read(from: nested) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(readData == [1], "Failed for configuration: \(name)")
+                #expect(readData == ([1] as [UInt8]).map(Byte.init(bitPattern:)), "Failed for configuration: \(name)")
             }
         }
     }

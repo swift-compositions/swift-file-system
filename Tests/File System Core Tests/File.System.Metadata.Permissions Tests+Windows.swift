@@ -91,11 +91,11 @@ import Testing
         func `File is readable after creation`() throws {
             try File.Directory.temporary { dir in
                 let filePath = dir.path / "readable.txt"
-                let testData: [Byte] = [1, 2, 3, 4, 5]
+                let testData: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
                 try File.System.Write.Atomic.write(testData, to: filePath)
 
                 let readData = try File.System.Read.Full.read(from: filePath) {
-                    $0.withUnsafeBytes { unsafe $0.map(Byte.init) }
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
                 #expect(readData == testData)
             }
