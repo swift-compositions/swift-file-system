@@ -509,7 +509,7 @@ extension File.System.Copy.Test.Unit {
                         let destPath = dir.path / "dest.bin"
 
                         try File.System.Write.Atomic.write(
-                            Array(repeating: 1, count: 1024).span,
+                            [Byte](repeating: Byte(bitPattern: 1), count: 1024).span,
                             to: sourcePath
                         )
 
