@@ -587,7 +587,7 @@ extension File.System.Copy.Test.Unit {
                         let destData = try Data(
                             contentsOf: URL(fileURLWithPath: Swift.String(destPath))
                         )
-                        #expect(Array(destData) == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
+                        #expect(destData.map(Byte.init(bitPattern:)) == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
 
                         let destAttrs = try FileManager.default.attributesOfItem(
                             atPath: Swift.String(destPath)
@@ -652,7 +652,7 @@ extension File.System.Copy.Test.Unit {
                         let destData = try Data(
                             contentsOf: URL(fileURLWithPath: Swift.String(linkPath))
                         )
-                        #expect(Array(destData) == ([100, 200] as [UInt8]).map(Byte.init(bitPattern:)))
+                        #expect(destData.map(Byte.init(bitPattern:)) == ([100, 200] as [UInt8]).map(Byte.init(bitPattern:)))
 
                         let destAttrs = try FileManager.default.attributesOfItem(
                             atPath: Swift.String(linkPath)
