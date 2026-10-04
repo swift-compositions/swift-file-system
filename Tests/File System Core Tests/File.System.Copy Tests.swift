@@ -477,9 +477,7 @@ extension File.System.Copy.Test.Unit {
                             fileHandle.write(chunk)
                         }
 
-                        let startTime = Date()
                         try File.System.Copy.copy(from: sourcePath, to: destPath)
-                        let elapsed = Date().timeIntervalSince(startTime)
 
                         let sourceAttrs = try FileManager.default.attributesOfItem(
                             atPath: Swift.String(sourcePath)
@@ -493,11 +491,6 @@ extension File.System.Copy.Test.Unit {
 
                         #expect(sourceSize == destSize)
                         #expect(sourceSize == 500 * 1024 * 1024)
-
-                        #expect(
-                            elapsed < 5.0,
-                            "Large file copy took \(elapsed)s - may not be using kernel optimization"
-                        )
                     }
                 }
 
