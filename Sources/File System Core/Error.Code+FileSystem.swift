@@ -6,7 +6,7 @@ extension Error::Error.Code {
         #if os(Windows)
             .win32(1117)
         #else
-            .POSIX.EIO
+            .EIO
         #endif
     }
 
@@ -14,7 +14,7 @@ extension Error::Error.Code {
         #if os(Windows)
             .Windows.ERROR_FILE_NOT_FOUND
         #else
-            .POSIX.ENOENT
+            .ENOENT
         #endif
     }
 
@@ -22,7 +22,7 @@ extension Error::Error.Code {
         #if os(Windows)
             .Windows.ERROR_INVALID_PARAMETER
         #else
-            .POSIX.EINVAL
+            .EINVAL
         #endif
     }
 
@@ -30,7 +30,7 @@ extension Error::Error.Code {
         #if os(Windows)
             .Windows.ERROR_ACCESS_DENIED
         #else
-            .POSIX.EACCES
+            .EACCES
         #endif
     }
 
@@ -38,7 +38,7 @@ extension Error::Error.Code {
         #if os(Windows)
             .Windows.ERROR_FILE_EXISTS
         #else
-            .POSIX.EEXIST
+            .EEXIST
         #endif
     }
 }

@@ -213,7 +213,7 @@ extension File.System.Read.Full.Test.Unit {
         @Test
         func `isPermissionDenied semantic accessor`() {
             let error = File.System.Read.Full.Error.open(
-                .platform(Error::Error(code: .POSIX.EACCES))
+                .platform(Error::Error(code: .EACCES))
             )
             #expect(error.isPermissionDenied)
             #expect(!error.isNotFound)

@@ -11,16 +11,16 @@
                 return .cancelled
 
             case .invalidDescriptor:
-                return .platform(.POSIX.EBADF)
+                return .platform(.EBADF)
 
             case .tooManyOpen:
-                return .platform(.POSIX.EMFILE)
+                return .platform(.EMFILE)
 
             case .platform(let code):
                 return .platform(code)
 
             case .kernel:
-                return .platform(.POSIX.EIO)
+                return .platform(.EIO)
             }
         }
     }

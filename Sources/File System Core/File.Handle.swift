@@ -112,7 +112,7 @@ extension File.Handle {
         } catch let error {
 
             #if !os(Windows)
-                if case .platform(let p) = error, p.code == .POSIX.ESPIPE, offset == 0 {
+                if case .platform(let p) = error, p.code == .ESPIPE, offset == 0 {
                     return try unsafe Kernel.IO.Write.write(
                         _descriptor.kernelDescriptor,
                         from: buffer
