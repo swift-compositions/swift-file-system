@@ -1,4 +1,4 @@
-import Kernel
+public import Kernel
 import Strings
 
 extension File.System.Copy {
