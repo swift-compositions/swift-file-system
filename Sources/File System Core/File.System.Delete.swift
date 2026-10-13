@@ -133,13 +133,39 @@ extension File.System.Delete {
     @usableFromInline
     internal static func unlink(at path: File.Path) throws(Error) {
         do throws(Kernel.File.Delete.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.File.Delete.Error) in
-                try Kernel.File.Delete.delete(kernelPath)
-            }
+            try remove(path)
         } catch {
-            throw .unlink(error)
+            #if os(Windows)
+                guard case .permission = error, clearReadOnly(path) else { throw .unlink(error) }
+                do throws(Kernel.File.Delete.Error) {
+                    try remove(path)
+                } catch {
+                    throw .unlink(error)
+                }
+            #else
+                throw .unlink(error)
+            #endif
         }
     }
+
+    private static func remove(_ path: File.Path) throws(Kernel.File.Delete.Error) {
+        try path.withKernelPath { kernelPath throws(Kernel.File.Delete.Error) in
+            try Kernel.File.Delete.delete(kernelPath)
+        }
+    }
+
+    #if os(Windows)
+        private static func clearReadOnly(_ path: File.Path) -> Bool {
+            do throws(Kernel.File.Attributes.Error) {
+                try path.withKernelPath { kernelPath throws(Kernel.File.Attributes.Error) in
+                    try Kernel.File.Attributes.set(Kernel.File.Permissions(rawValue: 0o600), at: kernelPath)
+                }
+                return true
+            } catch {
+                return false
+            }
+        }
+    #endif
 
     @usableFromInline
     internal static func rmdir(at path: File.Path) throws(Error) {
@@ -165,37 +191,39 @@ extension File.System.Delete {
         } catch {
             throw .directory(error)
         }
-        defer { stream.close() }
+        do {
+            defer { stream.close() }
 
-        while true {
-            let entry: Kernel.Directory.Entry?
-            do throws(Kernel.Directory.Error) {
-                entry = try stream.next()
-            } catch {
-                throw .directory(error)
-            }
+            while true {
+                let entry: Kernel.Directory.Entry?
+                do throws(Kernel.Directory.Error) {
+                    entry = try stream.next()
+                } catch {
+                    throw .directory(error)
+                }
 
-            guard let entry else {
-                break
-            }
+                guard let entry else {
+                    break
+                }
 
-            if entry.isDotOrDotDot {
-                continue
-            }
+                if entry.isDotOrDotDot {
+                    continue
+                }
 
-            let component: File.Path.Component
-            do throws(Paths.Path.Component.Error) {
-                component = try File.Name(from: entry).asPathComponent()
-            } catch {
+                let component: File.Path.Component
+                do throws(Paths.Path.Component.Error) {
+                    component = try File.Name(from: entry).asPathComponent()
+                } catch {
 
-                continue
-            }
-            let childPath = path / component
+                    continue
+                }
+                let childPath = path / component
 
-            if case .directory = entry.type {
-                try deleteRecursive(at: childPath)
-            } else {
-                try unlink(at: childPath)
+                if case .directory = entry.type {
+                    try deleteRecursive(at: childPath)
+                } else {
+                    try unlink(at: childPath)
+                }
             }
         }
 
