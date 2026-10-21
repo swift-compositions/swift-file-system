@@ -80,7 +80,9 @@ extension File.System.Write.Atomic {
             for: resolved
         )
         let tempPath = tempFile.path
-        let descriptor = tempFile.descriptor.take()!
+        guard let descriptor = tempFile.descriptor.take() else {
+            preconditionFailure("a created temporary file holds its descriptor")
+        }
         phase = .writing
 
         defer {

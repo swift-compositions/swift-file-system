@@ -5,8 +5,7 @@ extension [UInt8] {
     @available(
         *,
         deprecated,
-        message:
-            "Use `name.withCodeUnits { span in Array(span) }` (POSIX) for cross-platform zero-copy access; this POSIX-only allocating convenience is superseded."
+        message: "Use `name.withCodeUnits { span in Array(span) }` (POSIX) for cross-platform zero-copy access; this POSIX-only allocating convenience is superseded."
     )
     @inlinable
     public init?(copying fileName: File.Name) {
@@ -23,8 +22,7 @@ extension [UInt16] {
     @available(
         *,
         deprecated,
-        message:
-            "Use `name.withCodeUnits { span in Array(span) }` (Windows) for cross-platform zero-copy access; this Windows-only allocating convenience is superseded."
+        message: "Use `name.withCodeUnits { span in Array(span) }` (Windows) for cross-platform zero-copy access; this Windows-only allocating convenience is superseded."
     )
     @inlinable
     public init?(copying fileName: File.Name) {

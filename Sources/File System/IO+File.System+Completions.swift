@@ -29,7 +29,10 @@
                     } catch {
                         throw .platform(error.code)
                     }
-                    let address = unsafe Memory.Address(raw.baseAddress!)
+                    guard let base = raw.baseAddress else {
+                        preconditionFailure("a non-null buffer has a base address")
+                    }
+                    let address = unsafe Memory.Address(base)
                     let length: Memory.Address.Count = buf.count.retag(Memory.self)
                     do throws(Completion.Failure) {
                         return try await completion.submit(
@@ -39,7 +42,10 @@
                             if let error = event.result.failure {
                                 throw error.completionFailure
                             }
-                            return Int(event.result.value!)
+                            guard let value = event.result.value else {
+                                preconditionFailure("a successful completion carries a value")
+                            }
+                            return Int(value)
                         }
                     } catch {
                         throw error.fileSystemError
@@ -53,7 +59,10 @@
                     } catch {
                         throw .platform(error.code)
                     }
-                    let address = unsafe Memory.Address(raw.baseAddress!)
+                    guard let base = raw.baseAddress else {
+                        preconditionFailure("a non-null buffer has a base address")
+                    }
+                    let address = unsafe Memory.Address(base)
                     let length: Memory.Address.Count = buf.count.retag(Memory.self)
                     do throws(Completion.Failure) {
                         return try await completion.submit(
@@ -63,7 +72,10 @@
                             if let error = event.result.failure {
                                 throw error.completionFailure
                             }
-                            return Int(event.result.value!)
+                            guard let value = event.result.value else {
+                                preconditionFailure("a successful completion carries a value")
+                            }
+                            return Int(value)
                         }
                     } catch {
                         throw error.fileSystemError

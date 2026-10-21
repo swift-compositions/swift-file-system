@@ -119,10 +119,11 @@ extension File.System.Write.Streaming {
             do throws(E) {
                 bytesProduced = try fill(&buffer)
             } catch {
-                writeError = .userError(
+                let failure: Self.Error = .userError(
                     message: Swift.String(describing: error)
                 )
-                throw writeError!
+                writeError = failure
+                throw failure
             }
 
             if bytesProduced == 0 {
@@ -130,11 +131,12 @@ extension File.System.Write.Streaming {
             }
 
             guard bytesProduced <= buffer.count else {
-                writeError = .invalidFillResult(
+                let failure: Self.Error = .invalidFillResult(
                     produced: bytesProduced,
                     capacity: buffer.count
                 )
-                throw writeError!
+                writeError = failure
+                throw failure
             }
 
             do throws(Error) {
@@ -150,7 +152,7 @@ extension File.System.Write.Streaming {
                 }
             } catch let error {
                 writeError = error
-                throw writeError!
+                throw error
             }
         }
 

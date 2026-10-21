@@ -53,7 +53,9 @@ extension File.System.Write.Streaming {
                 try path.withKernelPath { kernelPath throws(Error) in
                     contextStorage = try Self.open(path: kernelPath, options: options)
                 }
-                let context = contextStorage.take()!
+                guard let context = contextStorage.take() else {
+                    preconditionFailure("open produced a context")
+                }
                 var succeeded = false
                 defer {
                     if !succeeded {
@@ -124,7 +126,10 @@ extension File.System.Write.Streaming {
         try path.withKernelPath { kernelPath throws(Error) in
             contextStorage = try Self.open(path: kernelPath, options: options)
         }
-        return contextStorage.take()!
+        guard let context = contextStorage.take() else {
+            preconditionFailure("open produced a context")
+        }
+        return context
     }
 
 }

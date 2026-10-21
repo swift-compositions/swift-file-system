@@ -44,8 +44,7 @@ extension File.Delete {
     }
 
     @inlinable
-    public func ifExists() async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>)
-    {
+    public func ifExists() async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
         let path = self.path
         do throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
             try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in

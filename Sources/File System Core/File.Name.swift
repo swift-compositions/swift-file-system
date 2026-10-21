@@ -125,8 +125,7 @@ extension File.Name {
     @available(
         *,
         deprecated,
-        message:
-            "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `posixBytes` exposed POSIX-specific byte storage and returned nil on Windows."
+        message: "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `posixBytes` exposed POSIX-specific byte storage and returned nil on Windows."
     )
     @inlinable
     public var posixBytes: [UInt8]? {
@@ -140,8 +139,7 @@ extension File.Name {
     @available(
         *,
         deprecated,
-        message:
-            "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `windowsCodeUnits` exposed Windows-specific code-unit storage and returned nil on POSIX."
+        message: "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `windowsCodeUnits` exposed Windows-specific code-unit storage and returned nil on POSIX."
     )
     @inlinable
     public var windowsCodeUnits: [UInt16]? {
@@ -155,8 +153,7 @@ extension File.Name {
     @available(
         *,
         deprecated,
-        message:
-            "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; bridge to UnsafeBufferPointer inside the closure if required."
+        message: "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; bridge to UnsafeBufferPointer inside the closure if required."
     )
     @inlinable
     public func withUnsafeUTF8Bytes<R, E: Swift.Error>(
@@ -172,8 +169,7 @@ extension File.Name {
     @available(
         *,
         deprecated,
-        message:
-            "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; bridge to UnsafeBufferPointer inside the closure if required."
+        message: "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; bridge to UnsafeBufferPointer inside the closure if required."
     )
     @inlinable
     public func withUnsafeCodeUnits<R, E: Swift.Error>(
@@ -221,8 +217,7 @@ extension File.Name {
     @available(
         *,
         deprecated,
-        message:
-            "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `withBytes` was POSIX-only."
+        message: "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `withBytes` was POSIX-only."
     )
     @inlinable
     public func withBytes<R>(
@@ -238,8 +233,7 @@ extension File.Name {
     @available(
         *,
         deprecated,
-        message:
-            "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `withBytes` was POSIX-only."
+        message: "Use `withCodeUnits { span in ... }` for cross-platform zero-copy access; `withBytes` was POSIX-only."
     )
     @inlinable
     public func withBytes<R, E: Swift.Error>(

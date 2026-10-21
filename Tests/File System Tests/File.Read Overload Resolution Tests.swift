@@ -23,8 +23,7 @@ private func readThrowing(
 
 private func byteCountAsync(
     of file: File
-) async throws(Either<Kernel.Thread.Pool.Error, Either<File.System.Read.Full.Error, Never>>) -> Int
-{
+) async throws(Either<Kernel.Thread.Pool.Error, Either<File.System.Read.Full.Error, Never>>) -> Int {
     try await file.read.full { span in span.count }
 }
 

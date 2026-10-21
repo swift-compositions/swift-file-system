@@ -371,8 +371,7 @@ extension File.Directory.Walk {
         }
 
         @Test
-        func `throwing body in nested directory stops the entire walk, not just its level`() throws
-        {
+        func `throwing body in nested directory stops the entire walk, not just its level`() throws {
             try File.Directory.temporary { dir in
                 let subdirX = dir.path / "subdirX"
                 let subdirY = dir.path / "subdirY"

@@ -141,8 +141,11 @@ extension File.System.Read.Full {
 
         var totalRead = 0
         while totalRead < size {
+            guard let base = buffer.baseAddress else {
+                preconditionFailure("an allocated buffer has a base address")
+            }
             let slice = unsafe UnsafeMutableRawBufferPointer(
-                start: buffer.baseAddress!.advanced(by: totalRead),
+                start: base.advanced(by: totalRead),
                 count: size - totalRead
             )
             do throws(Kernel.IO.Read.Error) {
