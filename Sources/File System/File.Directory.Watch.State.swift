@@ -1,6 +1,5 @@
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 
-    import Either
     import Executors
     import Kernel
 
@@ -125,6 +124,7 @@
             do throws(File.Directory.Contents.Error) {
                 entries = try File.Directory.Contents.list(at: File.Directory(path))
             } catch {
+                guard path != root else { throw .list(path, error) }
                 drop(path)
                 return
             }
@@ -143,36 +143,26 @@
             queue(path)
         }
 
-        /// Watches a directory and every admitted directory below it.
+        /// Watches a directory and every admitted directory below it. A subdirectory that cannot
+        /// be opened or listed is left out, with its subtree; only the root's failures throw.
         private func watch(subtree path: File.Path) throws(File.Directory.Watch.Error) {
             guard try watch(path) else { return }
 
-            let walk = File.Directory.Walk.Options(includeHidden: options.includeHidden)
-            var failure: File.Directory.Watch.Error?
-            do throws(Either<File.Directory.Walk.Error, File.Directory.Watch.Error>) {
-                try File.Directory(path).walk.iterate(options: walk) {
-                    entry throws(File.Directory.Watch.Error) -> File.Directory.Walk.Control in
-                    guard entry.type == .directory else { return .continue }
-                    guard admits(entry), let child = entry.pathIfValid else { return .skip }
-                    guard ids[child] == nil else { return .skip }
-                    return try watch(child) ? .continue : .skip
-                }
+            let entries: [File.Directory.Entry]
+            do throws(File.Directory.Contents.Error) {
+                entries = try File.Directory.Contents.list(at: File.Directory(path))
             } catch {
-                switch error {
-                case .left(let error) where error.isNotFound && path != root:
-                    break
-
-                case .left(let error):
-                    failure = .walk(error)
-
-                case .right(let error):
-                    failure = error
-                }
+                guard path == root else { return }
+                throw .list(path, error)
             }
-            if let failure { throw failure }
+            for entry in entries where entry.type == .directory && admits(entry) {
+                guard let child = entry.pathIfValid, ids[child] == nil else { continue }
+                try watch(subtree: child)
+            }
         }
 
-        /// Opens and registers one directory, and queues it. False when it vanished first.
+        /// Opens and registers one directory, and queues it. False when a subdirectory cannot be
+        /// opened: it vanished, or the process may not read it.
         private func watch(_ path: File.Path) throws(File.Directory.Watch.Error) -> Bool {
             guard let handle else { return false }
             guard ids.count < options.limit else { throw .limit(options.limit) }
@@ -188,7 +178,9 @@
                     )
                 }
             } catch {
-                if case .path(.notFound) = error, path != root { return false }
+                // Running out of descriptors is the watch's own failure, wherever it happens.
+                if case .handle(.limit) = error { throw .open(path, error) }
+                guard path == root else { return false }
                 throw .open(path, error)
             }
 

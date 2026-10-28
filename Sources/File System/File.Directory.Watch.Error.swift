@@ -12,8 +12,8 @@
             /// A directory could not be opened for watching.
             case open(File.Path, Kernel.File.Open.Error)
 
-            /// The tree could not be walked.
-            case walk(File.Directory.Walk.Error)
+            /// The watched directory could not be listed.
+            case list(File.Path, File.Directory.Contents.Error)
 
             /// Watching another directory would pass `Options.limit`.
             case limit(Int)

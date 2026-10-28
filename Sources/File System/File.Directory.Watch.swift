@@ -12,7 +12,8 @@
         /// not reported: that would take a descriptor per file.
         ///
         /// Subdirectories are watched as they appear and dropped as they go; a new subdirectory is
-        /// yielded once it is watched, since files may already be in it. Hidden entries and
+        /// yielded once it is watched, since files may already be in it. One the process may not
+        /// open or list is left out with its subtree, and the watch goes on. Hidden entries and
         /// symbolic links are never followed out of the tree; `Options.descend` leaves out any
         /// other subdirectory, such as `node_modules`, `.build` or a package.
         ///

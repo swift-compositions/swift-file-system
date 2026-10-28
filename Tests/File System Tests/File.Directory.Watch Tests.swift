@@ -153,6 +153,64 @@
     extension File.Directory.Watch.Test.`Edge Case` {
 
         @Test
+        func `an unreadable subfolder is left out and the watch goes on`() async throws {
+            try await File.Directory.temporary { dir in
+                let locked = dir.path / "locked"
+                let open = dir.path / "open"
+                try File.System.Create.Directory.create(at: locked)
+                try File.System.Create.Directory.create(at: locked / "inner")
+                try File.System.Create.Directory.create(at: open)
+                try File.System.Metadata.Permissions.set([], at: locked)
+                defer {
+                    try? File.System.Metadata.Permissions.set(
+                        [.ownerRead, .ownerWrite, .ownerExecute],
+                        at: locked
+                    )
+                }
+
+                var iterator = dir.watch().makeAsyncIterator()
+                var seen: Set<File.Path> = []
+                while !seen.isSuperset(of: [dir.path, open]), let next = try await iterator.next() {
+                    seen.insert(next.path)
+                }
+                #expect(!seen.contains(locked / "inner"))
+
+                try File.Directory.Watch.Test.touch(open / "document.pdf")
+
+                var changed: File.Path?
+                for _ in 0..<2 where changed != open {
+                    changed = try await iterator.next()?.path
+                }
+                #expect(changed == open)
+            }
+        }
+
+        @Test
+        func `a subfolder renamed within the tree is watched under its new name`() async throws {
+            try await File.Directory.temporary { dir in
+                let a = dir.path / "a"
+                let before = a / "before"
+                let after = a / "after"
+                try File.System.Create.Directory.create(at: a)
+                try File.System.Create.Directory.create(at: before)
+                let node = try File.Directory.Watch.Test.node(before)
+
+                var iterator = dir.watch().makeAsyncIterator()
+                _ = try await File.Directory.Watch.Test.take(3, from: &iterator)
+
+                try File.System.Move.move(from: before, to: after)
+
+                let afterRenaming = try await File.Directory.Watch.Test.take(2, from: &iterator)
+                #expect(afterRenaming == [after, a])
+                #expect(try File.Directory.Watch.Test.descriptors(on: [node]) == 1)
+
+                try File.Directory.Watch.Test.touch(after / "document.pdf")
+                let changed = try await iterator.next()
+                #expect(changed?.path == after)
+            }
+        }
+
+        @Test
         func `passing the limit throws`() async throws {
             try await File.Directory.temporary { dir in
                 try File.System.Create.Directory.create(at: dir.path / "a")
