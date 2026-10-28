@@ -307,6 +307,33 @@
                 #expect(try await iterator.next() == nil)
             }
         }
+
+        @Test
+        func `latency reports a burst of changes in a directory once`() async throws {
+            try await File.Directory.temporary { dir in
+                var iterator = dir.watch(options: .init(latency: .milliseconds(400))).makeAsyncIterator()
+                _ = try await File.Directory.Watch.Test.take(1, from: &iterator)
+
+                let waiting = iterator
+                let collector = Task {
+                    var iterator = waiting
+                    var seen: [File.Path] = []
+                    while let directory = try await iterator.next() { seen.append(directory.path) }
+                    return seen
+                }
+
+                try await Task.sleep(for: .milliseconds(50))
+                try File.Directory.Watch.Test.touch(dir.path / "first.pdf")
+                try await Task.sleep(for: .milliseconds(100))
+                try File.Directory.Watch.Test.touch(dir.path / "second.pdf")
+                try await Task.sleep(for: .milliseconds(800))
+
+                collector.cancel()
+                let seen = try await collector.value
+
+                #expect(seen == [dir.path])
+            }
+        }
     }
 
 #endif

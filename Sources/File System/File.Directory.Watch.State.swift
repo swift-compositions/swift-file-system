@@ -82,17 +82,30 @@
                 if !pending.isEmpty {
                     return File.Directory(pending.removeFirst())
                 }
-                guard let handle else { return nil }
+                guard handle != nil else { return nil }
 
-                let count: Int
-                do throws(Kernel.Event.Driver.Error) {
-                    count = try handle.source.poll(deadline: nil, into: &events)
-                } catch {
-                    throw .source(error)
+                try collect(until: nil)
+                guard !pending.isEmpty, options.latency > .zero else { continue }
+
+                let window = Clock.Continuous.Deadline.after(options.latency, from: Clock.Continuous.now)
+                while !window.hasExpired(at: Clock.Continuous.now), !Task.isCancelled, handle != nil {
+                    try collect(until: window)
                 }
-                for event in events.prefix(count) {
-                    try receive(event)
-                }
+            }
+        }
+
+        /// Waits for events, at most until the deadline, and takes them in.
+        private func collect(until deadline: Clock.Continuous.Deadline?) throws(File.Directory.Watch.Error) {
+            guard let handle else { return }
+
+            let count: Int
+            do throws(Kernel.Event.Driver.Error) {
+                count = try handle.source.poll(deadline: deadline, into: &events)
+            } catch {
+                throw .source(error)
+            }
+            for event in events.prefix(count) {
+                try receive(event)
             }
         }
 
