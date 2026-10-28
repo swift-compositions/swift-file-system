@@ -44,7 +44,7 @@ extension File.Directory.Walk {
 
     public func iterate<E: Swift.Error>(
         options: borrowing Options = Options(),
-        body: (File.Directory.Entry) throws(E) -> File.Directory.Contents.Control
+        body: (File.Directory.Entry) throws(E) -> File.Directory.Walk.Control
     ) throws(Either<File.Directory.Walk.Error, E>) {
         var bodyError: E?
         var visited: Set<InodeKey> = []
@@ -75,7 +75,7 @@ extension File.Directory.Walk {
 
     public func files(
         options: borrowing Options = Options(),
-        body: (File) -> File.Directory.Contents.Control
+        body: (File) -> File.Directory.Walk.Control
     ) throws(File.Directory.Walk.Error) {
         do throws(Either<File.Directory.Walk.Error, Never>) {
             try iterate(options: options) { entry in
@@ -92,7 +92,7 @@ extension File.Directory.Walk {
 
     public func directories(
         options: borrowing Options = Options(),
-        body: (File.Directory) -> File.Directory.Contents.Control
+        body: (File.Directory) -> File.Directory.Walk.Control
     ) throws(File.Directory.Walk.Error) {
         do throws(Either<File.Directory.Walk.Error, Never>) {
             try iterate(options: options) { entry in
@@ -116,7 +116,7 @@ extension File.Directory.Walk {
         depth: Int,
         visited: inout Set<InodeKey>,
         stopped: inout Bool,
-        body: (File.Directory.Entry) -> File.Directory.Contents.Control
+        body: (File.Directory.Entry) -> File.Directory.Walk.Control
     ) throws(File.Directory.Walk.Error) {
 
         if stopped {
@@ -150,6 +150,9 @@ extension File.Directory.Walk {
                     switch body(entry) {
                     case .continue:
                         break
+
+                    case .skip:
+                        return .continue
 
                     case .break:
                         stopped = true
@@ -217,7 +220,7 @@ extension File.Directory.Walk {
 
                     case .emit:
                         switch body(entry) {
-                        case .continue:
+                        case .continue, .skip:
                             break
 
                         case .break:

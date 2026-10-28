@@ -18,6 +18,53 @@ extension File.Directory.Walk {
 
     extension File.Directory.Walk.Test.Unit {
         @Test
+        func `skip leaves a subdirectory out and the walk goes on`() throws {
+            try File.Directory.temporary { dir in
+
+                let modules = dir.path / "node_modules"
+                let source = dir.path / "source"
+                try File.System.Create.Directory.create(at: modules)
+                try File.System.Create.Directory.create(at: source)
+                let files: [File.Path] = [modules / "dependency.js", source / "kept.txt", dir.path / "top.txt"]
+                for file in files {
+                    let h = try File.Handle.open(file, mode: .write, options: [.create, .execClose])
+                    try h.close()
+                }
+
+                var visited: [Swift.String] = []
+                try dir.walk.iterate { (entry: File.Directory.Entry) -> File.Directory.Walk.Control in
+                    let name = Swift.String(entry.name) ?? ""
+                    visited.append(name)
+                    return name == "node_modules" ? .skip : .continue
+                }
+
+                #expect(visited.sorted() == ["kept.txt", "node_modules", "source", "top.txt"])
+            }
+        }
+
+        @Test
+        func `skip on a file is the same as continue`() throws {
+            try File.Directory.temporary { dir in
+
+                let files: [File.Path] = [dir.path / "a.txt", dir.path / "b.txt"]
+                for file in files {
+                    let h = try File.Handle.open(file, mode: .write, options: [.create, .execClose])
+                    try h.close()
+                }
+
+                var count = 0
+                try dir.walk.files { _ in
+                    count += 1
+                    return .skip
+                }
+
+                #expect(count == 2)
+            }
+        }
+    }
+
+    extension File.Directory.Walk.Test.Unit {
+        @Test
         func `walk empty directory returns empty array`() throws {
             try File.Directory.temporary { dir in
                 let entries = try dir.walk()
@@ -397,7 +444,7 @@ extension File.Directory.Walk {
                     try dir.walk.iterate {
                         (
                             entry: File.Directory.Entry
-                        ) throws(Poison) -> File.Directory.Contents.Control in
+                        ) throws(Poison) -> File.Directory.Walk.Control in
                         callCount += 1
                         if entry.type == .directory {
                             return .continue

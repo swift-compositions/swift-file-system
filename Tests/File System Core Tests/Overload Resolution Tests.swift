@@ -50,7 +50,7 @@ private func walkThrowing(
     in directory: borrowing File.Directory
 ) throws(Either<File.Directory.Walk.Error, Sentinel>) {
     try directory.walk.iterate {
-        _ throws(Sentinel) -> File.Directory.Contents.Control in
+        _ throws(Sentinel) -> File.Directory.Walk.Control in
         throw Sentinel()
     }
 }

@@ -23,6 +23,7 @@ let package = Package(
         .package(url: "https://github.com/swift-compositions/swift-strings.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-io-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
+        .package(url: "https://github.com/swift-compositions/swift-executors.git", branch: "main"),
         .package(
             url: "https://github.com/swift-atoms/swift-either.git",
             branch: "main"
@@ -65,6 +66,7 @@ let package = Package(
                 .product(name: "IO Kernel", package: "swift-io-kernel"),
                 .product(name: "Thread Pool", package: "swift-threads"),
                 .product(name: "Thread Actor", package: "swift-threads"),
+                .product(name: "Executors", package: "swift-executors"),
                 .product(name: "Span", package: "swift-span"),
             ]
         ),
