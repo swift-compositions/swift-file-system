@@ -211,6 +211,13 @@
         }
 
         @Test
+        func `the descriptor limit a watch counts against is readable through Kernel`() throws {
+            let limit = try Kernel.Resource.Limit.get(.descriptors)
+            #expect(limit.current > 0)
+            #expect(limit.current <= limit.maximum)
+        }
+
+        @Test
         func `passing the limit throws`() async throws {
             try await File.Directory.temporary { dir in
                 try File.System.Create.Directory.create(at: dir.path / "a")

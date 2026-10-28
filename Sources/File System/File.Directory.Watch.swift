@@ -21,7 +21,14 @@
         /// keeps a volume busy nor needs more than the sandbox's read access to the folder. The
         /// descriptors count against the process's `RLIMIT_NOFILE`, which on macOS is 256 for an
         /// app unless it raises it, so `Options.limit` caps the watch and the sequence throws
-        /// `Error.limit` past it rather than starve the process of descriptors.
+        /// `Error.limit` past it rather than starve the process of descriptors. An app watching a
+        /// large tree raises its own limit first, up to its hard limit:
+        ///
+        /// ```swift
+        /// var limit = try Kernel.Resource.Limit.get(.descriptors)
+        /// limit.current = limit.maximum
+        /// try Kernel.Resource.Limit.set(limit, for: .descriptors)
+        /// ```
         ///
         /// Cancelling the consuming task, or leaving the loop, ends the watch and closes every
         /// descriptor it opened. The watch runs on a thread of its own, which blocks in kqueue.
