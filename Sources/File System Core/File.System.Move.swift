@@ -118,30 +118,26 @@ extension File.System.Move {
         options: borrowing Options = .init()
     ) throws(Self.Error) {
 
-        if !options.overwrite {
-            let destExists: Bool
-            do throws(Kernel.File.Stats.Error) {
-                _ = try destination.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                    try Kernel.File.Stats.get(path: kernelPath)
-                }
-                destExists = true
-            } catch {
-                destExists = false
-            }
-            if destExists {
-                throw .destinationExists(copy destination)
-            }
-        }
-
+        let overwrite = options.overwrite
         do throws(Kernel.File.Move.Error) {
             try source.withKernelPath { sourceKernelPath throws(Kernel.File.Move.Error) in
                 try destination.withKernelPath {
                     destinationKernelPath throws(Kernel.File.Move.Error) in
-                    try Kernel.File.Move.move(from: sourceKernelPath, to: destinationKernelPath)
+                    if overwrite {
+                        try Kernel.File.Move.move(from: sourceKernelPath, to: destinationKernelPath)
+                    } else {
+                        try Kernel.File.Move.exclusive(
+                            from: sourceKernelPath,
+                            to: destinationKernelPath
+                        )
+                    }
                 }
             }
         } catch {
 
+            if case .exists = error {
+                throw .destinationExists(copy destination)
+            }
             if case .crossDevice = error {
                 try copyAndDelete(from: source, to: destination, options: options)
                 return

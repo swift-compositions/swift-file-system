@@ -220,16 +220,16 @@ extension File.System.Write {
         from source: File.Path,
         to dest: File.Path
     ) throws(Self.Error) {
-        if File.System.Stat.exists(at: dest) {
-            throw .exists(path: dest)
-        }
         do throws(Kernel.File.Move.Error) {
             try source.withKernelPath { sourceKernelPath throws(Kernel.File.Move.Error) in
                 try dest.withKernelPath { destKernelPath throws(Kernel.File.Move.Error) in
-                    try Kernel.File.Move.move(from: sourceKernelPath, to: destKernelPath)
+                    try Kernel.File.Move.exclusive(from: sourceKernelPath, to: destKernelPath)
                 }
             }
         } catch {
+            if case .exists = error {
+                throw .exists(path: dest)
+            }
             throw .rename(from: source, to: dest, "\(error)")
         }
     }

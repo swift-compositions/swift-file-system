@@ -235,3 +235,37 @@ extension File.System.Move.Test.Unit {
         #expect(!error.isSourceNotFound)
     }
 }
+
+#if !os(Windows)
+    extension File.System.Move.Test.`Edge Case` {
+
+        // A dangling symlink is an entry `stat` cannot see, standing in for a file
+        // that appears after a check-then-rename's check: an exclusive rename still
+        // refuses it, so the destination is never silently replaced.
+        @Test
+        func `Move without overwrite refuses a destination its stat cannot see`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source.bin"
+                let destPath = dir.path / "dest.bin"
+                let missingPath = dir.path / "missing.bin"
+
+                let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+                try File.System.Link.Symbolic.create(at: destPath, pointingTo: missingPath)
+
+                let options = File.System.Move.Options(overwrite: false)
+                var refused = false
+                do throws(File.System.Move.Error) {
+                    try File.System.Move.move(from: sourcePath, to: destPath, options: options)
+                } catch {
+                    refused = error.isDestinationExists
+                }
+
+                #expect(refused)
+                #expect(File.System.Stat.exists(at: sourcePath))
+                let destInfo = try File.System.Stat.info(at: destPath, followSymlinks: false)
+                #expect(destInfo.type == .symbolicLink)
+            }
+        }
+    }
+#endif
