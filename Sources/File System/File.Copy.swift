@@ -1,3 +1,5 @@
+public import Kernel
+
 extension File {
 
     public struct Copy: Sendable {
