@@ -1,6 +1,3 @@
-public import IO_Kernel
-public import Thread_Pool
-
 extension File.Directory {
 
     public struct Delete: Sendable {
@@ -22,26 +19,8 @@ extension File.Directory.Delete {
     }
 
     @inlinable
-    public func callAsFunction() async throws(Either<
-        Kernel.Thread.Pool.Error, File.System.Delete.Error
-    >) {
-        let path = self.path
-        try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in
-            try File.System.Delete.delete(at: path)
-        }
-    }
-
-    @inlinable
     public func recursive() throws(File.System.Delete.Error) {
         try File.System.Delete.delete(at: path, recursive: true)
-    }
-
-    @inlinable
-    public func recursive() async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
-        let path = self.path
-        try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in
-            try File.System.Delete.delete(at: path, recursive: true)
-        }
     }
 
     @inlinable
@@ -50,21 +29,6 @@ extension File.Directory.Delete {
             try File.System.Delete.delete(at: path)
         } catch {
             if error.isNotFound {
-                return
-            }
-            throw error
-        }
-    }
-
-    @inlinable
-    public func ifExists() async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
-        let path = self.path
-        do throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in
-                try File.System.Delete.delete(at: path)
-            }
-        } catch {
-            if case .right(let deleteError) = error, deleteError.isNotFound {
                 return
             }
             throw error

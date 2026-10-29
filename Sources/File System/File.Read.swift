@@ -1,6 +1,4 @@
-public import IO_Kernel
-import Kernel
-public import Thread_Pool
+public import Either
 
 extension File {
 
@@ -22,17 +20,6 @@ extension File.Read {
         _ body: (Swift.Span<Byte>) throws(E) -> R
     ) throws(Either<File.System.Read.Full.Error, E>) -> R {
         try File.System.Read.Full.read(from: path, body: body)
-    }
-
-    @inlinable
-    public func full<R: Sendable, E: Swift.Error>(
-        _ body: @escaping @Sendable (Swift.Span<Byte>) throws(E) -> R
-    ) async throws(Either<Kernel.Thread.Pool.Error, Either<File.System.Read.Full.Error, E>>) -> R {
-        let path = self.path
-        return try await Kernel.Thread.Pool.shared.run {
-            () throws(Either<File.System.Read.Full.Error, E>) -> R in
-            try File.System.Read.Full.read(from: path, body: body)
-        }
     }
 }
 

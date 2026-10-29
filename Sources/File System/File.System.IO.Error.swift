@@ -1,19 +1,21 @@
-public import Kernel
+#if IO
+    public import Kernel
 
-extension File.System.IO {
+    extension File.System.IO {
 
-    public enum Error: Swift.Error, Sendable {
+        public enum Error: Swift.Error, Sendable {
 
-        case open(Kernel.File.Open.Error)
+            case open(Kernel.File.Open.Error)
 
-        case stat(Kernel.File.Stats.Error)
+            case stat(Kernel.File.Stats.Error)
 
-        case read(Kernel.IO.Read.Error)
+            case read(Kernel.IO.Read.Error)
 
-        case write(Kernel.IO.Write.Error)
+            case write(Kernel.IO.Write.Error)
 
-        case cancelled
+            case cancelled
 
-        case platform(Error::Error.Code)
+            case platform(Error::Error.Code)
+        }
     }
-}
+#endif

@@ -1,6 +1,3 @@
-public import IO_Kernel
-public import Thread_Pool
-
 extension File.Directory {
 
     public struct Copy: Sendable {
@@ -33,32 +30,6 @@ extension File.Directory.Copy {
         options: File.System.Copy.Options = .init()
     ) throws(File.System.Copy.Error) -> File.Directory {
         try File.System.Copy.recursive(from: path, to: destination.path, options: options)
-        return destination
-    }
-
-    @discardableResult
-    @inlinable
-    public func to(
-        _ destination: File.Path,
-        options: File.System.Copy.Options = .init()
-    ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Copy.Error>) -> File.Directory {
-        let source = self.path
-        try await Kernel.Thread.Pool.shared.run { () throws(File.System.Copy.Error) in
-            try File.System.Copy.recursive(from: source, to: destination, options: options)
-        }
-        return File.Directory(destination)
-    }
-
-    @discardableResult
-    @inlinable
-    public func to(
-        _ destination: File.Directory,
-        options: File.System.Copy.Options = .init()
-    ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Copy.Error>) -> File.Directory {
-        let source = self.path
-        try await Kernel.Thread.Pool.shared.run { () throws(File.System.Copy.Error) in
-            try File.System.Copy.recursive(from: source, to: destination.path, options: options)
-        }
         return destination
     }
 }

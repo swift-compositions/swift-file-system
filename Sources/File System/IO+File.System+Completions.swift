@@ -1,96 +1,98 @@
-#if os(Linux)
+#if IO
+    #if os(Linux)
 
-    public import Executors
-    public import IO_Kernel
-    public import Kernel
-    public import Memory
-    public import Span
-    public import Thread_Actor
+        public import Executors
+        public import IO_Kernel
+        public import Kernel
+        public import Memory
+        public import Span
+        public import Thread_Actor
 
-    extension IO where Capabilities == File.System.IO.Capabilities {
+        extension IO where Capabilities == File.System.IO.Capabilities {
 
-        public static func completions(
-            on completion: Completion.Actor,
-            blockingOn executor: Kernel::Kernel.Thread.Executor
-        ) -> IO<File.System.IO.Capabilities> {
-            let thread = Kernel::Kernel.Thread.Actor(executor: executor)
-            let capabilities = File.System.IO.Capabilities(
-                open: { path, mode throws(File.System.IO.Error) in
-                    try await thread.open(path, mode: mode)
-                },
-                close: { fd in
-                    await thread.close(consume fd)
-                },
-                read: { fd, buf throws(File.System.IO.Error) -> Int in
-                    let raw = unsafe buf.base.nonNull
-                    let descriptor: Kernel::Kernel.Descriptor?
-                    do throws(Kernel::Kernel.Descriptor.Duplicate.Error) {
-                        descriptor = try Kernel::Kernel.Descriptor.Duplicate.duplicate(fd)
-                    } catch {
-                        throw .platform(error.code)
-                    }
-                    guard let base = raw.baseAddress else {
-                        preconditionFailure("a non-null buffer has a base address")
-                    }
-                    let address = unsafe Memory.Address(base)
-                    let length: Memory.Address.Count = buf.count.retag(Memory.self)
-                    do throws(Completion.Failure) {
-                        return try await completion.submit(
-                            .read(address: address, length: length, offset: nil),
-                            descriptor: consume descriptor
-                        ) { event throws(Completion.Failure) in
-                            if let error = event.result.failure {
-                                throw error.completionFailure
-                            }
-                            guard let value = event.result.value else {
-                                preconditionFailure("a successful completion carries a value")
-                            }
-                            return Int(value)
+            public static func completions(
+                on completion: Completion.Actor,
+                blockingOn executor: Kernel::Kernel.Thread.Executor
+            ) -> IO<File.System.IO.Capabilities> {
+                let thread = Kernel::Kernel.Thread.Actor(executor: executor)
+                let capabilities = File.System.IO.Capabilities(
+                    open: { path, mode throws(File.System.IO.Error) in
+                        try await thread.open(path, mode: mode)
+                    },
+                    close: { fd in
+                        await thread.close(consume fd)
+                    },
+                    read: { fd, buf throws(File.System.IO.Error) -> Int in
+                        let raw = unsafe buf.base.nonNull
+                        let descriptor: Kernel::Kernel.Descriptor?
+                        do throws(Kernel::Kernel.Descriptor.Duplicate.Error) {
+                            descriptor = try Kernel::Kernel.Descriptor.Duplicate.duplicate(fd)
+                        } catch {
+                            throw .platform(error.code)
                         }
-                    } catch {
-                        throw error.fileSystemError
-                    }
-                },
-                write: { fd, buf throws(File.System.IO.Error) -> Int in
-                    let raw = unsafe buf.base.nonNull
-                    let descriptor: Kernel::Kernel.Descriptor?
-                    do throws(Kernel::Kernel.Descriptor.Duplicate.Error) {
-                        descriptor = try Kernel::Kernel.Descriptor.Duplicate.duplicate(fd)
-                    } catch {
-                        throw .platform(error.code)
-                    }
-                    guard let base = raw.baseAddress else {
-                        preconditionFailure("a non-null buffer has a base address")
-                    }
-                    let address = unsafe Memory.Address(base)
-                    let length: Memory.Address.Count = buf.count.retag(Memory.self)
-                    do throws(Completion.Failure) {
-                        return try await completion.submit(
-                            .write(address: address, length: length, offset: nil),
-                            descriptor: consume descriptor
-                        ) { event throws(Completion.Failure) in
-                            if let error = event.result.failure {
-                                throw error.completionFailure
-                            }
-                            guard let value = event.result.value else {
-                                preconditionFailure("a successful completion carries a value")
-                            }
-                            return Int(value)
+                        guard let base = raw.baseAddress else {
+                            preconditionFailure("a non-null buffer has a base address")
                         }
-                    } catch {
-                        throw error.fileSystemError
+                        let address = unsafe Memory.Address(base)
+                        let length: Memory.Address.Count = buf.count.retag(Memory.self)
+                        do throws(Completion.Failure) {
+                            return try await completion.submit(
+                                .read(address: address, length: length, offset: nil),
+                                descriptor: consume descriptor
+                            ) { event throws(Completion.Failure) in
+                                if let error = event.result.failure {
+                                    throw error.completionFailure
+                                }
+                                guard let value = event.result.value else {
+                                    preconditionFailure("a successful completion carries a value")
+                                }
+                                return Int(value)
+                            }
+                        } catch {
+                            throw error.fileSystemError
+                        }
+                    },
+                    write: { fd, buf throws(File.System.IO.Error) -> Int in
+                        let raw = unsafe buf.base.nonNull
+                        let descriptor: Kernel::Kernel.Descriptor?
+                        do throws(Kernel::Kernel.Descriptor.Duplicate.Error) {
+                            descriptor = try Kernel::Kernel.Descriptor.Duplicate.duplicate(fd)
+                        } catch {
+                            throw .platform(error.code)
+                        }
+                        guard let base = raw.baseAddress else {
+                            preconditionFailure("a non-null buffer has a base address")
+                        }
+                        let address = unsafe Memory.Address(base)
+                        let length: Memory.Address.Count = buf.count.retag(Memory.self)
+                        do throws(Completion.Failure) {
+                            return try await completion.submit(
+                                .write(address: address, length: length, offset: nil),
+                                descriptor: consume descriptor
+                            ) { event throws(Completion.Failure) in
+                                if let error = event.result.failure {
+                                    throw error.completionFailure
+                                }
+                                guard let value = event.result.value else {
+                                    preconditionFailure("a successful completion carries a value")
+                                }
+                                return Int(value)
+                            }
+                        } catch {
+                            throw error.fileSystemError
+                        }
+                    },
+                    stat: { path throws(File.System.IO.Error) in
+                        try await thread.stat(path)
                     }
-                },
-                stat: { path throws(File.System.IO.Error) in
-                    try await thread.stat(path)
-                }
-            )
-            let runner = unsafe Self.Runner(
-                executor: { completion.unownedExecutor },
-                shutdown: {}
-            )
-            return IO(capabilities: capabilities, runner: runner)
+                )
+                let runner = unsafe Self.Runner(
+                    executor: { completion.unownedExecutor },
+                    shutdown: {}
+                )
+                return IO(capabilities: capabilities, runner: runner)
+            }
         }
-    }
 
+    #endif
 #endif

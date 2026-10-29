@@ -1,6 +1,8 @@
-import IO_Kernel
+#if IO
+    import IO_Kernel
 
-extension File.System {
+    extension File.System {
 
-    public enum IO {}
-}
+        public enum IO {}
+    }
+#endif

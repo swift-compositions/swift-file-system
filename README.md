@@ -12,8 +12,8 @@ File system operations for Swift, exposing a `File` value type for reading, writ
 - **Typed throws end-to-end** — Each operation throws a specific error type (`File.System.Write.Atomic.Error`, `File.Directory.Contents.Error`, …); no `any Error` reaches the surface.
 - **Zero-copy reads** — `read.full { span in … }` hands the closure a borrowed `Swift.Span<Byte>`, so decoding or checksumming needs no intermediate `[UInt8]` copy.
 - **Crash-safe atomic writes** — `write.atomic(_:)` writes to a temporary file and renames it into place, so a process that dies mid-write never leaves a half-written file.
-- **Async variants on a dedicated thread pool** — Read, write, create, and list each have an `async` form that runs the blocking syscall off the cooperative pool.
-- **Directory traversal** — `File.Directory` provides entry listing, recursive walk, and glob matching over `files`, `directories`, and `entries`.
+- **Async variants on a dedicated thread pool** — With the `Threads` trait, read, write, create, and list each have an `async` form that runs the blocking syscall off the cooperative pool.
+- **Directory traversal** — `File.Directory` provides entry listing and recursive walk over `files`, `directories`, and `entries`, and glob matching with the `Glob` trait.
 
 ---
 
@@ -65,13 +65,25 @@ Requires Swift 6.3.1 and macOS 26 / iOS 26 / tvOS 26 / watchOS 26.
 
 ## Architecture
 
-Three library products. `File System` re-exports `File System Core`, so most consumers import only the umbrella.
+Two library products. `File System` re-exports its `File System Core` target, so consumers import only `File_System`.
 
 | Product | Import | When to import |
 |---------|--------|----------------|
-| `File System` | `File_System` | Default. The full `File` / `File.Directory` API: sync and async read, write, open, and stat; directory creation, listing, recursive walk, glob, copy, move, and delete. |
-| `File System Core` | `File_System_Core` | The synchronous `File.System.*` operations and core value types (`File.Path`, `File.Directory.Entry`, error types) without the thread-pool-backed async surface or glob. |
+| `File System` | `File_System` | The `File` / `File.Directory` API: synchronous read, write, open, and stat; directory creation, listing, recursive walk, copy, move, and delete. Traits add the rest. |
 | `File System Test Support` | `File_System_Test_Support` | Test targets exercising file-system code; provides fixtures and helpers built on `File System` and the kernel test support. |
+
+With no traits, `File System` loads only its core and the kernel. Each trait adds one capability and the packages it needs; none is on by default.
+
+| Trait | Adds | Loads |
+|-------|------|-------|
+| `Watch` | `File.Directory.Watch`: directory change notification | swift-executors |
+| `Threads` | The `async` overloads, which run the blocking call on `Kernel.Thread.Pool` | swift-threads |
+| `Glob` | `File.Directory.Glob`: directory matching by glob pattern (enables `Threads`) | swift-glob, swift-threads |
+| `IO` | `File.System.IO`: the file system's capabilities for the IO executor model | swift-io-kernel, swift-threads, swift-executors, swift-span, swift-memory |
+
+```swift
+.package(url: "https://github.com/swift-compositions/swift-file-system.git", branch: "main", traits: ["Threads"])
+```
 
 ---
 

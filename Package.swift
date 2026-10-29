@@ -13,8 +13,13 @@ let package = Package(
     ],
     products: [
         .library(name: "File System", targets: ["File System"]),
-        .library(name: "File System Core", targets: ["File System Core"]),
         .library(name: "File System Test Support", targets: ["File System Test Support"]),
+    ],
+    traits: [
+        .trait(name: "Watch", description: "Directory change notification"),
+        .trait(name: "Threads", description: "Asynchronous overloads that run on the thread pool"),
+        .trait(name: "Glob", description: "Directory matching by glob pattern", enabledTraits: ["Threads"]),
+        .trait(name: "IO", description: "The file system's capabilities for the IO executor model"),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-compositions/swift-environment.git", branch: "main"),
@@ -43,6 +48,7 @@ let package = Package(
         ),
         .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-span.git", branch: "main", traits: ["Byte"]),
+        .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main"),
     ],
     targets: [
         .target(
@@ -62,12 +68,15 @@ let package = Package(
             name: "File System",
             dependencies: [
                 "File System Core",
-                .product(name: "Glob", package: "swift-glob"),
-                .product(name: "IO Kernel", package: "swift-io-kernel"),
-                .product(name: "Thread Pool", package: "swift-threads"),
-                .product(name: "Thread Actor", package: "swift-threads"),
-                .product(name: "Executors", package: "swift-executors"),
-                .product(name: "Span", package: "swift-span"),
+                .product(name: "Kernel", package: "swift-kernel"),
+                .product(name: "Either", package: "swift-either"),
+                .product(name: "Executors", package: "swift-executors", condition: .when(traits: ["Watch", "IO"])),
+                .product(name: "Thread Pool", package: "swift-threads", condition: .when(traits: ["Threads"])),
+                .product(name: "Glob", package: "swift-glob", condition: .when(traits: ["Glob"])),
+                .product(name: "IO Kernel", package: "swift-io-kernel", condition: .when(traits: ["IO"])),
+                .product(name: "Thread Actor", package: "swift-threads", condition: .when(traits: ["IO"])),
+                .product(name: "Span", package: "swift-span", condition: .when(traits: ["IO"])),
+                .product(name: "Memory", package: "swift-memory", condition: .when(traits: ["IO"])),
             ]
         ),
         .target(
