@@ -14,6 +14,7 @@ let package = Package(
     products: [
         .library(name: "File System", targets: ["File System"]),
         .library(name: "File System Test Support", targets: ["File System Test Support"]),
+        .library(name: "File System Foundation Integration", targets: ["File System Foundation Integration"]),
     ],
     traits: [
         .trait(name: "Watch", description: "Directory change notification"),
@@ -88,6 +89,28 @@ let package = Package(
                 .product(name: "Kernel Test Support", package: "swift-kernel"),
             ],
             path: "Tests/Support"
+        ),
+        .target(
+            name: "File System Foundation Integration",
+            dependencies: [
+                "File System Core",
+                .product(
+                    name: "Paths Foundation Integration",
+                    package: "swift-paths",
+                    condition: .when(platforms: [.macOS, .iOS, .tvOS, .watchOS, .visionOS])
+                ),
+            ]
+        ),
+        .testTarget(
+            name: "File System Foundation Integration Tests",
+            dependencies: [
+                "File System Foundation Integration",
+                .product(
+                    name: "Paths Foundation Integration",
+                    package: "swift-paths",
+                    condition: .when(platforms: [.macOS, .iOS, .tvOS, .watchOS, .visionOS])
+                ),
+            ]
         ),
         .testTarget(
             name: "File System Core Tests",
