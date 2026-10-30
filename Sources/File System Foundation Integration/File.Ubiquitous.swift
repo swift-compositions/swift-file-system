@@ -47,6 +47,18 @@
             }
         }
 
+        /// The folder of the iCloud container `identifier`, or of the app's first container when it is nil; nil
+        /// while iCloud Drive is off or signed out. It may block while iCloud sets the container up, so ask for it
+        /// away from the main thread.
+        public static func container(_ identifier: Swift.String? = nil) -> File.Path? {
+            guard let url = FileManager.default.url(forUbiquityContainerIdentifier: identifier) else { return nil }
+            do throws(File.Path.Error) {
+                return try File.Path(url)
+            } catch {
+                return nil
+            }
+        }
+
         private static func local(_ url: URL) -> Bool {
             // swift-linter:disable:next try optional
             // REASON: URL.resourceValues throws untyped; a file whose values cannot be read is treated as local, so reading it reports what is wrong.

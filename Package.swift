@@ -50,6 +50,10 @@ let package = Package(
         .package(url: "https://github.com/swift-ietf/swift-rfc-4648.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-span.git", branch: "main", traits: ["Byte"]),
         .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-time.git", branch: "main"),
+        .package(url: "https://github.com/swift-iso/swift-iso-8601.git", branch: "main"),
+        .package(url: "https://github.com/swift-iso/swift-iso-9945.git", branch: "main"),
+        .package(url: "https://github.com/swift-ietf/swift-rfc-3986.git", branch: "main"),
     ],
     targets: [
         .target(
@@ -63,6 +67,11 @@ let package = Package(
                 .product(name: "Either", package: "swift-either"),
                 .product(name: "Binary", package: "swift-binary"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
+                // The XDG trash's record: where the item was, percent-encoded, and when it was trashed, in local time.
+                .product(name: "ISO 8601", package: "swift-iso-8601", condition: .when(platforms: [.linux])),
+                .product(name: "ISO 9945 Kernel Time", package: "swift-iso-9945", condition: .when(platforms: [.linux])),
+                .product(name: "RFC 3986", package: "swift-rfc-3986", condition: .when(platforms: [.linux])),
+                .product(name: "Time", package: "swift-time", condition: .when(platforms: [.linux])),
             ]
         ),
         .target(
@@ -118,6 +127,8 @@ let package = Package(
                 "File System Core",
                 "File System Test Support",
                 .product(name: "Kernel", package: "swift-kernel"),
+                .product(name: "ISO 9945 Kernel Time", package: "swift-iso-9945", condition: .when(platforms: [.linux])),
+                .product(name: "Time", package: "swift-time", condition: .when(platforms: [.linux])),
                 .product(
                     name: "Tagged",
                     package: "swift-tagged"
