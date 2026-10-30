@@ -38,6 +38,14 @@
             #expect(resolution.stale == false)
         }
 
+        @Test func `a bookmark made from a URL resolves to the item it names`() throws {
+            let folder = try File.Bookmark.Test.folder()
+            defer { File.Bookmark.Test.remove(folder) }
+
+            let bookmark = try File.Bookmark(URL(folder))
+            #expect(try File.System.Canonical.resolve(bookmark.resolve().path) == folder)
+        }
+
         @Test func `a resolved folder is bookmarked again, and its scope opens and closes under a key`() throws {
             let folder = try File.Bookmark.Test.folder()
             defer { File.Bookmark.Test.remove(folder) }
@@ -58,6 +66,12 @@
         @Test func `bytes that are no bookmark do not resolve`() {
             #expect(throws: File.Bookmark.Error.unresolved) {
                 try File.Bookmark(bytes: "not a bookmark").resolve()
+            }
+        }
+
+        @Test func `a URL that names nothing cannot be bookmarked`() {
+            #expect(throws: File.Bookmark.Error.denied) {
+                try File.Bookmark(URL(filePath: "/nonexistent-\(UUID().uuidString)/folder"))
             }
         }
 

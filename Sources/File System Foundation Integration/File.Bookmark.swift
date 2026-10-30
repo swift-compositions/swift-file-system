@@ -1,6 +1,6 @@
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 
-    import Foundation
+    public import Foundation
     import Paths_Foundation_Integration
 
     extension File {
@@ -30,6 +30,21 @@
         /// - Throws: ``File/Bookmark/Error/denied`` when the item cannot be bookmarked.
         public init(_ path: File.Path) throws(File.Bookmark.Error) {
             try self.init(URL(path))
+        }
+
+        /// Makes a bookmark of the item `url` names, through the URL's own security scope: the one a file or
+        /// folder the person picked carries on the URL the system handed over, which a URL made from its path
+        /// does not. Keep the bookmark, not the URL, and reach the item through ``resolve()``.
+        ///
+        /// - Throws: ``File/Bookmark/Error/denied`` when the item cannot be bookmarked.
+        public init(_ url: URL) throws(File.Bookmark.Error) {
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            // swift-linter:disable:next try optional
+            // REASON: URL.bookmarkData throws untyped; an item that cannot be bookmarked is denied.
+            guard let data = try? url.bookmarkData(options: Self.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
+            else { throw .denied }
+            self.init(bytes: data.map(Byte.init(bitPattern:)))
         }
 
         /// Makes a fresh bookmark of a resolved item, through the resolution's own security scope, to keep in
@@ -67,14 +82,6 @@
     }
 
     extension File.Bookmark {
-
-        fileprivate init(_ url: URL) throws(File.Bookmark.Error) {
-            // swift-linter:disable:next try optional
-            // REASON: URL.bookmarkData throws untyped; an item that cannot be bookmarked is denied.
-            guard let data = try? url.bookmarkData(options: Self.creation, includingResourceValuesForKeys: nil, relativeTo: nil)
-            else { throw .denied }
-            self.init(bytes: data.map(Byte.init(bitPattern:)))
-        }
 
         #if os(macOS) || targetEnvironment(macCatalyst)
             fileprivate static let creation: URL.BookmarkCreationOptions = .withSecurityScope
