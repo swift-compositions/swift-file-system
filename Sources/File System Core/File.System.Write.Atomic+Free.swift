@@ -24,7 +24,7 @@ extension File.System.Write.Atomic {
             do throws(Error) {
                 try write(bytes, to: candidate, options: options, createIntermediates: createIntermediates)
                 return candidate
-            } catch where error.isDestinationExists {
+            } catch  where error.isDestinationExists {
                 number += 1
             }
         }

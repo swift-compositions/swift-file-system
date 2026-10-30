@@ -18,7 +18,7 @@ extension File.System.Move {
             do throws(Error) {
                 try move(from: source, to: candidate)
                 return candidate
-            } catch where error.isDestinationExists {
+            } catch  where error.isDestinationExists {
                 number += 1
             }
         }
