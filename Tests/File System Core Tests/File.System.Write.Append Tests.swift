@@ -49,15 +49,20 @@ extension File.System.Write.Append.Test.Unit {
         }
     }
 
-    @Test
-    func `Append creates a new file with the permissions asked for`() throws {
-        try File.Directory.temporary { dir in
-            let path = dir.path / "private.log"
-            let line: [Byte] = ([1, 2] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Append.append(line.span, to: path, options: .init(permissions: .init(rawValue: 0o600)))
-            #expect(try File.System.Metadata.Permissions(at: path).rawValue & 0o777 == 0o600)
+    #if !os(Windows)
+
+        // POSIX mode bits: Windows has none, and File.System.Metadata.Permissions.set does nothing there.
+        @Test
+        func `Append creates a new file with the permissions asked for`() throws {
+            try File.Directory.temporary { dir in
+                let path = dir.path / "private.log"
+                let line: [Byte] = ([1, 2] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Append.append(line.span, to: path, options: .init(permissions: .init(rawValue: 0o600)))
+                #expect(try File.System.Metadata.Permissions(at: path).rawValue & 0o777 == 0o600)
+            }
         }
-    }
+
+    #endif
 
     @Test
     func `Append leaves an existing file's permissions as they are`() throws {
