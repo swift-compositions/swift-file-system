@@ -96,9 +96,12 @@ extension File.System.Write.Append {
 
 extension File.System.Write.Append {
 
+    /// Appends `bytes` to the file at `path`, creating it when it does not exist: with `options.permissions`, or
+    /// 0644 when none are given. An existing file keeps its permissions.
     public static func append(
         _ bytes: borrowing Swift.Span<Byte>,
-        to path: borrowing File.Path
+        to path: borrowing File.Path,
+        options: File.System.Create.Options = .init()
     ) throws(Self.Error) {
 
         var descriptor: Kernel.Descriptor = .invalid
@@ -108,7 +111,7 @@ extension File.System.Write.Append {
                     path: kernelPath,
                     mode: .write,
                     options: [.create, .append],
-                    permissions: Kernel.File.Permissions(rawValue: 0o644)
+                    permissions: Kernel.File.Permissions(rawValue: options.permissions?.rawValue ?? 0o644)
                 )
             }
         } catch {
@@ -159,11 +162,12 @@ extension File.System.Write.Append {
 
     public static func append<S: Binary.Serializable>(
         _ value: S,
-        to path: borrowing File.Path
+        to path: borrowing File.Path,
+        options: File.System.Create.Options = .init()
     ) throws(Self.Error) {
         try S.withSerializedBytes(value) {
             (span: borrowing Swift.Span<Byte>) throws(Self.Error) in
-            try append(span, to: path)
+            try append(span, to: path, options: options)
         }
     }
 
