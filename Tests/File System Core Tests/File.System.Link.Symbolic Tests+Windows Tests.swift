@@ -9,8 +9,12 @@ import Testing
     extension File.System.Link.Symbolic.Test.Unit {
 
         private static func canCreateSymlinks(in dir: File.Directory) -> Bool {
-            let testFile = try dir.path.appending("symlink_test_target_\(Int.random(in: (0..<Int.max))).txt")
-            let testLink = try dir.path.appending("symlink_test_link_\(Int.random(in: (0..<Int.max))).lnk")
+            guard
+                let testFile = try? dir.path.appending("symlink_test_target_\(Int.random(in: (0..<Int.max))).txt"),
+                let testLink = try? dir.path.appending("symlink_test_link_\(Int.random(in: (0..<Int.max))).lnk")
+            else {
+                return false
+            }
             defer {
                 try? File.System.Delete.delete(at: testLink)
                 try? File.System.Delete.delete(at: testFile)

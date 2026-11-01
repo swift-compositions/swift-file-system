@@ -42,7 +42,7 @@ extension File.System.Canonical.Test.Unit {
             func `Resolve preserves native path code units`() throws {
                 try File.Directory.temporary { directory in
                     let bytes: [File.Path.Char] = [0xFF]
-                    let component = try File.Path(copying: bytes.span)
+                    let component = File.Path(bytes.span)
                     let target = directory.path / component
                     try File.System.Create.Directory.create(at: target)
 
