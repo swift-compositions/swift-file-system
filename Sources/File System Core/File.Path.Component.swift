@@ -1,16 +1,15 @@
-public import Paths
+public import Path
 public import Strings
 
 extension File.Path {
 
-    public typealias Component = Paths.Path.Component
 }
 
 #if !os(Windows)
     extension File.Path.Component {
 
         @inlinable
-        public init<Bytes: Swift.Sequence>(utf8 bytes: Bytes) throws(Paths.Path.Component.Error)
+        public init<Bytes: Swift.Sequence>(utf8 bytes: Bytes) throws(Path::Path.Component.Error)
         where Bytes.Element == UInt8 {
 
             var collected: [UInt8] = []
@@ -32,7 +31,7 @@ extension File.Path {
         }
 
         @inlinable
-        public init(utf8 buffer: UnsafeBufferPointer<UInt8>) throws(Paths.Path.Component.Error) {
+        public init(utf8 buffer: UnsafeBufferPointer<UInt8>) throws(Path::Path.Component.Error) {
             guard !buffer.isEmpty else { throw .empty }
 
             if unsafe buffer.contains(where: { $0 == 0x2F || $0 == 0x00 }) {

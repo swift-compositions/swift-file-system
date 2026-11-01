@@ -29,9 +29,7 @@ extension File.System.Create.Directory {
         permissions: Kernel.File.Permissions
     ) throws(Self.Error) {
         do throws(Kernel.Directory.Create.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.Directory.Create.Error) in
-                try Kernel.Directory.Create.create(kernelPath, permissions: permissions)
-            }
+            try Kernel.Directory.Create.create(path.view, permissions: permissions)
         } catch {
             throw .mkdir(error)
         }
@@ -44,9 +42,7 @@ extension File.System.Create.Directory {
 
         let existsAsDirectory: Bool
         do throws(Kernel.File.Stats.Error) {
-            let stats = try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                try Kernel.File.Stats.get(path: kernelPath)
-            }
+            let stats = try Kernel.File.Stats.get(path: path.view)
             existsAsDirectory = stats.type == .directory
         } catch {
 
@@ -62,18 +58,13 @@ extension File.System.Create.Directory {
         }
 
         do throws(Kernel.Directory.Create.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.Directory.Create.Error) in
-                try Kernel.Directory.Create.create(kernelPath, permissions: permissions)
-            }
+            try Kernel.Directory.Create.create(path.view, permissions: permissions)
         } catch {
 
             if case .exists = error {
                 let isDir: Bool
                 do throws(Kernel.File.Stats.Error) {
-                    let stats = try path.withKernelPath {
-                        kernelPath throws(Kernel.File.Stats.Error) in
-                        try Kernel.File.Stats.get(path: kernelPath)
-                    }
+                    let stats = try Kernel.File.Stats.get(path: path.view)
                     isDir = stats.type == .directory
                 } catch {
                     isDir = false

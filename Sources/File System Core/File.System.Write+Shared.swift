@@ -15,9 +15,7 @@ extension File.System.Write {
 extension File.System.Write {
     internal static func fileExists(_ path: File.Path) -> Bool {
         do throws(Kernel.File.Stats.Error) {
-            _ = try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                try Kernel.File.Stats.lget(path: kernelPath)
-            }
+            _ = try Kernel.File.Stats.lget(path: path.view)
             return true
         } catch {
             return false
@@ -206,11 +204,7 @@ extension File.System.Write {
         to dest: File.Path
     ) throws(Self.Error) {
         do throws(Kernel.File.Move.Error) {
-            try source.withKernelPath { sourceKernelPath throws(Kernel.File.Move.Error) in
-                try dest.withKernelPath { destKernelPath throws(Kernel.File.Move.Error) in
-                    try Kernel.File.Move.move(from: sourceKernelPath, to: destKernelPath)
-                }
-            }
+            try Kernel.File.Move.move(from: source.view, to: dest.view)
         } catch {
             throw .rename(from: source, to: dest, "\(error)")
         }
@@ -221,11 +215,7 @@ extension File.System.Write {
         to dest: File.Path
     ) throws(Self.Error) {
         do throws(Kernel.File.Move.Error) {
-            try source.withKernelPath { sourceKernelPath throws(Kernel.File.Move.Error) in
-                try dest.withKernelPath { destKernelPath throws(Kernel.File.Move.Error) in
-                    try Kernel.File.Move.exclusive(from: sourceKernelPath, to: destKernelPath)
-                }
-            }
+            try Kernel.File.Move.exclusive(from: source.view, to: dest.view)
         } catch {
             if case .exists = error {
                 throw .exists(path: dest)
@@ -243,14 +233,12 @@ extension File.System.Write {
             do {
 
                 var fd: Kernel.Descriptor = .invalid
-                try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                    fd = try Kernel.File.Open.open(
-                        path: kernelPath,
-                        mode: .read,
-                        options: [.execClose],
-                        permissions: .none
-                    )
-                }
+                fd = try Kernel.File.Open.open(
+                    path: path.view,
+                    mode: .read,
+                    options: [.execClose],
+                    permissions: .none
+                )
                 try Kernel.File.Flush.flush(fd)
 
             } catch {

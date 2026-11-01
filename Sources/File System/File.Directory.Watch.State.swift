@@ -183,14 +183,12 @@
 
                 var descriptor: Kernel.Descriptor = .invalid
                 do throws(Kernel.File.Open.Error) {
-                    try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                        descriptor = try Kernel.File.Open.open(
-                            path: kernelPath,
-                            mode: .read,
-                            options: [.eventOnly, .execClose, .noFollow],
-                            permissions: Kernel.File.Permissions(rawValue: 0)
-                        )
-                    }
+                    descriptor = try Kernel.File.Open.open(
+                        path: path.view,
+                        mode: .read,
+                        options: [.eventOnly, .execClose, .noFollow],
+                        permissions: Kernel.File.Permissions(rawValue: 0)
+                    )
                 } catch {
                     // Running out of descriptors is the watch's own failure, wherever it happens.
                     if case .handle(.limit) = error { throw .open(path, error) }

@@ -89,9 +89,7 @@ extension File.System.Write.Atomic {
 
             if phase < .renamedPublished {
                 do throws(Kernel.File.Delete.Error) {
-                    try tempPath.withKernelPath { kernelPath throws(Kernel.File.Delete.Error) in
-                        try Kernel.File.Delete.delete(kernelPath)
-                    }
+                    try Kernel.File.Delete.delete(tempPath.view)
                 } catch {
 
                 }
@@ -168,9 +166,7 @@ extension File.System.Write.Atomic {
         _ path: File.Path
     ) -> Kernel.File.Stats? {
         do throws(Kernel.File.Stats.Error) {
-            return try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                try Kernel.File.Stats.lget(path: kernelPath)
-            }
+            return try Kernel.File.Stats.lget(path: path.view)
         } catch {
             return nil
         }
@@ -204,21 +200,18 @@ extension File.System.Write.Atomic {
             do throws(File.System.Write.Error) {
                 random = try File.System.Write.randomToken(length: 12)
             } catch { throw Self.Error(error) }
-            let tempComponent: File.Path.Component =
-                ".\(baseName.string).atomic.\(pid).\(random).tmp"
+            let tempComponent = File.Path.Component(unchecked: ".\(baseName.string).atomic.\(pid).\(random).tmp")
             let tempPath = parent.appending(tempComponent)
 
             do throws(Kernel.File.Open.Error) {
 
                 var fd: Kernel.Descriptor = .invalid
-                try tempPath.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                    fd = try Kernel.File.Open.open(
-                        path: kernelPath,
-                        mode: .readWrite,
-                        options: [.create, .exclusive],
-                        permissions: .ownerReadWrite
-                    )
-                }
+                fd = try Kernel.File.Open.open(
+                    path: tempPath.view,
+                    mode: .readWrite,
+                    options: [.create, .exclusive],
+                    permissions: .ownerReadWrite
+                )
                 return TempFile(descriptor: fd, path: tempPath)
             } catch {
                 if case .path(.exists) = error,

@@ -120,18 +120,10 @@ extension File.System.Move {
 
         let overwrite = options.overwrite
         do throws(Kernel.File.Move.Error) {
-            try source.withKernelPath { sourceKernelPath throws(Kernel.File.Move.Error) in
-                try destination.withKernelPath {
-                    destinationKernelPath throws(Kernel.File.Move.Error) in
-                    if overwrite {
-                        try Kernel.File.Move.move(from: sourceKernelPath, to: destinationKernelPath)
-                    } else {
-                        try Kernel.File.Move.exclusive(
-                            from: sourceKernelPath,
-                            to: destinationKernelPath
-                        )
-                    }
-                }
+            if overwrite {
+                try Kernel.File.Move.move(from: source.view, to: destination.view)
+            } else {
+                try Kernel.File.Move.exclusive(from: source.view, to: destination.view)
             }
         } catch {
 
@@ -165,9 +157,7 @@ extension File.System.Move {
         }
 
         do throws(Kernel.File.Delete.Error) {
-            try source.withKernelPath { kernelPath throws(Kernel.File.Delete.Error) in
-                try Kernel.File.Delete.delete(kernelPath)
-            }
+            try Kernel.File.Delete.delete(source.view)
         } catch {
             throw .cleanup(error)
         }

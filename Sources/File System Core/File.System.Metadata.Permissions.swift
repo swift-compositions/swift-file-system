@@ -101,9 +101,7 @@ extension File.System.Metadata.Permissions {
     public init(at path: borrowing File.Path) throws(Self.Error) {
 
         do throws(Kernel.File.Stats.Error) {
-            let stats = try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                try Kernel.File.Stats.get(path: kernelPath)
-            }
+            let stats = try Kernel.File.Stats.get(path: path.view)
             self.init(rawValue: stats.permissions.rawValue)
         } catch {
             throw .stat(error)
@@ -122,12 +120,10 @@ extension File.System.Metadata.Permissions {
             return
         #else
             do throws(Kernel.File.Attributes.Error) {
-                try path.withKernelPath { kernelPath throws(Kernel.File.Attributes.Error) in
-                    try Kernel.File.Attributes.set(
-                        Kernel.File.Permissions(rawValue: permissions.rawValue),
-                        at: kernelPath
-                    )
-                }
+                try Kernel.File.Attributes.set(
+                    Kernel.File.Permissions(rawValue: permissions.rawValue),
+                    at: path.view
+                )
             } catch {
                 throw .chmod(error)
             }

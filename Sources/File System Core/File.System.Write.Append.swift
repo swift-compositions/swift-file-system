@@ -106,14 +106,12 @@ extension File.System.Write.Append {
 
         var descriptor: Kernel.Descriptor = .invalid
         do throws(Kernel.File.Open.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                descriptor = try Kernel.File.Open.open(
-                    path: kernelPath,
-                    mode: .write,
-                    options: [.create, .append],
-                    permissions: Kernel.File.Permissions(rawValue: options.permissions?.rawValue ?? 0o644)
-                )
-            }
+            descriptor = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .write,
+                options: [.create, .append],
+                permissions: Kernel.File.Permissions(rawValue: options.permissions?.rawValue ?? 0o644)
+            )
         } catch {
             throw .open(error)
         }

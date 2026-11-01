@@ -2,7 +2,7 @@
 
     import File_System_Foundation_Integration
     import Foundation
-    import Paths_Foundation_Integration
+    import Path_Foundation_Integration
     import Testing
 
     extension File.System.Trash {

@@ -80,14 +80,12 @@ extension File.System.Read.Full {
 
         var descriptor: Kernel.Descriptor = .invalid
         do throws(Kernel.File.Open.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                descriptor = try Kernel.File.Open.open(
-                    path: kernelPath,
-                    mode: .read,
-                    options: [],
-                    permissions: Kernel.File.Permissions(rawValue: 0)
-                )
-            }
+            descriptor = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .read,
+                options: [],
+                permissions: Kernel.File.Permissions(rawValue: 0)
+            )
         } catch {
             throw .left(.open(error))
         }

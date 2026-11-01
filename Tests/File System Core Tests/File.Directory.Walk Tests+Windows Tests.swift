@@ -24,7 +24,7 @@ import Testing
             try File.Directory.temporary { dir in
 
                 for i in 0..<3 {
-                    let filePath = dir.path / "file\(i).txt"
+                    let filePath = try dir.path.appending("file\(i).txt")
                     try File.System.Write.Atomic.write([Byte(UInt8(i))], to: filePath)
                 }
 
@@ -112,7 +112,7 @@ import Testing
         func `Walk handles files with spaces`() throws {
             try File.Directory.temporary { dir in
                 let spaceName = "file with spaces.txt"
-                let filePath = dir.path / "\(spaceName)"
+                let filePath = try dir.path.appending("\(spaceName)")
                 try File.System.Write.Atomic.write(([1] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
 
                 let entries = try dir.walk()
@@ -131,7 +131,7 @@ import Testing
                 let depth = 10
 
                 for i in 0..<depth {
-                    let component: File.Path.Component = "level\(i)"
+                    let component = try File.Path.Component("level\(i)")
                     currentPath = currentPath.appending(component)
                     try File.System.Create.Directory.create(at: currentPath)
                 }

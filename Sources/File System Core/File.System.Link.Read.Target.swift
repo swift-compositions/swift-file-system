@@ -15,8 +15,6 @@ extension File.System.Link.Read.Target {
         case readlink(Kernel.Link.Symbolic.Error)
 
         case notASymlink(File.Path)
-
-        case invalidTargetPath(Swift.String)
     }
 }
 
@@ -72,9 +70,7 @@ extension File.System.Link.Read.Target {
 
         let stats: Kernel.File.Stats
         do throws(Kernel.File.Stats.Error) {
-            stats = try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                try Kernel.File.Stats.lget(path: kernelPath)
-            }
+            stats = try Kernel.File.Stats.lget(path: path.view)
         } catch {
             throw .stat(error)
         }
@@ -83,24 +79,12 @@ extension File.System.Link.Read.Target {
             throw .notASymlink(copy path)
         }
 
-        let targetString: Swift.String
         do throws(Kernel.Link.Symbolic.Error) {
-            targetString = try path.withKernelPath {
-                kernelPath throws(Kernel.Link.Symbolic.Error) in
-                let kernelString = try Kernel.Link.Symbolic.readTarget(at: kernelPath)
-                return Swift.String(kernelString.view)
-            }
+            let target = try Kernel.Link.Symbolic.readTarget(at: path.view)
+            return File.Path(copying: target.view)
         } catch {
             throw .readlink(error)
         }
-
-        let targetPath: File.Path
-        do throws(File.Path.Error) {
-            targetPath = try File.Path(targetString)
-        } catch {
-            throw .invalidTargetPath(targetString)
-        }
-        return targetPath
     }
 }
 
@@ -115,9 +99,6 @@ extension File.System.Link.Read.Target.Error: CustomStringConvertible {
 
         case .notASymlink(let path):
             return "Not a symbolic link: \(path)"
-
-        case .invalidTargetPath(let target):
-            return "Invalid target path: \(target)"
         }
     }
 }

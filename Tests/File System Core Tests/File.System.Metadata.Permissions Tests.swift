@@ -149,7 +149,7 @@ extension File.System.Metadata.Permissions.Test.Unit {
         @Test
         func `Get permissions of non-existent file throws error with isNotFound`() throws {
             try File.Directory.temporary { dir in
-                let nonExistent = dir.path / "non-existent-\(Int.random(in: (0..<Int.max))).tmp"
+                let nonExistent = try dir.path.appending("non-existent-\(Int.random(in: (0..<Int.max))).tmp")
 
                 do throws(File.System.Metadata.Permissions.Error) {
                     _ = try File.System.Metadata.Permissions(at: nonExistent)
@@ -163,7 +163,7 @@ extension File.System.Metadata.Permissions.Test.Unit {
         @Test
         func `Set permissions of non-existent file throws error with isNotFound`() throws {
             try File.Directory.temporary { dir in
-                let nonExistent = dir.path / "non-existent-\(Int.random(in: (0..<Int.max))).tmp"
+                let nonExistent = try dir.path.appending("non-existent-\(Int.random(in: (0..<Int.max))).tmp")
 
                 do throws(File.System.Metadata.Permissions.Error) {
                     try File.System.Metadata.Permissions.set(.defaultFile, at: nonExistent)

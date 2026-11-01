@@ -125,9 +125,7 @@ extension File.System.Delete {
     internal static func lstat(
         _ path: File.Path
     ) throws(Kernel.File.Stats.Error) -> Kernel.File.Stats {
-        try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-            try Kernel.File.Stats.lget(path: kernelPath)
-        }
+        try Kernel.File.Stats.lget(path: path.view)
     }
 
     @usableFromInline
@@ -149,17 +147,13 @@ extension File.System.Delete {
     }
 
     private static func remove(_ path: File.Path) throws(Kernel.File.Delete.Error) {
-        try path.withKernelPath { kernelPath throws(Kernel.File.Delete.Error) in
-            try Kernel.File.Delete.delete(kernelPath)
-        }
+        try Kernel.File.Delete.delete(path.view)
     }
 
     #if os(Windows)
         private static func clearReadOnly(_ path: File.Path) -> Bool {
             do throws(Kernel.File.Attributes.Error) {
-                try path.withKernelPath { kernelPath throws(Kernel.File.Attributes.Error) in
-                    try Kernel.File.Attributes.set(Kernel.File.Permissions(rawValue: 0o600), at: kernelPath)
-                }
+                try Kernel.File.Attributes.set(Kernel.File.Permissions(rawValue: 0o600), at: path.view)
                 return true
             } catch {
                 return false
@@ -170,9 +164,7 @@ extension File.System.Delete {
     @usableFromInline
     internal static func rmdir(at path: File.Path) throws(Error) {
         do throws(Kernel.Directory.Remove.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.Directory.Remove.Error) in
-                try Kernel.Directory.Remove.remove(kernelPath)
-            }
+            try Kernel.Directory.Remove.remove(path.view)
         } catch {
             throw .rmdir(error)
         }
@@ -185,9 +177,7 @@ extension File.System.Delete {
 
         let stream: Kernel.Directory.Stream
         do throws(Kernel.Directory.Error) {
-            stream = try path.withKernelPath { kernelPath throws(Kernel.Directory.Error) in
-                try Kernel.Directory.open(at: kernelPath)
-            }
+            stream = try Kernel.Directory.open(at: path.view)
         } catch {
             throw .directory(error)
         }
@@ -211,7 +201,7 @@ extension File.System.Delete {
                 }
 
                 let component: File.Path.Component
-                do throws(Paths.Path.Component.Error) {
+                do throws(Path::Path.Component.Error) {
                     component = try File.Name(from: entry).asPathComponent()
                 } catch {
 

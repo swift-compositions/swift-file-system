@@ -106,8 +106,8 @@ extension File.System.Metadata.Attributes.Test.`Edge Case` {
     }
 
     @Test
-    func `A missing file throws`() {
-        let filePath = File.Path("/nonexistent-\(Swift.UInt64.random(in: 0 ... .max))/letter.txt")
+    func `A missing file throws`() throws {
+        let filePath = try File.Path("/nonexistent-\(Swift.UInt64.random(in: 0 ... .max))/letter.txt")
         #expect(throws: File.System.Metadata.Attributes.Error.self) {
             try File.System.Metadata.Attributes.list(at: filePath)
         }

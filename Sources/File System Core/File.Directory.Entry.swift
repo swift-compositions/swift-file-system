@@ -19,13 +19,13 @@ extension File.Directory {
 extension File.Directory.Entry {
 
     @inlinable
-    public func path() throws(Paths.Path.Component.Error) -> File.Path {
+    public func path() throws(Path::Path.Component.Error) -> File.Path {
         parent / (try name.asPathComponent())
     }
 
     @inlinable
     public var pathIfValid: File.Path? {
-        do throws(Paths.Path.Component.Error) {
+        do throws(Path::Path.Component.Error) {
             return try path()
         } catch {
             return nil

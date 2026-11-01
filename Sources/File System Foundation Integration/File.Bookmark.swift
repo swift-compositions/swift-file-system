@@ -1,7 +1,7 @@
 #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 
     public import Foundation
-    import Paths_Foundation_Integration
+    import Path_Foundation_Integration
 
     extension File {
 

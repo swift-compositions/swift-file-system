@@ -71,18 +71,14 @@ extension File.System.Metadata.Ownership {
         #if os(Windows)
 
             do throws(Kernel.File.Stats.Error) {
-                _ = try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                    try Kernel.File.Stats.get(path: kernelPath)
-                }
+                _ = try Kernel.File.Stats.get(path: path.view)
             } catch {
                 throw .stat(error)
             }
             self.init(uid: 0, gid: 0)
         #else
             do throws(Kernel.File.Stats.Error) {
-                let stats = try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                    try Kernel.File.Stats.get(path: kernelPath)
-                }
+                let stats = try Kernel.File.Stats.get(path: path.view)
                 self.init(uid: stats.uid, gid: stats.gid)
             } catch {
                 throw .stat(error)
@@ -99,13 +95,11 @@ extension File.System.Metadata.Ownership {
     ) throws(Self.Error) {
 
         do throws(Kernel.File.Chown.Error) {
-            try path.withKernelPath { kernelPath throws(Kernel.File.Chown.Error) in
-                try Kernel.File.Chown.chown(
-                    path: kernelPath,
-                    uid: ownership.uid,
-                    gid: ownership.gid
-                )
-            }
+            try Kernel.File.Chown.chown(
+                path: path.view,
+                uid: ownership.uid,
+                gid: ownership.gid
+            )
         } catch {
             throw .chown(error)
         }

@@ -50,7 +50,7 @@ extension File.Path.Property where Value == File.Path.Component {
         Self(
             set: { path, value in
                 guard let parent = path.parent else {
-                    return Paths.Path(stringLiteral: value.string)
+                    return Path::Path(stringLiteral: value.string)
                 }
                 return parent / value
             },

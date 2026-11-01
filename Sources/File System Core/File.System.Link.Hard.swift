@@ -72,11 +72,7 @@ extension File.System.Link.Hard {
         to existing: borrowing File.Path
     ) throws(Self.Error) {
         do throws(Kernel.Link.Error) {
-            try path.withKernelPath { pathKernelPath throws(Kernel.Link.Error) in
-                try existing.withKernelPath { existingKernelPath throws(Kernel.Link.Error) in
-                    try Kernel.Link.create(at: pathKernelPath, to: existingKernelPath)
-                }
-            }
+            try Kernel.Link.create(at: path.view, to: existing.view)
         } catch {
             throw .link(error)
         }

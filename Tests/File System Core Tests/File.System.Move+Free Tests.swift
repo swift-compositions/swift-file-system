@@ -20,7 +20,7 @@ extension File.System.Move.Test.Unit {
 
     @Test
     func `A name is numbered after its stem, as Finder numbers a copy`() throws {
-        let name = try File.Path.Component("Report.pdf")
+        let name = File.Path.Component("Report.pdf")
         #expect(name.numbered(1).string == "Report.pdf")
         #expect(name.numbered(2).string == "Report 2.pdf")
         #expect(name.numbered(12).string == "Report 12.pdf")

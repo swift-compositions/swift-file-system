@@ -299,9 +299,7 @@ extension File.System.Write.Streaming {
     public static func cleanup(_ context: borrowing Context) {
         if let tempPath = context.tempPath {
             do throws(Kernel.File.Delete.Error) {
-                try tempPath.withKernelPath { kernelPath throws(Kernel.File.Delete.Error) in
-                    try Kernel.File.Delete.delete(kernelPath)
-                }
+                try Kernel.File.Delete.delete(tempPath.view)
             } catch {
 
             }
@@ -343,14 +341,12 @@ extension File.System.Write.Streaming {
         do throws(Kernel.File.Open.Error) {
 
             var descriptor: Kernel.Descriptor = .invalid
-            try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                descriptor = try Kernel.File.Open.open(
-                    path: kernelPath,
-                    mode: .write,
-                    options: options,
-                    permissions: .standard
-                )
-            }
+            descriptor = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .write,
+                options: options,
+                permissions: .standard
+            )
             return descriptor
         } catch {
             throw .fileCreationFailed(
@@ -376,8 +372,7 @@ extension File.System.Write.Streaming {
         do throws(File.System.Write.Error) {
             random = try File.System.Write.randomToken(length: 12)
         } catch { throw Self.Error(error) }
-        let tempComponent: File.Path.Component =
-            ".\(baseName.string).streaming.\(random).tmp"
+        let tempComponent = File.Path.Component(unchecked: ".\(baseName.string).streaming.\(random).tmp")
         return parent.appending(tempComponent)
     }
 }

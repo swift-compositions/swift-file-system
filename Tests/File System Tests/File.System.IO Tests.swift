@@ -23,16 +23,14 @@
             let path = try File.Path(pathString)
 
             var fd: Kernel.Descriptor = .invalid
-            try path.withKernelPath { kernelPath in
-                fd = try Kernel.File.Open.open(
-                    path: kernelPath,
-                    mode: .readWrite,
-                    options: [.create, .execClose],
-                    permissions: Kernel.File.Permissions(rawValue: 0o644)
-                )
-            }
+            fd = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .readWrite,
+                options: [.create, .execClose],
+                permissions: Kernel.File.Permissions(rawValue: 0o644)
+            )
             defer {
-                try? path.withKernelPath { kernelPath in try Kernel.File.Delete.delete(kernelPath) }
+                try? try Kernel.File.Delete.delete(path.view)
             }
 
             let stats = try await io.stat(path)
@@ -50,17 +48,15 @@
             let pathString = Kernel.Temporary.filePath(prefix: "fs-io-default")
             let path = try File.Path(pathString)
             defer {
-                try? path.withKernelPath { kernelPath in try Kernel.File.Delete.delete(kernelPath) }
+                try? try Kernel.File.Delete.delete(path.view)
             }
             var fd: Kernel.Descriptor = .invalid
-            try path.withKernelPath { kernelPath in
-                fd = try Kernel.File.Open.open(
-                    path: kernelPath,
-                    mode: .readWrite,
-                    options: [.create, .execClose],
-                    permissions: Kernel.File.Permissions(rawValue: 0o644)
-                )
-            }
+            fd = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .readWrite,
+                options: [.create, .execClose],
+                permissions: Kernel.File.Permissions(rawValue: 0o644)
+            )
 
             let stats = try await io.stat(path)
             #expect(stats.size.underlying == 0)
@@ -78,18 +74,16 @@
             let pathString = Kernel.Temporary.filePath(prefix: "fs-io-rw")
             let path = try File.Path(pathString)
             defer {
-                try? path.withKernelPath { kernelPath in try Kernel.File.Delete.delete(kernelPath) }
+                try? try Kernel.File.Delete.delete(path.view)
             }
 
             var fd: Kernel.Descriptor = .invalid
-            try path.withKernelPath { kernelPath in
-                fd = try Kernel.File.Open.open(
-                    path: kernelPath,
-                    mode: .readWrite,
-                    options: [.create, .truncate, .execClose],
-                    permissions: Kernel.File.Permissions(rawValue: 0o644)
-                )
-            }
+            fd = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .readWrite,
+                options: [.create, .truncate, .execClose],
+                permissions: Kernel.File.Permissions(rawValue: 0o644)
+            )
 
             let payload: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
             let writePtr = unsafe UnsafeMutableRawBufferPointer.allocate(

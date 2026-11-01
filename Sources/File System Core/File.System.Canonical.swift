@@ -11,28 +11,12 @@ extension File.System.Canonical {
     public static func resolve(
         _ path: borrowing File.Path
     ) throws(File.System.Canonical.Error) -> File.Path {
-        let canonical: Result<File.Path, File.Path.Error>
         do throws(Path::Path.Canonical.Error) {
-            canonical = try path.withKernelPath {
-                kernelPath throws(Path::Path.Canonical.Error) in
-                try Path::Path.Canonical.withCanonicalBytes(kernelPath) { bytes in
-                    do throws(File.Path.Error) {
-                        return .success(try File.Path(copying: bytes))
-                    } catch {
-                        return .failure(error)
-                    }
-                }
+            return try Path::Path.Canonical.withCanonicalBytes(path.view) { bytes in
+                File.Path(bytes)
             }
         } catch {
             throw .resolution(error)
-        }
-
-        switch canonical {
-        case .success(let path):
-            return path
-
-        case .failure(let error):
-            throw .representation(error)
         }
     }
 }

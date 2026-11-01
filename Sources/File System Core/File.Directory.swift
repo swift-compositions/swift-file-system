@@ -8,7 +8,7 @@ extension File {
             self.path = path
         }
 
-        public init(validating string: Swift.String) throws(Paths.Path.Error) {
+        public init(validating string: Swift.String) throws(Path::Path.Error) {
             self.path = try File.Path(string)
         }
     }

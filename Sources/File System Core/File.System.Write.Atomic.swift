@@ -15,9 +15,7 @@ extension File.System.Write.Atomic {
         createIntermediates: Bool = false
     ) throws(Error) {
         try ensureParent(for: path, createIntermediates: createIntermediates)
-        try path.withKernelPath { kernelPath throws(Error) in
-            try Self.write(bytes, to: kernelPath, options: options)
-        }
+        try Self.write(bytes, to: path.view, options: options)
     }
 }
 

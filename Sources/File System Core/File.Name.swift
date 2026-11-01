@@ -95,7 +95,7 @@ extension File.Name {
 extension File.Name {
 
     @inlinable
-    public func asPathComponent() throws(Paths.Path.Component.Error) -> File.Path.Component {
+    public func asPathComponent() throws(Path::Path.Component.Error) -> File.Path.Component {
         try File.Path.Component(platformNative: rawBytes)
     }
 }

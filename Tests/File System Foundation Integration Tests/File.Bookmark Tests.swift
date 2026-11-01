@@ -2,7 +2,7 @@
 
     import File_System_Foundation_Integration
     import Foundation
-    import Paths_Foundation_Integration
+    import Path_Foundation_Integration
     import Testing
 
     extension File.Bookmark {
@@ -75,8 +75,8 @@
             }
         }
 
-        @Test func `a missing folder cannot be bookmarked`() {
-            let missing = File.Path("/nonexistent-\(UUID().uuidString)/folder")
+        @Test func `a missing folder cannot be bookmarked`() throws {
+            let missing = try File.Path("/nonexistent-\(UUID().uuidString)/folder")
             #expect(throws: File.Bookmark.Error.denied) {
                 try File.Bookmark(missing)
             }

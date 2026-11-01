@@ -57,7 +57,7 @@ extension File.System.Write.Streaming {
 
         case invalidFillResult(produced: Int, capacity: Int)
 
-        case invalidPath(Paths.Path.Error)
+        case invalidPath(Path::Path.Error)
     }
 }
 

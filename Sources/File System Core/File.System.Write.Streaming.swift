@@ -14,9 +14,7 @@ extension File.System.Write.Streaming {
         createIntermediates: Bool = false
     ) throws(Error) where Chunks.Element == [Byte] {
         try ensureParent(for: path, createIntermediates: createIntermediates)
-        try path.withKernelPath { kernelPath throws(Error) in
-            try Self.write(chunks, to: kernelPath, options: options)
-        }
+        try Self.write(chunks, to: path.view, options: options)
     }
 }
 
@@ -30,9 +28,7 @@ extension File.System.Write.Streaming {
         createIntermediates: Bool = false
     ) throws(Error) {
         try ensureParent(for: path, createIntermediates: createIntermediates)
-        try path.withKernelPath { kernelPath throws(Error) in
-            try Self.write(bytes, to: kernelPath, options: options)
-        }
+        try Self.write(bytes, to: path.view, options: options)
     }
 
     @inlinable
@@ -50,9 +46,7 @@ extension File.System.Write.Streaming {
             do throws(Error) {
 
                 var contextStorage: Context? = nil
-                try path.withKernelPath { kernelPath throws(Error) in
-                    contextStorage = try Self.open(path: kernelPath, options: options)
-                }
+                contextStorage = try Self.open(path: path.view, options: options)
                 guard let context = contextStorage.take() else {
                     preconditionFailure("open produced a context")
                 }
@@ -91,9 +85,7 @@ extension File.System.Write.Streaming {
         createIntermediates: Bool = false
     ) throws(Error) {
         try ensureParent(for: path, createIntermediates: createIntermediates)
-        try path.withKernelPath { kernelPath throws(Error) in
-            try Self.write(bytes, to: kernelPath, options: options)
-        }
+        try Self.write(bytes, to: path.view, options: options)
     }
 }
 
@@ -107,9 +99,7 @@ extension File.System.Write.Streaming {
         fill: (inout [Byte]) throws(E) -> Int
     ) throws(Error) {
         try ensureParent(for: path, createIntermediates: createIntermediates)
-        try path.withKernelPath { kernelPath throws(Error) in
-            try Self.write(to: kernelPath, options: options, using: &buffer, fill: fill)
-        }
+        try Self.write(to: path.view, options: options, using: &buffer, fill: fill)
     }
 }
 
@@ -123,9 +113,7 @@ extension File.System.Write.Streaming {
         try ensureParent(for: path, createIntermediates: createIntermediates)
 
         var contextStorage: Context? = nil
-        try path.withKernelPath { kernelPath throws(Error) in
-            contextStorage = try Self.open(path: kernelPath, options: options)
-        }
+        contextStorage = try Self.open(path: path.view, options: options)
         guard let context = contextStorage.take() else {
             preconditionFailure("open produced a context")
         }

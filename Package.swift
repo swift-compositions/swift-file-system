@@ -25,7 +25,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/swift-compositions/swift-environment.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-kernel.git", branch: "main"),
-        .package(url: "https://github.com/swift-compositions/swift-paths.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-strings.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-io-kernel.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-threads.git", branch: "main"),
@@ -62,7 +61,6 @@ let package = Package(
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Path", package: "swift-path"),
-                .product(name: "Paths", package: "swift-paths"),
                 .product(name: "Strings", package: "swift-strings"),
                 .product(name: "Either", package: "swift-either"),
                 .product(name: "Binary", package: "swift-binary"),
@@ -104,8 +102,8 @@ let package = Package(
             dependencies: [
                 "File System Core",
                 .product(
-                    name: "Paths Foundation Integration",
-                    package: "swift-paths",
+                    name: "Path Foundation Integration",
+                    package: "swift-path",
                     condition: .when(platforms: [.macOS, .iOS, .tvOS, .watchOS, .visionOS])
                 ),
             ]
@@ -115,8 +113,8 @@ let package = Package(
             dependencies: [
                 "File System Foundation Integration",
                 .product(
-                    name: "Paths Foundation Integration",
-                    package: "swift-paths",
+                    name: "Path Foundation Integration",
+                    package: "swift-path",
                     condition: .when(platforms: [.macOS, .iOS, .tvOS, .watchOS, .visionOS])
                 ),
             ]

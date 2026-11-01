@@ -209,7 +209,7 @@ struct `File.System.Copy.recursive` {
             try File.System.Create.Directory.create(at: sourcePath)
 
             for i in 0..<10 {
-                let filePath = sourcePath / "file\(i).txt"
+                let filePath = try sourcePath.appending("file\(i).txt")
                 let bytes: [Byte] = [Byte(UInt8(i))]
                 try File.System.Write.Atomic.write(bytes.span, to: filePath)
             }
@@ -217,7 +217,7 @@ struct `File.System.Copy.recursive` {
             try File.System.Copy.recursive(from: sourcePath, to: destPath)
 
             for i in 0..<10 {
-                let filePath = destPath / "file\(i).txt"
+                let filePath = try destPath.appending("file\(i).txt")
                 #expect(File.System.Stat.exists(at: filePath))
                 let data = try File.System.Read.Full.read(from: filePath) {
                     $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
@@ -235,7 +235,7 @@ struct `File.System.Copy.recursive` {
 
             var currentPath = sourcePath
             for i in 1...5 {
-                let component: File.Path.Component = "\(i)"
+                let component = try File.Path.Component("\(i)")
                 currentPath = currentPath.appending(component)
             }
 

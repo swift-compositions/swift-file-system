@@ -88,7 +88,7 @@ extension File.System.Copy {
             }
 
             let destPath: File.Path
-            do throws(Paths.Path.Component.Error) {
+            do throws(Path::Path.Component.Error) {
                 destPath = destination / (try entry.name.asPathComponent())
             } catch {
 
@@ -164,34 +164,19 @@ extension File.System.Copy {
             to destination: File.Path
         ) throws(Error) {
 
-            let target: Swift.String
+            let targetPath: File.Path
             do throws(Kernel.Link.Symbolic.Error) {
-                target = try source.withKernelPath {
-                    sourceKernelPath throws(Kernel.Link.Symbolic.Error) in
-                    let kernelString = try Kernel.Link.Symbolic.readTarget(at: sourceKernelPath)
-                    return Swift.String(kernelString.view)
-                }
+                let target = try Kernel.Link.Symbolic.readTarget(at: source.view)
+                targetPath = File.Path(copying: target.view)
             } catch {
                 throw .operation("symlink read failed: \(error)")
             }
 
             do throws(Kernel.Link.Symbolic.Error) {
-                let targetPath: File.Path
-                do throws(File.Path.Error) {
-                    targetPath = try File.Path(target)
-                } catch {
-                    throw Kernel.Link.Symbolic.Error.notFound
-                }
-                try targetPath.withKernelPath {
-                    targetKernelPath throws(Kernel.Link.Symbolic.Error) in
-                    try destination.withKernelPath {
-                        destinationKernelPath throws(Kernel.Link.Symbolic.Error) in
-                        try Kernel.Link.Symbolic.create(
-                            target: targetKernelPath,
-                            at: destinationKernelPath
-                        )
-                    }
-                }
+                try Kernel.Link.Symbolic.create(
+                    target: targetPath.view,
+                    at: destination.view
+                )
             } catch {
                 throw .operation("symlink create failed: \(error)")
             }
@@ -233,10 +218,7 @@ extension File.System.Copy {
                 let kernelPermissions = Kernel.File.Permissions(
                     rawValue: sourceInfo.permissions.rawValue
                 )
-                try destination.withKernelPath {
-                    destinationKernelPath throws(Kernel.File.Attributes.Error) in
-                    try Kernel.File.Attributes.set(kernelPermissions, at: destinationKernelPath)
-                }
+                try Kernel.File.Attributes.set(kernelPermissions, at: destination.view)
             } catch {
 
             }
@@ -257,14 +239,11 @@ extension File.System.Copy {
             }
 
             do throws(Kernel.File.Times.Error) {
-                try destination.withKernelPath {
-                    destinationKernelPath throws(Kernel.File.Times.Error) in
-                    try Kernel.File.Times.set(
-                        access: sourceInfo.accessTime,
-                        modification: sourceInfo.modificationTime,
-                        at: destinationKernelPath
-                    )
-                }
+                try Kernel.File.Times.set(
+                    access: sourceInfo.accessTime,
+                    modification: sourceInfo.modificationTime,
+                    at: destination.view
+                )
             } catch {
 
             }

@@ -48,14 +48,12 @@ extension File.Descriptor {
     ) throws(Kernel.File.Open.Error) -> File.Descriptor {
 
         var descriptor: Kernel.Descriptor = .invalid
-        try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-            descriptor = try Kernel.File.Open.open(
-                path: kernelPath,
-                mode: mode,
-                options: options,
-                permissions: Kernel.File.Permissions(rawValue: 0o644)
-            )
-        }
+        descriptor = try Kernel.File.Open.open(
+            path: path.view,
+            mode: mode,
+            options: options,
+            permissions: Kernel.File.Permissions(rawValue: 0o644)
+        )
         return File.Descriptor(__unchecked: descriptor)
     }
 

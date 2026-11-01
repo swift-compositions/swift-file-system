@@ -1,27 +1,27 @@
 import Environment
 import Kernel
-public import Paths
+public import Path
 import Strings
 
 extension File {
 
-    public typealias Path = Paths.Path
+    public typealias Path = Path::Path
 }
 
 extension File.Path {
 
     @usableFromInline
-    package init(__unchecked: Void, _ path: Paths.Path) {
+    package init(__unchecked: Void, _ path: Path::Path) {
         self = path
     }
 
     @usableFromInline
     package init(__unchecked: Void, _ string: Swift.String) {
-        self = Paths.Path(stringLiteral: string)
+        self = Path::Path(stringLiteral: string)
     }
 
     @usableFromInline
-    package var parentOrSelf: Paths.Path {
+    package var parentOrSelf: Path::Path {
         parent ?? self
     }
 }
@@ -33,7 +33,7 @@ extension File.Path {
         @usableFromInline
         internal init(cString: UnsafePointer<CChar>) {
             let string = unsafe Swift.String(cString: cString)
-            self = Paths.Path(stringLiteral: string)
+            self = Path::Path(stringLiteral: string)
         }
     }
 

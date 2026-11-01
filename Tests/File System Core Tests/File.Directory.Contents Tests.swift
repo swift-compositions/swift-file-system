@@ -132,7 +132,7 @@ extension File.Directory.Contents.Test.Unit {
     @Test
     func `List non-existent directory throws pathNotFound`() throws {
         try File.Directory.temporary { dir in
-            let nonExistent = dir.path / "non-existent-\(Int.random(in: (0..<Int.max)))"
+            let nonExistent = try dir.path.appending("non-existent-\(Int.random(in: (0..<Int.max)))")
             let nonExistentDir = File.Directory(nonExistent)
 
             #expect(throws: File.Directory.Contents.Error.self) {

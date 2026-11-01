@@ -5,8 +5,6 @@ extension File.System.Canonical {
     public enum Error: Swift.Error, Sendable, Equatable {
 
         case resolution(Path::Path.Canonical.Error)
-
-        case representation(File.Path.Error)
     }
 }
 
@@ -33,9 +31,6 @@ extension File.System.Canonical.Error: CustomStringConvertible {
         switch self {
         case .resolution(let error):
             return "Path canonicalization failed: \(error)"
-
-        case .representation(let error):
-            return "Canonical path cannot be represented: \(error)"
         }
     }
 }

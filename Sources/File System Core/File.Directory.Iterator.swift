@@ -63,10 +63,7 @@ extension File.Directory.Iterator {
     ) throws(Self.Error) -> File.Directory.Iterator {
         let stream: Kernel.Directory.Stream
         do throws(Kernel.Directory.Error) {
-            stream = try directory.path.withKernelPath {
-                kernelPath throws(Kernel.Directory.Error) in
-                try Kernel.Directory.open(at: kernelPath)
-            }
+            stream = try Kernel.Directory.open(at: directory.path.view)
         } catch {
             throw .directory(error)
         }
@@ -138,9 +135,7 @@ extension File.Directory.Iterator {
         }
 
         do throws(Kernel.File.Stats.Error) {
-            let stats = try entryPath.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                try Kernel.File.Stats.lget(path: kernelPath)
-            }
+            let stats = try Kernel.File.Stats.lget(path: entryPath.view)
             switch stats.type {
             case .regular:
                 return .file

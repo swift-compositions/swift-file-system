@@ -58,11 +58,7 @@ extension File.System.Link.Symbolic {
         pointingTo target: borrowing File.Path
     ) throws(Self.Error) {
         do throws(Kernel.Link.Symbolic.Error) {
-            try target.withKernelPath { targetKernelPath throws(Kernel.Link.Symbolic.Error) in
-                try path.withKernelPath { pathKernelPath throws(Kernel.Link.Symbolic.Error) in
-                    try Kernel.Link.Symbolic.create(target: targetKernelPath, at: pathKernelPath)
-                }
-            }
+            try Kernel.Link.Symbolic.create(target: target.view, at: path.view)
         } catch {
             throw .symlink(error)
         }

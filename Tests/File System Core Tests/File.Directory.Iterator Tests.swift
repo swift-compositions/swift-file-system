@@ -123,7 +123,7 @@ extension File.Directory.Iterator.Test.Unit {
 extension File.Directory.Iterator.Test.`Edge Case` {
     @Test
     func `open on non-existent directory throws pathNotFound`() throws {
-        let directory = File.Directory("/nonexistent-dir-\(Int.random(in: (0..<Int.max)))")
+        let directory = File.Directory(try File.Path("/nonexistent-dir-\(Int.random(in: (0..<Int.max)))"))
 
         #expect(throws: File.Directory.Iterator.Error.self) {
             _ = try File.Directory.Iterator.open(at: directory)

@@ -14,14 +14,12 @@
             do throws(Kernel.File.Open.Error) {
 
                 var descriptor: Kernel.Descriptor = .invalid
-                try path.withKernelPath { kernelPath throws(Kernel.File.Open.Error) in
-                    descriptor = try Kernel.File.Open.open(
-                        path: kernelPath,
-                        mode: mode,
-                        options: [.execClose],
-                        permissions: Kernel.File.Permissions(rawValue: 0)
-                    )
-                }
+                descriptor = try Kernel.File.Open.open(
+                    path: path.view,
+                    mode: mode,
+                    options: [.execClose],
+                    permissions: Kernel.File.Permissions(rawValue: 0)
+                )
                 return descriptor
             } catch {
                 throw .open(error)
@@ -32,9 +30,7 @@
             _ path: borrowing File.Path
         ) throws(File.System.IO.Error) -> Kernel.File.Stats {
             do throws(Kernel.File.Stats.Error) {
-                return try path.withKernelPath { kernelPath throws(Kernel.File.Stats.Error) in
-                    try Kernel.File.Stats.get(path: kernelPath)
-                }
+                return try Kernel.File.Stats.get(path: path.view)
             } catch {
                 throw .stat(error)
             }

@@ -13,7 +13,7 @@ extension File.Path.Temporary {
 extension File.Path.Temporary.Test.Sibling {
     @Test
     func `Path has requested parent prefix and suffix`() throws {
-        let destination = try File.Path("/work/Packages/swift-example")
+        let destination = File.Path("/work/Packages/swift-example")
 
         let temporary = try File.Path.Temporary.sibling(
             of: destination,
@@ -29,7 +29,7 @@ extension File.Path.Temporary.Test.Sibling {
 
     @Test
     func `Successive paths are distinct`() throws {
-        let destination = try File.Path("/work/Packages/swift-example")
+        let destination = File.Path("/work/Packages/swift-example")
 
         let first = try File.Path.Temporary.sibling(of: destination, prefix: ".workspace-")
         let second = try File.Path.Temporary.sibling(of: destination, prefix: ".workspace-")

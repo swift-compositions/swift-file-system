@@ -31,14 +31,12 @@
             options: Glob.Options
         ) throws(Glob.Error) -> [Swift.String] {
             var results: [Swift.String] = []
-            try directory.path.withKernelPath { kernelPath throws(Glob.Error) in
-                try Glob.match(
-                    include: include,
-                    excluding: excluding,
-                    in: kernelPath,
-                    options: options
-                ) { results.append($0) }
-            }
+            try Glob.match(
+                include: include,
+                excluding: excluding,
+                in: directory.path.view,
+                options: options
+            ) { results.append($0) }
 
             return results
         }

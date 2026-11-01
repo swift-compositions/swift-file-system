@@ -55,7 +55,7 @@ import Testing
             try File.Directory.temporary { dir in
 
                 let longName = Swift.String(repeating: "a", count: 100) + ".txt"
-                let filePath = dir.path / "\(longName)"
+                let filePath = try dir.path.appending("\(longName)")
 
                 try File.System.Write.Atomic.write(([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)), to: filePath)
                 #expect(File.System.Stat.exists(at: filePath))

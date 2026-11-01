@@ -54,21 +54,18 @@ extension File.System.Canonical.Test.Unit {
         #endif
 
         @Test
-        func `Resolve reports an unrepresentable physical target`() throws {
+        func `Resolve represents a physical target with a control character`() throws {
             try File.Directory.temporary { directory in
-                var rawTarget: [File.Path.Char] = directory.path.withKernelPath { path in
-                    var bytes: [File.Path.Char] = []
-                    bytes.reserveCapacity(path.count + 3)
-                    for index in 0..<path.count {
-                        bytes.append(path.span[index])
-                    }
-                    return bytes
+                var rawTarget: [File.Path.Char] = []
+                rawTarget.reserveCapacity(directory.path.count + 3)
+                for index in 0..<directory.path.count {
+                    rawTarget.append(directory.path.unit(at: index))
                 }
                 rawTarget.append(0x2F)
                 rawTarget.append(0x01)
                 rawTarget.append(0)
 
-                try unsafe rawTarget.withUnsafeBufferPointer {
+                try rawTarget.withUnsafeBufferPointer {
                     pointer throws(Kernel.Directory.Create.Error) in
                     let path = unsafe Path.Borrowed(
                         pointer.baseAddress!,
@@ -77,7 +74,7 @@ extension File.System.Canonical.Test.Unit {
                     try Kernel.Directory.Create.create(path)
                 }
                 defer {
-                    try? unsafe rawTarget.withUnsafeBufferPointer {
+                    try? rawTarget.withUnsafeBufferPointer {
                         pointer throws(Kernel.Directory.Remove.Error) in
                         let path = unsafe Path.Borrowed(
                             pointer.baseAddress!,
@@ -88,24 +85,19 @@ extension File.System.Canonical.Test.Unit {
                 }
 
                 let link = directory.path / "link"
-                try unsafe rawTarget.withUnsafeBufferPointer {
+                try rawTarget.withUnsafeBufferPointer {
                     targetPointer throws(Kernel.Link.Symbolic.Error) in
                     let target = unsafe Path.Borrowed(
                         targetPointer.baseAddress!,
                         count: targetPointer.count - 1
                     )
-                    try link.withKernelPath { linkPath throws(Kernel.Link.Symbolic.Error) in
-                        try Kernel.Link.Symbolic.create(target: target, at: linkPath)
-                    }
+                    try Kernel.Link.Symbolic.create(target: target, at: link.view)
                 }
                 defer { try? File.System.Delete.delete(at: link) }
 
-                do throws(File.System.Canonical.Error) {
-                    _ = try File.System.Canonical.resolve(link)
-                    Issue.record("Expected the physical target to fail File.Path validation")
-                } catch {
-                    #expect(error == .representation(.containsControlCharacters))
-                }
+                // What the system returns is always a path: control characters included.
+                let resolved = try File.System.Canonical.resolve(link)
+                #expect(resolved.unit(at: resolved.count - 1) == 0x01)
             }
         }
     #endif

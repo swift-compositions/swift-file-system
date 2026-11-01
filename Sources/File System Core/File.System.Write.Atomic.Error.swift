@@ -70,7 +70,7 @@ extension File.System.Write.Atomic {
 
         case platformIncompatible(operation: Swift.String, message: Swift.String)
 
-        case invalidPath(Paths.Path.Error)
+        case invalidPath(Path::Path.Error)
     }
 }
 

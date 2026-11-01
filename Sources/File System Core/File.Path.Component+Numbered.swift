@@ -1,4 +1,4 @@
-public import Paths
+public import Path
 
 extension File.Path.Component {
 
@@ -7,7 +7,7 @@ extension File.Path.Component {
     public func numbered(_ number: Int) -> File.Path.Component {
         guard number > 1 else { return self }
         let suffix = self.extension.map { "." + $0.string } ?? ""
-        do throws(Paths.Path.Component.Error) {
+        do throws(Path::Path.Component.Error) {
             return try File.Path.Component("\(stem.string) \(number)\(suffix)")
         } catch {
             // A space and digits add no separator, control character or NUL that this name did not hold.

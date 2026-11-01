@@ -38,12 +38,10 @@ import Testing
                 let filePath = dir.path / "readonly.txt"
                 try File.System.Write.Atomic.write([], to: filePath)
 
-                try filePath.withKernelPath { kernelPath in
-                    try Kernel.File.Attributes.set(
-                        Kernel.File.Permissions(rawValue: 0o444),
-                        at: kernelPath
-                    )
-                }
+                try Kernel.File.Attributes.set(
+                    Kernel.File.Permissions(rawValue: 0o444),
+                    at: filePath.view
+                )
 
                 let perms = try File.System.Metadata.Permissions(at: filePath)
                 #expect(!perms.contains(.ownerWrite))
