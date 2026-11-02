@@ -1,4 +1,5 @@
 public import Either
+public import Kernel
 
 extension File {
 
@@ -20,6 +21,31 @@ extension File.Read {
         _ body: (Swift.Span<Byte>) throws(E) -> R
     ) throws(Either<File.System.Read.Full.Error, E>) -> R {
         try File.System.Read.Full.read(from: path, body: body)
+    }
+
+    @inlinable
+    public func bytes() throws(File.System.Read.Full.Error) -> [Byte] {
+        try File.System.Read.Full.bytes(at: path)
+    }
+
+    @inlinable
+    public func bytes(
+        from offset: Kernel.File.Offset,
+        count: Kernel.File.Size
+    ) throws(File.System.Read.Range.Error) -> [Byte] {
+        try File.System.Read.Range.bytes(at: path, from: offset, count: count)
+    }
+
+    @inlinable
+    public func ifExists() throws(File.System.Read.Full.Error) -> [Byte]? {
+        do throws(File.System.Read.Full.Error) {
+            return try File.System.Read.Full.bytes(at: path)
+        } catch {
+            if error.isNotFound {
+                return nil
+            }
+            throw error
+        }
     }
 }
 

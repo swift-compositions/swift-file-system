@@ -40,14 +40,20 @@ extension File.Write {
     }
 
     @inlinable
-    public func append(_ bytes: borrowing Swift.Span<Byte>) throws(File.System.Write.Append.Error) {
-        try File.System.Write.Append.append(bytes, to: path)
+    public func append(
+        _ bytes: borrowing Swift.Span<Byte>,
+        options: File.System.Create.Options = .init()
+    ) throws(File.System.Write.Append.Error) {
+        try File.System.Write.Append.append(bytes, to: path, options: options)
     }
 
     @inlinable
-    public func append(_ string: Swift.String) throws(File.System.Write.Append.Error) {
+    public func append(
+        _ string: Swift.String,
+        options: File.System.Create.Options = .init()
+    ) throws(File.System.Write.Append.Error) {
         let utf8 = [Byte](utf8: string)
-        try append(utf8.span)
+        try append(utf8.span, options: options)
     }
 
     @inlinable

@@ -57,6 +57,18 @@ extension File.Stat {
     }
 
     @inlinable
+    public func ifExists(followSymlinks: Bool = true) throws(Kernel.File.Stats.Error) -> File.System.Metadata.Info? {
+        do throws(Kernel.File.Stats.Error) {
+            return try File.System.Stat.info(at: path, followSymlinks: followSymlinks)
+        } catch {
+            if case .platform(let p) = error, p.code.isNotFound {
+                return nil
+            }
+            throw error
+        }
+    }
+
+    @inlinable
     public var isEmpty: Bool {
         get throws(Kernel.File.Stats.Error) {
             try size.isZero
