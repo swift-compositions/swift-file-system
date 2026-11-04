@@ -78,7 +78,9 @@ let package = Package(
                 "File System Core",
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Either", package: "swift-either"),
-                .product(name: "Executors", package: "swift-executors"),  // unconditional until SwiftPM resolves mixed trait requests (swift-institute/Issues#123); the code stays behind #if Watch and #if IO
+                // Unconditional until SwiftPM resolves mixed trait requests (swift-institute/Issues#123);
+                // the code stays behind #if Watch and #if IO.
+                .product(name: "Executors", package: "swift-executors"),
                 .product(name: "Thread Pool", package: "swift-threads", condition: .when(traits: ["Threads"])),
                 .product(name: "Glob", package: "swift-glob", condition: .when(traits: ["Glob"])),
                 .product(name: "IO Kernel", package: "swift-io-kernel", condition: .when(traits: ["IO"])),
