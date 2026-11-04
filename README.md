@@ -1,156 +1,27 @@
 # swift-file-system
 
-![CI](https://github.com/swift-compositions/swift-file-system/actions/workflows/ci.yml/badge.svg) ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
+Use this package when your code reads, writes, lists, copies, moves or deletes files and directories, and you want writes that can't leave a half-written file and errors you can switch over. Start from `File` for a single file and `File.Directory` for a folder; `File.System` holds the same operations as static functions on paths. If you only need path values, use swift-path. If you need the raw system calls, use swift-kernel.
 
-File system operations for Swift, exposing a `File` value type for reading, writing, scoped handles, atomic writes, and directory traversal with typed-throws error handling.
+## Laws
 
----
-
-## Key Features
-
-- **`File` value type** — A `Hashable`, `Sendable` reference to a path that exposes `read`, `write`, `stat`, and `open` accessors.
-- **Typed throws end-to-end** — Each operation throws a specific error type (`File.System.Write.Atomic.Error`, `File.Directory.Contents.Error`, …); no `any Error` reaches the surface.
-- **Zero-copy reads** — `read.full { span in … }` hands the closure a borrowed `Swift.Span<Byte>`, so decoding or checksumming needs no intermediate `[UInt8]` copy.
-- **Crash-safe atomic writes** — `write.atomic(_:)` writes to a temporary file and renames it into place, so a process that dies mid-write never leaves a half-written file.
-- **Async variants on a dedicated thread pool** — With the `Threads` trait, read, write, create, and list each have an `async` form that runs the blocking syscall off the cooperative pool.
-- **Directory traversal** — `File.Directory` provides entry listing and recursive walk over `files`, `directories`, and `entries`, and glob matching with the `Glob` trait.
-
----
-
-## Quick Start
-
-```swift
-import File_System
-
-// Crash-safe configuration update: write to a temp file, then atomically
-// rename it into place — readers never observe a partially written file.
-let config = File(try File.Path("/etc/app/config.json"))
-try config.write.atomic(#"{ "logLevel": "debug" }"#)
-
-// Zero-copy read: the closure borrows the file's bytes directly, decoding
-// without an intermediate [UInt8] allocation.
-let logLevel = try config.read.full { bytes in
-    String(decoding: bytes, as: UTF8.self)
-}
-
-// List a directory and act on regular files, preserving raw filename bytes.
-let project = File.Directory(try File.Path("/Users/me/project"))
-for entry in try project.entries() where entry.type == .file {
-    print(String(lossy: entry.name))
-}
-```
-
----
-
-## Installation
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/swift-compositions/swift-file-system.git", from: "0.6.0")
-]
-```
-
-```swift
-.target(
-    name: "YourTarget",
-    dependencies: [
-        .product(name: "File System", package: "swift-file-system")
-    ]
-)
-```
-
-Requires Swift 6.3.1 and macOS 26 / iOS 26 / tvOS 26 / watchOS 26.
-
----
-
-## Architecture
-
-Two library products. `File System` re-exports its `File System Core` target, so consumers import only `File_System`.
-
-| Product | Import | When to import |
-|---------|--------|----------------|
-| `File System` | `File_System` | The `File` / `File.Directory` API: synchronous read, write, open, and stat; directory creation, listing, recursive walk, copy, move, and delete. Traits add the rest. |
-| `File System Test Support` | `File_System_Test_Support` | Test targets exercising file-system code; provides fixtures and helpers built on `File System` and the kernel test support. |
-
-With no traits, `File System` loads only its core and the kernel. Each trait adds one capability and the packages it needs; none is on by default.
-
-| Trait | Adds | Loads |
-|-------|------|-------|
-| `Watch` | `File.Directory.Watch`: directory change notification | swift-executors |
-| `Threads` | The `async` overloads, which run the blocking call on `Kernel.Thread.Pool` | swift-threads |
-| `Glob` | `File.Directory.Glob`: directory matching by glob pattern (enables `Threads`) | swift-glob, swift-threads |
-| `IO` | `File.System.IO`: the file system's capabilities for the IO executor model | swift-io-kernel, swift-threads, swift-executors, swift-span, swift-memory |
-
-```swift
-.package(url: "https://github.com/swift-compositions/swift-file-system.git", branch: "main", traits: ["Threads"])
-```
-
----
-
-## Error Handling
-
-The Quick Start's `write.atomic(_:)` throws a typed `File.System.Write.Atomic.Error`:
-
-```
-File.System.Write.Atomic.Error
-├── .parentVerificationFailed          // parent directory verification or creation failed
-├── .destinationStatFailed             // stat on the destination file failed
-├── .tempFileCreationFailed            // temp file creation failed
-├── .writeFailed                       // write operation failed (reports bytesWritten/bytesExpected)
-├── .syncFailed                        // fsync/flush of the temp file failed
-├── .closeFailed                       // closing the temp file failed
-├── .metadataPreservationFailed        // preserving owner/mode/xattrs failed
-├── .timestampPreservationFailed       // futimens timestamp preservation failed
-├── .renameFailed                      // the atomic rename into place failed
-├── .destinationExists                 // destination already exists (noClobber mode)
-├── .directorySyncFailed               // directory sync failed before commit completed
-├── .directorySyncFailedAfterCommit    // rename succeeded but directory sync failed — durability compromised
-├── .randomGenerationFailed            // CSPRNG failed; cannot generate secure temp file names
-├── .platformIncompatible              // platform struct-layout incompatibility at runtime
-└── .invalidPath                       // input path failed validation (wraps Paths.Path.Error)
-```
-
-```swift
-do {
-    let config = File(try File.Path("/etc/app/config.json"))
-    try config.write.atomic(#"{ "logLevel": "debug" }"#)
-} catch .parentVerificationFailed {
-} catch .destinationStatFailed {
-} catch .tempFileCreationFailed {
-} catch .writeFailed {
-} catch .syncFailed {
-} catch .closeFailed {
-} catch .metadataPreservationFailed {
-} catch .timestampPreservationFailed {
-} catch .renameFailed {
-} catch .destinationExists {
-    // another writer beat us to it in noClobber mode
-} catch .directorySyncFailed {
-} catch .directorySyncFailedAfterCommit {
-    // file is complete on disk, but durability is not guaranteed — do not retry
-} catch .randomGenerationFailed {
-} catch .platformIncompatible {
-} catch .invalidPath {
-    // the path string could not be validated as a File.Path
-}
-```
-
-Other file-system operations expose their own typed errors with the same exhaustive shape — for example `write.append(_:)` throws `File.System.Write.Append.Error`, directory listing throws `File.Directory.Contents.Error`, and delete throws `File.System.Delete.Error`.
-
----
-
-## Community
-
-<!-- BEGIN: discussion -->
-*A discussion thread will open with the first tagged release.*
-<!-- END: discussion -->
-
-## Status & maintainer
-
-This package is public alpha (pre-1.0): interfaces are stabilizing and APIs may change between minor versions.
-
-Maintained by [Coen ten Thije Boonkkamp](https://github.com/coenttb) — available for Swift infrastructure and document-systems consulting: coen@coenttb.com.
-
-## License
-
-Apache 2.0. See [LICENSE](LICENSE.md).
+- `File.System.Write.Atomic` writes a hidden temporary file beside the destination and renames it into place, so a reader sees either the old file or the whole new one. If anything fails before the rename, the temporary file is removed.
+- By default an atomic write replaces an existing file, keeps that file's permissions, and leaves ownership and timestamps as the new file has them. It syncs the file, then after the rename syncs the parent directory. With `dataOnly` durability only the file's data is synced, with `none` nothing is, and in both cases the directory is not synced.
+- If the directory sync fails after the rename, the write still throws, but the new file is already in place. Don't retry it as if nothing was written.
+- An atomic or streaming write needs the parent directory to exist unless `createIntermediates` is true. The `noClobber` strategy refuses a destination that exists.
+- `File.System.Write.Atomic.free(_:to:options:createIntermediates:)` and `File.System.Move.free(from:to:)` never replace a file. When the name is taken they use the first free name numbered as Finder numbers a copy: `Report 2.pdf`, then `Report 3.pdf`. A move whose source already has one of those names leaves it where it is.
+- A streaming write is atomic in the same way by default. Its direct mode writes in place: it truncates an existing file by default, refuses one with the `create` strategy, and a failure partway leaves the bytes written so far. With a fill closure, returning 0 ends the write and returning more than the buffer holds throws.
+- Appending creates a missing file with permissions 0644 unless others are asked for. An existing file keeps its permissions.
+- Reading a whole file takes its size when it is opened and reads that many bytes. Reading a directory throws. A range read returns fewer bytes when the file ends first. `File.Read.ifExists()` returns nil only when nothing is at the path; a directory still throws.
+- Listing a directory leaves out `.` and `..` and returns entries in the order the system gives them, unsorted. A symbolic link is listed as a link and not followed, so `File.Directory.files` and `File.Directory.directories` leave links out.
+- `File.Directory.Walk` visits each entry before its contents. A `maxDepth` of 0 gives only the directory's own entries. Hidden entries are included and symbolic links are not followed unless asked. When links are followed, each directory is visited once by device and inode, so a link cycle ends. `skip` leaves out an entry's subtree, while `break` or a throwing body stops the whole walk, not only the current level. An entry whose name can't be a path component is skipped by default.
+- Deleting never follows a symbolic link: the link goes and its target stays, also inside a recursive delete. Deleting a non-empty directory throws unless the delete is recursive. `ifExists()` ignores only a missing path.
+- Copying refuses an existing destination, copies permissions and timestamps, and follows symbolic links by default. A recursive copy with `overwrite` deletes the destination first. If it then fails, the partial copy is removed. Without following, links inside the tree are recreated pointing at the same target, and devices, pipes and sockets are skipped.
+- Moving refuses an existing destination by default, even a dangling symbolic link. Across volumes a file is copied with its attributes and then the source is deleted.
+- Creating a directory throws if it exists. Creating it recursively succeeds when a directory is already there. New directories are created with permissions 0755.
+- `File.Name` keeps the bytes the system returned, which need not be UTF-8. Converting to `String` gives nil for such a name, and the lossy form uses the replacement character.
+- `File.Path.Component.init(cleaning:)` applies the POSIX and Windows rules together on every platform: forbidden, control and format characters become spaces, runs of white space become one space, leading and trailing spaces and dots go, and a Windows device name such as `con.txt` gets `_` after its first part. Cleaning a cleaned name changes nothing.
+- `File.Path.Component.bounded(to:)` cuts to 255 UTF-8 bytes by default, on a character boundary, and may leave a trailing space or dot. A component's extension is what follows its last dot. A name whose only dot leads, such as `.profile`, has none.
+- `File.Path.Temporary.deterministic(prefix:key:suffix:)` gives the same path for the same inputs, under `TMPDIR` or `/tmp` (`TEMP`, `TMP` or `C:\Temp` on Windows), with unsafe characters in the key sanitized.
+- `File.System.same(_:_:)` compares device and inode after following symbolic links, so two paths to one file are the same.
+- `File.System.Trash.move(_:)` uses the system trash on Apple platforms. On Linux it uses the XDG home trash and writes a `.trashinfo` with the percent-encoded path and the local date and time, numbering a name that is already there. Windows has no trash.
+- `File.Directory.Watch` runs on Apple platforms only. It first yields every directory it watches, the root included, then yields a directory each time an entry in it is added, removed or renamed. A file edited in place is not reported. Hidden directories are not watched by default, and watching more than `limit` directories (1024 by default) throws, as does removing the watched directory. With a `latency`, a burst of changes in one directory is reported once. Cancelling the consuming task ends the watch and closes every descriptor.
