@@ -30,13 +30,13 @@ extension File.Temporary {
         _ body: (File.Path) throws -> T
     ) throws -> T {
         let base = try File.Directory.Temporary.system
-        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())")
+        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())" as Swift.String)
         let dirPath = base.path / dirName
 
         try File.System.Create.Directory.create(at: dirPath)
         defer { try? File.System.Delete.delete(at: dirPath, recursive: true) }
 
-        let fileName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID()).\(ext)")
+        let fileName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID()).\(ext)" as Swift.String)
         let filePath = dirPath / fileName
 
         return try body(filePath)
@@ -47,13 +47,13 @@ extension File.Temporary {
         _ body: (File.Path) async throws -> T
     ) async throws -> T {
         let base = try File.Directory.Temporary.system
-        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())")
+        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())" as Swift.String)
         let dirPath = base.path / dirName
 
         try File.System.Create.Directory.create(at: dirPath)
         defer { try? File.System.Delete.delete(at: dirPath, recursive: true) }
 
-        let fileName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID()).\(ext)")
+        let fileName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID()).\(ext)" as Swift.String)
         let filePath = dirPath / fileName
 
         return try await body(filePath)

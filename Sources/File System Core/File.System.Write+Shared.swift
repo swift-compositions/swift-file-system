@@ -27,7 +27,7 @@ extension File.System.Write {
     internal static func randomToken(
         length: Int
     ) throws(Self.Error) -> Swift.String {
-        try unsafe withUnsafeTemporaryAllocation(
+        try withUnsafeTemporaryAllocation(
             of: UInt8.self,
             capacity: length
         ) { buffer throws(Self.Error) -> Swift.String in

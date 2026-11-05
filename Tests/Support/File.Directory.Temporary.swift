@@ -96,7 +96,7 @@ extension File.Directory.Temporary.Scope {
         _ body: (File.Directory) throws -> T
     ) throws -> T {
         let base = try File.Directory.Temporary.system
-        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())")
+        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())" as Swift.String)
         let path = base.path / dirName
 
         try File.System.Create.Directory.create(at: path)
@@ -110,7 +110,7 @@ extension File.Directory.Temporary.Scope {
         _ body: (File.Directory) async throws -> T
     ) async throws -> T {
         let base = try File.Directory.Temporary.system
-        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())")
+        let dirName = try File.Path.Component("\(prefix)-\(File.Directory.Temporary.randomID())" as Swift.String)
         let path = base.path / dirName
 
         try File.System.Create.Directory.create(at: path)

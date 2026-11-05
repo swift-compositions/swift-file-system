@@ -7,11 +7,7 @@ extension File.Path.Component {
     public func numbered(_ number: Int) -> File.Path.Component {
         guard number > 1 else { return self }
         let suffix = self.extension.map { "." + $0.string } ?? ""
-        do throws(Path::Path.Component.Error) {
-            return try File.Path.Component("\(stem.string) \(number)\(suffix)")
-        } catch {
-            // A space and digits add no separator, control character or NUL that this name did not hold.
-            preconditionFailure("\(self) numbered \(number) is not a name: \(error)")
-        }
+        // A space and digits add no separator, control character or NUL that this name did not hold.
+        return File.Path.Component("\(stem.string) \(number)\(suffix)")
     }
 }
