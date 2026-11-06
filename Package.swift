@@ -75,7 +75,7 @@ let package = Package(
         .target(
             name: "File System",
             dependencies: [
-                "File System Core",
+                .target(name: "File System Core"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Either", package: "swift-either"),
                 // Unconditional until SwiftPM resolves mixed trait requests (swift-institute/Issues#123);
@@ -92,8 +92,8 @@ let package = Package(
         .target(
             name: "File System Test Support",
             dependencies: [
-                "File System Core",
-                "File System",
+                .target(name: "File System Core"),
+                .target(name: "File System"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "Kernel Test Support", package: "swift-kernel"),
             ],
@@ -102,7 +102,7 @@ let package = Package(
         .target(
             name: "File System Foundation Integration",
             dependencies: [
-                "File System Core",
+                .target(name: "File System Core"),
                 .product(
                     name: "Path Foundation Integration",
                     package: "swift-path",
@@ -113,7 +113,7 @@ let package = Package(
         .testTarget(
             name: "File System Foundation Integration Tests",
             dependencies: [
-                "File System Foundation Integration",
+                .target(name: "File System Foundation Integration"),
                 .product(
                     name: "Path Foundation Integration",
                     package: "swift-path",
@@ -124,8 +124,8 @@ let package = Package(
         .testTarget(
             name: "File System Core Tests",
             dependencies: [
-                "File System Core",
-                "File System Test Support",
+                .target(name: "File System Core"),
+                .target(name: "File System Test Support"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(name: "ISO 9945 Kernel Time", package: "swift-iso-9945", condition: .when(platforms: [.linux])),
                 .product(name: "Time", package: "swift-time", condition: .when(platforms: [.linux])),
@@ -138,8 +138,8 @@ let package = Package(
         .testTarget(
             name: "File System Tests",
             dependencies: [
-                "File System",
-                "File System Test Support",
+                .target(name: "File System"),
+                .target(name: "File System Test Support"),
                 .product(name: "Kernel", package: "swift-kernel"),
                 .product(
                     name: "Tagged",
