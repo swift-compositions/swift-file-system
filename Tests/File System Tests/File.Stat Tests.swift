@@ -3,12 +3,14 @@ import File_System_Test_Support
 import Kernel
 import Testing
 
-extension File.Stat {
+enum `File.Stat Tests` {}
+
+extension `File.Stat Tests` {
     @Suite
     struct Test {}
 }
 
-extension File.Stat.Test {
+extension `File.Stat Tests`.Test {
     @Test
     func `ifExists is nil for a missing file and the info otherwise`() throws {
         try File.Directory.temporary { dir in

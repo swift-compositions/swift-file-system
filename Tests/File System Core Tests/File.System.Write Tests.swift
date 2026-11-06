@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write {
+enum `File.System.Write Tests` {}
+
+extension `File.System.Write Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write {
     }
 }
 
-extension File.System.Write.Test.Unit {
+extension `File.System.Write Tests`.Test.Unit {
 
     @Test
     func `Write namespace exists`() {

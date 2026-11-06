@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Contents {
+enum `File.Directory.Contents Tests` {}
+
+extension `File.Directory.Contents Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.Directory.Contents {
     }
 }
 
-extension File.Directory.Contents.Test.Unit {
+extension `File.Directory.Contents Tests`.Test.Unit {
 
     @Test
     func `List empty directory`() throws {

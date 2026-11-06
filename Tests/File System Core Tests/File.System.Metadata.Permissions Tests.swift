@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Metadata.Permissions {
+enum `File.System.Metadata.Permissions Tests` {}
+
+extension `File.System.Metadata.Permissions Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Metadata.Permissions {
     }
 }
 
-extension File.System.Metadata.Permissions.Test.Unit {
+extension `File.System.Metadata.Permissions Tests`.Test.Unit {
 
     @Test
     func `Owner permission values`() {

@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory {
+enum `File.Directory Tests` {}
+
+extension `File.Directory Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.Directory {
     }
 }
 
-extension File.Directory.Test.Unit {
+extension `File.Directory Tests`.Test.Unit {
     @Test
     func `init from path`() throws {
         let path = File.Path("/tmp/mydir")
@@ -96,7 +98,7 @@ extension File.Directory.Test.Unit {
     }
 }
 
-extension File.Directory.Test.`Edge Case` {
+extension `File.Directory Tests`.Test.`Edge Case` {
     @Test
     func `Directory with root path`() throws {
         let path: File.Path = "/"

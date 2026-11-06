@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Streaming.Atomic.Strategy {
+enum `File.System.Write.Streaming.Atomic.Strategy Tests` {}
+
+extension `File.System.Write.Streaming.Atomic.Strategy Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Streaming.Atomic.Strategy {
     }
 }
 
-extension File.System.Write.Streaming.Atomic.Strategy.Test.Unit {
+extension `File.System.Write.Streaming.Atomic.Strategy Tests`.Test.Unit {
     @Test
     func `all cases are distinct`() {
         let allCases: [File.System.Write.Streaming.Atomic.Strategy] = [

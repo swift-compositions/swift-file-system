@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Durability {
+enum `File.System.Write.Durability Tests` {}
+
+extension `File.System.Write.Durability Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Durability {
     }
 }
 
-extension File.System.Write.Durability.Test.Unit {
+extension `File.System.Write.Durability Tests`.Test.Unit {
     @Test
     func `all cases are distinct`() {
         let allCases: [File.System.Write.Durability] = [.full, .dataOnly, .none]
@@ -107,7 +109,7 @@ extension File.System.Write.Durability.Test.Unit {
 
 }
 
-extension File.System.Write.Durability.Test.`Edge Case` {
+extension `File.System.Write.Durability Tests`.Test.`Edge Case` {
     @Test
     func `Hashable conformance`() {
         let set: Set<File.System.Write.Durability> = [.full, .dataOnly, .none]

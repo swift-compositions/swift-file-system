@@ -5,7 +5,7 @@ import Testing
 @testable import File_System_Core
 
 #if os(Windows)
-    extension File.System.Metadata.Permissions.Test.Unit {
+    extension `File.System.Metadata.Permissions Tests`.Test.Unit {
 
         @Test
         func `Get permissions on Windows synthesizes 0o644 for a regular writable file`() throws {

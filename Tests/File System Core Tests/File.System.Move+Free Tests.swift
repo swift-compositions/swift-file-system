@@ -4,7 +4,7 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Move.Test.Unit {
+extension `File.System.Move Tests`.Test.Unit {
 
     private static func write(_ text: Swift.String, to path: File.Path) throws {
         let bytes = text.utf8.map(Byte.init(bitPattern:))
@@ -73,14 +73,16 @@ extension File.System.Move.Test.Unit {
     }
 }
 
-extension File.System.Write.Atomic {
+enum `File.System.Write.Atomic Tests` {}
+
+extension `File.System.Write.Atomic Tests` {
     @Suite
     struct `Free Test` {
         @Suite struct Unit {}
     }
 }
 
-extension File.System.Write.Atomic.`Free Test`.Unit {
+extension `File.System.Write.Atomic Tests`.`Free Test`.Unit {
 
     @Test
     func `A free write takes the first free numbered name and replaces nothing`() throws {
@@ -103,14 +105,16 @@ extension File.System.Write.Atomic.`Free Test`.Unit {
     }
 }
 
-extension File.System.Read.Full {
+enum `File.System.Read.Full Tests` {}
+
+extension `File.System.Read.Full Tests` {
     @Suite
     struct `Bytes Test` {
         @Suite struct Unit {}
     }
 }
 
-extension File.System.Read.Full.`Bytes Test`.Unit {
+extension `File.System.Read.Full Tests`.`Bytes Test`.Unit {
 
     @Test
     func `The whole file reads as its bytes, and a missing one fails as not found`() throws {

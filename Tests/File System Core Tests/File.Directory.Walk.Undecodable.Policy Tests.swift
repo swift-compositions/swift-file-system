@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Walk.Undecodable.Policy {
+enum `File.Directory.Walk.Undecodable.Policy Tests` {}
+
+extension `File.Directory.Walk.Undecodable.Policy Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.Directory.Walk.Undecodable.Policy {
     }
 }
 
-extension File.Directory.Walk.Undecodable.Policy.Test.Unit {
+extension `File.Directory.Walk.Undecodable.Policy Tests`.Test.Unit {
 
     @Test
     func `skip case exists`() {
@@ -166,7 +168,7 @@ extension File.Directory.Walk.Undecodable.Policy.Test.Unit {
     }
 }
 
-extension File.Directory.Walk.Undecodable.Policy.Test.`Edge Case` {
+extension `File.Directory.Walk.Undecodable.Policy Tests`.Test.`Edge Case` {
 
     @Test
     func `Policy in optional`() {

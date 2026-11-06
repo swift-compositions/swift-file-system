@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Read {
+enum `File.System.Read Tests` {}
+
+extension `File.System.Read Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Read {
     }
 }
 
-extension File.System.Read.Test.Unit {
+extension `File.System.Read Tests`.Test.Unit {
 
     @Test
     func `Read namespace exists`() {

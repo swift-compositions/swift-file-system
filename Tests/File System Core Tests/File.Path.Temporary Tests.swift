@@ -2,7 +2,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Path.Temporary {
+enum `File.Path.Temporary Tests` {}
+
+extension `File.Path.Temporary Tests` {
     @Suite
     struct Test {
         @Suite struct Deterministic {}
@@ -10,7 +12,7 @@ extension File.Path.Temporary {
     }
 }
 
-extension File.Path.Temporary.Test.Sibling {
+extension `File.Path.Temporary Tests`.Test.Sibling {
     @Test
     func `Path has requested parent prefix and suffix`() throws {
         let destination = File.Path("/work/Packages/swift-example")
@@ -38,7 +40,7 @@ extension File.Path.Temporary.Test.Sibling {
     }
 }
 
-extension File.Path.Temporary.Test.Deterministic {
+extension `File.Path.Temporary Tests`.Test.Deterministic {
     @Test
     func `Same triple produces same path`() throws {
         let first = try File.Path.Temporary.deterministic(

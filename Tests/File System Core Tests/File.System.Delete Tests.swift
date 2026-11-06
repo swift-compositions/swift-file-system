@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Delete {
+enum `File.System.Delete Tests` {}
+
+extension `File.System.Delete Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Delete {
     }
 }
 
-extension File.System.Delete.Test.Unit {
+extension `File.System.Delete Tests`.Test.Unit {
 
     @Test
     func `Delete existing file`() throws {
@@ -169,7 +171,7 @@ extension File.System.Delete.Test.Unit {
     }
 }
 
-extension File.System.Delete.Test.`Edge Case` {
+extension `File.System.Delete Tests`.Test.`Edge Case` {
 
     #if !os(Windows)
         @Test

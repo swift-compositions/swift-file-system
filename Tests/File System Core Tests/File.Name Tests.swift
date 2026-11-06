@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Name {
+enum `File.Name Tests` {}
+
+extension `File.Name Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -16,7 +18,7 @@ extension File.Name {
 
 #if os(macOS) || os(Linux)
 
-    extension File.Name.Test.Unit {
+    extension `File.Name Tests`.Test.Unit {
 
         @Test
         func `isHiddenByDotPrefix returns true for dot-prefixed names`() {
@@ -216,7 +218,7 @@ extension File.Name {
         }
     }
 
-    extension File.Name.Test.`Edge Case` {
+    extension `File.Name Tests`.Test.`Edge Case` {
 
         @Test
         func `empty name`() {

@@ -1,7 +1,7 @@
 import File_System_Core
 import Testing
 
-extension Path.Component {
+extension `Path.Component Tests` {
     @Suite
     struct Cleaning {
         @Suite
@@ -12,7 +12,7 @@ extension Path.Component {
     }
 }
 
-extension Path.Component.Cleaning.Unit {
+extension `Path.Component Tests`.Cleaning.Unit {
 
     @Test
     func `text a portable name can hold is kept as it is`() {
@@ -77,7 +77,7 @@ extension Path.Component.Cleaning.Unit {
     }
 }
 
-extension Path.Component.Cleaning.`Edge Case` {
+extension `Path.Component Tests`.Cleaning.`Edge Case` {
 
     @Test
     func `text with nothing nameable has no component`() {

@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Streaming.Atomic {
+enum `File.System.Write.Streaming.Atomic Tests` {}
+
+extension `File.System.Write.Streaming.Atomic Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Streaming.Atomic {
     }
 }
 
-extension File.System.Write.Streaming.Atomic.Test.Unit {
+extension `File.System.Write.Streaming.Atomic Tests`.Test.Unit {
 
     @Test
     func `Atomic namespace exists`() {

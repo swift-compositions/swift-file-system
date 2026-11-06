@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Move {
+enum `File.System.Move Tests` {}
+
+extension `File.System.Move Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Move {
     }
 }
 
-extension File.System.Move.Test.Unit {
+extension `File.System.Move Tests`.Test.Unit {
 
     @Test
     func `Move file to new location`() throws {
@@ -237,7 +239,7 @@ extension File.System.Move.Test.Unit {
 }
 
 #if !os(Windows)
-    extension File.System.Move.Test.`Edge Case` {
+    extension `File.System.Move Tests`.Test.`Edge Case` {
 
         // A dangling symlink is an entry `stat` cannot see, standing in for a file
         // that appears after a check-then-rename's check: an exclusive rename still

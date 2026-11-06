@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Streaming.Commit.Policy {
+enum `File.System.Write.Streaming.Commit.Policy Tests` {}
+
+extension `File.System.Write.Streaming.Commit.Policy Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Streaming.Commit.Policy {
     }
 }
 
-extension File.System.Write.Streaming.Commit.Policy.Test.Unit {
+extension `File.System.Write.Streaming.Commit.Policy Tests`.Test.Unit {
     @Test
     func `.atomic case with default options`() {
         let policy: File.System.Write.Streaming.Commit.Policy = .atomic()
@@ -79,7 +81,7 @@ extension File.System.Write.Streaming.Commit.Policy.Test.Unit {
     }
 }
 
-extension File.System.Write.Streaming.Commit.Policy.Test.`Edge Case` {
+extension `File.System.Write.Streaming.Commit.Policy Tests`.Test.`Edge Case` {
     @Test
     func `atomic with none durability`() {
         let options = File.System.Write.Streaming.Atomic.Options(durability: .none)

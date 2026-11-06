@@ -6,7 +6,7 @@ import Testing
 @testable import File_System_Core
 
 #if os(Windows)
-    extension File.System.Metadata.Ownership.Test.Unit {
+    extension `File.System.Metadata.Ownership Tests`.Test.Unit {
 
         @Test
         func `Get ownership on Windows returns zero values`() throws {

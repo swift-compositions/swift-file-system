@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Streaming.Direct.Options {
+enum `File.System.Write.Streaming.Direct.Options Tests` {}
+
+extension `File.System.Write.Streaming.Direct.Options Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Streaming.Direct.Options {
     }
 }
 
-extension File.System.Write.Streaming.Direct.Options.Test.Unit {
+extension `File.System.Write.Streaming.Direct.Options Tests`.Test.Unit {
     @Test
     func `default init values`() {
         let options = File.System.Write.Streaming.Direct.Options()
@@ -60,7 +62,7 @@ extension File.System.Write.Streaming.Direct.Options.Test.Unit {
     }
 }
 
-extension File.System.Write.Streaming.Direct.Options.Test.`Edge Case` {
+extension `File.System.Write.Streaming.Direct.Options Tests`.Test.`Edge Case` {
     @Test
     func `create with none durability`() {
         let options = File.System.Write.Streaming.Direct.Options(

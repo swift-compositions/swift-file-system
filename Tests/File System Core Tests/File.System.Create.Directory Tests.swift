@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Create.Directory {
+enum `File.System.Create.Directory Tests` {}
+
+extension `File.System.Create.Directory Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Create.Directory {
     }
 }
 
-extension File.System.Create.Directory.Test.Unit {
+extension `File.System.Create.Directory Tests`.Test.Unit {
 
     @Test
     func `Create directory at path`() throws {

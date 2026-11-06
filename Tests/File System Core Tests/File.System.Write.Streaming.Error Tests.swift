@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Streaming.Error {
+enum `File.System.Write.Streaming.Error Tests` {}
+
+extension `File.System.Write.Streaming.Error Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Streaming.Error {
     }
 }
 
-extension File.System.Write.Streaming.Error.Test.Unit {
+extension `File.System.Write.Streaming.Error Tests`.Test.Unit {
     @Test
     func `parentVerificationFailed case`() {
         let path: File.Path = "/nonexistent/parent"
@@ -262,7 +264,7 @@ extension File.System.Write.Streaming.Error.Test.Unit {
     }
 }
 
-extension File.System.Write.Streaming.Error.Test.`Edge Case` {
+extension `File.System.Write.Streaming.Error Tests`.Test.`Edge Case` {
     @Test
     func `Equatable conformance`() {
         let path: File.Path = "/tmp/test.txt"

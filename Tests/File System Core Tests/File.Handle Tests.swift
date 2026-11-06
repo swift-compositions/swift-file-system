@@ -12,7 +12,9 @@ import Testing
     import Musl
 #endif
 
-extension File.Handle {
+enum `File.Handle Tests` {}
+
+extension `File.Handle Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -22,7 +24,7 @@ extension File.Handle {
     }
 }
 
-extension File.Handle.Test.Unit {
+extension `File.Handle Tests`.Test.Unit {
 
     @Test
     func `Open file for reading`() throws {
@@ -301,7 +303,7 @@ extension File.Handle.Test.Unit {
 
 }
 
-extension File.Handle.Test.Unit {
+extension `File.Handle Tests`.Test.Unit {
     @Test
     func `pwrite writes at absolute offset`() throws {
         try File.Directory.temporary { dir in
@@ -456,7 +458,7 @@ extension File.Handle.Test.Unit {
 
 }
 
-extension File.Handle.Test.`Edge Case` {
+extension `File.Handle Tests`.Test.`Edge Case` {
     @Test
     func `advance throws shortWrite when a syscall reports zero progress`() {
         #expect(throws: File.Handle.Error.self) {

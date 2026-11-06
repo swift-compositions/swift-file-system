@@ -8,7 +8,9 @@ private func byteChunks(_ chunks: [UInt8]...) -> [[Byte]] {
     chunks.map { $0.map(Byte.init(bitPattern:)) }
 }
 
-extension File.System.Write.Streaming {
+enum `File.System.Write.Streaming Tests` {}
+
+extension `File.System.Write.Streaming Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -18,7 +20,7 @@ extension File.System.Write.Streaming {
     }
 }
 
-extension File.System.Write.Streaming.Test.Unit {
+extension `File.System.Write.Streaming Tests`.Test.Unit {
 
     @Test
     func `Write multiple chunks and read back`() throws {
@@ -346,7 +348,7 @@ extension File.System.Write.Streaming.Test.Unit {
     }
 }
 
-extension File.System.Write.Streaming.Test.Integration {
+extension `File.System.Write.Streaming Tests`.Test.Integration {
 
     @Test
     func `createIntermediates creates directories with execute bit`() throws {

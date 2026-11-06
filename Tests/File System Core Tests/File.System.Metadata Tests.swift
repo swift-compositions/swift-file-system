@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Metadata {
+enum `File.System.Metadata Tests` {}
+
+extension `File.System.Metadata Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Metadata {
     }
 }
 
-extension File.System.Metadata.Test.Unit {
+extension `File.System.Metadata Tests`.Test.Unit {
 
     @Test
     func `Metadata namespace exists`() {

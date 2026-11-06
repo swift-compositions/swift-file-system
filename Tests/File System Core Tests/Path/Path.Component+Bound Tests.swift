@@ -1,7 +1,7 @@
 import File_System_Core
 import Testing
 
-extension Path.Component {
+extension `Path.Component Tests` {
     @Suite
     struct Bound {
         @Suite
@@ -12,7 +12,7 @@ extension Path.Component {
     }
 }
 
-extension Path.Component.Bound.Unit {
+extension `Path.Component Tests`.Bound.Unit {
 
     @Test
     func `a component within the bound comes back unchanged`() {
@@ -47,7 +47,7 @@ extension Path.Component.Bound.Unit {
     }
 }
 
-extension Path.Component.Bound.`Edge Case` {
+extension `Path.Component Tests`.Bound.`Edge Case` {
 
     @Test
     func `nothing fits when the first character is larger than the bound`() {

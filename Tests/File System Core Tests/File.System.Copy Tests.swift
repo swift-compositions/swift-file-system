@@ -8,7 +8,9 @@ import Testing
     import Foundation
 #endif
 
-extension File.System.Copy {
+enum `File.System.Copy Tests` {}
+
+extension `File.System.Copy Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -18,7 +20,7 @@ extension File.System.Copy {
     }
 }
 
-extension File.System.Copy.Test.Unit {
+extension `File.System.Copy Tests`.Test.Unit {
 
     @Test
     func `Copy file to new location`() throws {

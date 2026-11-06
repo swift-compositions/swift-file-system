@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Iterator {
+enum `File.Directory.Iterator Tests` {}
+
+extension `File.Directory.Iterator Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.Directory.Iterator {
     }
 }
 
-extension File.Directory.Iterator.Test.Unit {
+extension `File.Directory.Iterator Tests`.Test.Unit {
     @Test
     func `open on valid directory succeeds`() throws {
         try File.Directory.temporary { dir in
@@ -84,7 +86,7 @@ extension File.Directory.Iterator.Test.Unit {
     }
 }
 
-extension File.Directory.Iterator.Test.Unit {
+extension `File.Directory.Iterator Tests`.Test.Unit {
     @Test
     func `isNotFound semantic accessor`() {
         let error = File.Directory.Iterator.Error.directory(.notFound)
@@ -120,7 +122,7 @@ extension File.Directory.Iterator.Test.Unit {
     }
 }
 
-extension File.Directory.Iterator.Test.`Edge Case` {
+extension `File.Directory.Iterator Tests`.Test.`Edge Case` {
     @Test
     func `open on non-existent directory throws pathNotFound`() throws {
         let directory = File.Directory(try File.Path("/nonexistent-dir-\(Int.random(in: (0..<Int.max)))"))

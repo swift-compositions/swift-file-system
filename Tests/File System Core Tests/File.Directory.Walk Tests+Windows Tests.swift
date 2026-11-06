@@ -6,7 +6,7 @@ import Testing
 
 #if os(Windows)
 
-    extension File.Directory.Walk.Test.Unit {
+    extension `File.Directory.Walk Tests`.Test.Unit {
 
         @Test
         func `Walk empty directory`() throws {

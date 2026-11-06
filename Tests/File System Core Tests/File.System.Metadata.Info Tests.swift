@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Metadata.Info {
+enum `File.System.Metadata.Info Tests` {}
+
+extension `File.System.Metadata.Info Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Metadata.Info {
     }
 }
 
-extension File.System.Metadata.Info.Test.Unit {
+extension `File.System.Metadata.Info Tests`.Test.Unit {
 
     @Test
     func `Info initialization`() throws {

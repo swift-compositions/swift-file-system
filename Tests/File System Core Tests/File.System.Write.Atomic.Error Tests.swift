@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Atomic.Error {
+enum `File.System.Write.Atomic.Error Tests` {}
+
+extension `File.System.Write.Atomic.Error Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Atomic.Error {
     }
 }
 
-extension File.System.Write.Atomic.Error.Test.Unit {
+extension `File.System.Write.Atomic.Error Tests`.Test.Unit {
     @Test
     func `Error.parentVerificationFailed`() {
         let path: File.Path = "/nonexistent/parent"
@@ -242,7 +244,7 @@ extension File.System.Write.Atomic.Error.Test.Unit {
     }
 }
 
-extension File.System.Write.Atomic.Error.Test.`Edge Case` {
+extension `File.System.Write.Atomic.Error Tests`.Test.`Edge Case` {
     @Test
     func `Error.writeFailed with zero bytes`() {
         let error = File.System.Write.Atomic.Error.writeFailed(

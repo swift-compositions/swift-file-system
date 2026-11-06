@@ -1,7 +1,7 @@
 import File_System_Core
 import Testing
 
-extension Path {
+extension `Path Tests` {
     @Suite
     struct Navigation {
         @Suite
@@ -9,7 +9,7 @@ extension Path {
     }
 }
 
-extension Path.Navigation.`Edge Case` {
+extension `Path Tests`.Navigation.`Edge Case` {
 
     @Test
     func

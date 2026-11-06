@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Link.Hard {
+enum `File.System.Link.Hard Tests` {}
+
+extension `File.System.Link.Hard Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -16,7 +18,7 @@ extension File.System.Link.Hard {
 
 #if os(macOS) || os(Linux)
 
-    extension File.System.Link.Hard.Test.Unit {
+    extension `File.System.Link.Hard Tests`.Test.Unit {
 
         @Test
         func `Create hard link to file`() throws {

@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Walk {
+enum `File.Directory.Walk Tests` {}
+
+extension `File.Directory.Walk Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -16,7 +18,7 @@ extension File.Directory.Walk {
 
 #if os(macOS) || os(Linux)
 
-    extension File.Directory.Walk.Test.Unit {
+    extension `File.Directory.Walk Tests`.Test.Unit {
         @Test
         func `skip leaves a subdirectory out and the walk goes on`() throws {
             try File.Directory.temporary { dir in
@@ -63,7 +65,7 @@ extension File.Directory.Walk {
         }
     }
 
-    extension File.Directory.Walk.Test.Unit {
+    extension `File.Directory.Walk Tests`.Test.Unit {
         @Test
         func `walk empty directory returns empty array`() throws {
             try File.Directory.temporary { dir in
@@ -281,7 +283,7 @@ extension File.Directory.Walk {
         }
     }
 
-    extension File.Directory.Walk.Test.Unit {
+    extension `File.Directory.Walk Tests`.Test.Unit {
         @Test
         func `Error.pathNotFound description`() {
             let path: File.Path = "/nonexistent"
@@ -354,7 +356,7 @@ extension File.Directory.Walk {
         }
     }
 
-    extension File.Directory.Walk.Test.`Edge Case` {
+    extension `File.Directory.Walk Tests`.Test.`Edge Case` {
         @Test
         func `walk on non-existent directory throws`() throws {
             let path = try File.Path("/nonexistent-\(Int.random(in: (0..<Int.max)))")

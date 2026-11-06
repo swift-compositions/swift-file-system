@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Walk.Undecodable.Context {
+enum `File.Directory.Walk.Undecodable.Context Tests` {}
+
+extension `File.Directory.Walk.Undecodable.Context Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.Directory.Walk.Undecodable.Context {
 }
 #if os(macOS) || os(Linux)
 
-    extension File.Directory.Walk.Undecodable.Context.Test.Unit {
+    extension `File.Directory.Walk.Undecodable.Context Tests`.Test.Unit {
 
         @Test
         func `init stores all properties`() {
@@ -198,7 +200,7 @@ extension File.Directory.Walk.Undecodable.Context {
         }
     }
 
-    extension File.Directory.Walk.Undecodable.Context.Test.`Edge Case` {
+    extension `File.Directory.Walk.Undecodable.Context Tests`.Test.`Edge Case` {
 
         @Test
         func `context with root path as parent`() {

@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Name.Decode.Error {
+enum `File.Name.Decode.Error Tests` {}
+
+extension `File.Name.Decode.Error Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -16,7 +18,7 @@ extension File.Name.Decode.Error {
 
 #if os(macOS) || os(Linux)
 
-    extension File.Name.Decode.Error.Test.Unit {
+    extension `File.Name.Decode.Error Tests`.Test.Unit {
 
         @Test
         func `init stores the undecodable name`() {
@@ -134,7 +136,7 @@ extension File.Name.Decode.Error {
         }
     }
 
-    extension File.Name.Decode.Error.Test.`Edge Case` {
+    extension `File.Name.Decode.Error Tests`.Test.`Edge Case` {
 
         @Test
         func `error with single invalid byte`() {

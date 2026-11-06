@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Atomic.Strategy {
+enum `File.System.Write.Atomic.Strategy Tests` {}
+
+extension `File.System.Write.Atomic.Strategy Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Atomic.Strategy {
     }
 }
 
-extension File.System.Write.Atomic.Strategy.Test.Unit {
+extension `File.System.Write.Atomic.Strategy Tests`.Test.Unit {
     @Test
     func `all cases are distinct`() {
         let allCases: [File.System.Write.Atomic.Strategy] = [.replaceExisting, .noClobber]
@@ -47,7 +49,7 @@ extension File.System.Write.Atomic.Strategy.Test.Unit {
 
 }
 
-extension File.System.Write.Atomic.Strategy.Test.`Edge Case` {
+extension `File.System.Write.Atomic.Strategy Tests`.Test.`Edge Case` {
     @Test
     func `invalid rawValue returns nil`() {
         #expect(File.System.Write.Atomic.Strategy(rawValue: 255) == nil)

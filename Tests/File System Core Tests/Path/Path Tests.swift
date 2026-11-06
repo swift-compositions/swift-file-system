@@ -1,7 +1,9 @@
 import File_System_Core
 import Testing
 
-extension Path {
+enum `Path Tests` {}
+
+extension `Path Tests` {
     @Suite
     struct Test {
 
@@ -288,7 +290,9 @@ extension Path {
     }
 }
 
-extension Path.Error {
+enum `Path.Error Tests` {}
+
+extension `Path.Error Tests` {
     @Suite
     struct Test {
 
@@ -367,7 +371,9 @@ extension Path.Error {
     }
 }
 
-extension Path.Component {
+enum `Path.Component Tests` {}
+
+extension `Path.Component Tests` {
     @Suite
     struct Test {
 
@@ -479,7 +485,9 @@ extension Path.Component {
     }
 }
 
-extension Path.Component.Error {
+enum `Path.Component.Error Tests` {}
+
+extension `Path.Component.Error Tests` {
     @Suite
     struct Test {
 

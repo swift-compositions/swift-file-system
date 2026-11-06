@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Link.Symbolic {
+enum `File.System.Link.Symbolic Tests` {}
+
+extension `File.System.Link.Symbolic Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -16,7 +18,7 @@ extension File.System.Link.Symbolic {
 
 #if os(macOS) || os(Linux)
 
-    extension File.System.Link.Symbolic.Test.Unit {
+    extension `File.System.Link.Symbolic Tests`.Test.Unit {
 
         @Test
         func `Create symlink to file`() throws {

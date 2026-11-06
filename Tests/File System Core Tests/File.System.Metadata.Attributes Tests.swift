@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Metadata.Attributes {
+enum `File.System.Metadata.Attributes Tests` {}
+
+extension `File.System.Metadata.Attributes Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Metadata.Attributes {
     }
 }
 
-extension File.System.Metadata.Attributes.Test.Unit {
+extension `File.System.Metadata.Attributes Tests`.Test.Unit {
 
     @Test
     func `A set attribute reads back and is listed`() throws {
@@ -68,7 +70,7 @@ extension File.System.Metadata.Attributes.Test.Unit {
     }
 }
 
-extension File.System.Metadata.Attributes.Test.`Edge Case` {
+extension `File.System.Metadata.Attributes Tests`.Test.`Edge Case` {
 
     @Test
     func `An attribute the file never had reads as absent`() throws {

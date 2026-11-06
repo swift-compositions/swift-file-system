@@ -6,7 +6,7 @@ import Testing
 
 #if os(Windows)
 
-    extension File.System.Link.Symbolic.Test.Unit {
+    extension `File.System.Link.Symbolic Tests`.Test.Unit {
 
         private static func canCreateSymlinks(in dir: File.Directory) -> Bool {
             guard

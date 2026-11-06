@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Entry {
+enum `File.Directory.Entry Tests` {}
+
+extension `File.Directory.Entry Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -16,7 +18,7 @@ extension File.Directory.Entry {
 
 #if os(macOS) || os(Linux)
 
-    extension File.Directory.Entry.Test.Unit {
+    extension `File.Directory.Entry Tests`.Test.Unit {
         @Test
         func `init with all properties`() throws {
             let parent: File.Path = "/tmp"
@@ -116,7 +118,7 @@ extension File.Directory.Entry {
         }
     }
 
-    extension File.Directory.Entry.Test.`Edge Case` {
+    extension `File.Directory.Entry Tests`.Test.`Edge Case` {
         @Test
         func `entry with name containing spaces`() throws {
             let parent: File.Path = "/tmp"

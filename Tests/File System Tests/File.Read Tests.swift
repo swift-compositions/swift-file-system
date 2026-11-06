@@ -3,12 +3,14 @@ import File_System_Test_Support
 import Kernel
 import Testing
 
-extension File.Read {
+enum `File.Read Tests` {}
+
+extension `File.Read Tests` {
     @Suite
     struct Test {}
 }
 
-extension File.Read.Test {
+extension `File.Read Tests`.Test {
     @Test
     func `bytes reads the whole file`() throws {
         try File.Directory.temporary { dir in

@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Create {
+enum `File.System.Create Tests` {}
+
+extension `File.System.Create Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Create {
     }
 }
 
-extension File.System.Create.Test.Unit {
+extension `File.System.Create Tests`.Test.Unit {
 
     @Test
     func `Create namespace exists`() {
@@ -54,7 +56,7 @@ extension File.System.Create.Test.Unit {
     }
 }
 
-extension File.System.Create.Test.`Edge Case` {
+extension `File.System.Create Tests`.Test.`Edge Case` {
     @Test
     func `Options with zero permissions`() {
         let permissions = File.System.Metadata.Permissions(rawValue: 0o000)

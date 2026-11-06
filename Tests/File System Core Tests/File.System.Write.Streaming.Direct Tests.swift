@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Streaming.Direct {
+enum `File.System.Write.Streaming.Direct Tests` {}
+
+extension `File.System.Write.Streaming.Direct Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Streaming.Direct {
     }
 }
 
-extension File.System.Write.Streaming.Direct.Test.Unit {
+extension `File.System.Write.Streaming.Direct Tests`.Test.Unit {
 
     @Test
     func `Direct namespace exists`() {

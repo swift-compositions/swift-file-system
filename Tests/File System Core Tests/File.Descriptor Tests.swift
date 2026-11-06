@@ -5,7 +5,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Descriptor {
+enum `File.Descriptor Tests` {}
+
+extension `File.Descriptor Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -15,7 +17,7 @@ extension File.Descriptor {
     }
 }
 
-extension File.Descriptor.Test.Unit {
+extension `File.Descriptor Tests`.Test.Unit {
 
     @Test
     func `Open file in read mode`() throws {

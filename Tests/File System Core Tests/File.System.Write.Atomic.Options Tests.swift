@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Atomic.Options {
+enum `File.System.Write.Atomic.Options Tests` {}
+
+extension `File.System.Write.Atomic.Options Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Atomic.Options {
     }
 }
 
-extension File.System.Write.Atomic.Options.Test.Unit {
+extension `File.System.Write.Atomic.Options Tests`.Test.Unit {
     @Test
     func `default init values`() {
         let options = File.System.Write.Atomic.Options()
@@ -84,7 +86,7 @@ extension File.System.Write.Atomic.Options.Test.Unit {
     }
 }
 
-extension File.System.Write.Atomic.Options.Test.`Edge Case` {
+extension `File.System.Write.Atomic.Options Tests`.Test.`Edge Case` {
     @Test
     func `all preservation enabled with strict ownership`() {
         let options = File.System.Write.Atomic.Options(

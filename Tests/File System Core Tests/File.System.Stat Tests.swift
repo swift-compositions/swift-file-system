@@ -5,7 +5,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Stat {
+enum `File.System.Stat Tests` {}
+
+extension `File.System.Stat Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -15,7 +17,7 @@ extension File.System.Stat {
     }
 }
 
-extension File.System.Stat.Test.Unit {
+extension `File.System.Stat Tests`.Test.Unit {
 
     @Test
     func `exists returns true for existing file`() throws {

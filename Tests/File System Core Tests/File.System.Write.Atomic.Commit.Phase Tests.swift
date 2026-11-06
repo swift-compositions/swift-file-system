@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Atomic.Commit.Phase {
+enum `File.System.Write.Atomic.Commit.Phase Tests` {}
+
+extension `File.System.Write.Atomic.Commit.Phase Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Atomic.Commit.Phase {
     }
 }
 
-extension File.System.Write.Atomic.Commit.Phase.Test.Unit {
+extension `File.System.Write.Atomic.Commit.Phase Tests`.Test.Unit {
     @Test
     func `all cases are distinct`() {
         let allCases: [File.System.Write.Atomic.Commit.Phase] = [
@@ -118,7 +120,7 @@ extension File.System.Write.Atomic.Commit.Phase.Test.Unit {
     }
 }
 
-extension File.System.Write.Atomic.Commit.Phase.Test.`Edge Case` {
+extension `File.System.Write.Atomic.Commit.Phase Tests`.Test.`Edge Case` {
     @Test
     func `rawValue progression is sequential`() {
         let phases: [File.System.Write.Atomic.Commit.Phase] = [

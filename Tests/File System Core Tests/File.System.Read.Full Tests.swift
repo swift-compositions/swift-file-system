@@ -5,7 +5,7 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Read.Full {
+extension `File.System.Read.Full Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -15,7 +15,7 @@ extension File.System.Read.Full {
     }
 }
 
-extension File.System.Read.Full.Test.Unit {
+extension `File.System.Read.Full Tests`.Test.Unit {
 
     @Test
     func `Read small file`() throws {

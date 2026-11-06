@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.Directory.Walk.Undecodable {
+enum `File.Directory.Walk.Undecodable Tests` {}
+
+extension `File.Directory.Walk.Undecodable Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -15,7 +17,7 @@ extension File.Directory.Walk.Undecodable {
 
 #if os(macOS) || os(Linux)
 
-    extension File.Directory.Walk.Undecodable.Test.Unit {
+    extension `File.Directory.Walk.Undecodable Tests`.Test.Unit {
 
         @Test
         func `Undecodable is a namespace for Policy and Context`() {

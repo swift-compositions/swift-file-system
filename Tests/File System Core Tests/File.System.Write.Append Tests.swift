@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Append {
+enum `File.System.Write.Append Tests` {}
+
+extension `File.System.Write.Append Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Write.Append {
     }
 }
 
-extension File.System.Write.Append.Test.Unit {
+extension `File.System.Write.Append Tests`.Test.Unit {
 
     @Test
     func `Append to existing file`() throws {
@@ -223,7 +225,7 @@ extension File.System.Write.Append.Test.Unit {
     }
 }
 
-extension File.System.Write.Append.Test.`Edge Case` {
+extension `File.System.Write.Append Tests`.Test.`Edge Case` {
     @Test
     func `advance throws shortWrite when a syscall reports zero progress`() {
         #expect(throws: File.System.Write.Append.Error.self) {

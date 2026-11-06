@@ -3,7 +3,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Atomic.Commit {
+enum `File.System.Write.Atomic.Commit Tests` {}
+
+extension `File.System.Write.Atomic.Commit Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Write.Atomic.Commit {
     }
 }
 
-extension File.System.Write.Atomic.Commit.Test.Unit {
+extension `File.System.Write.Atomic.Commit Tests`.Test.Unit {
 
     @Test
     func `Commit namespace exists`() {

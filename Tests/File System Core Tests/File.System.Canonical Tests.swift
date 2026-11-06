@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Canonical {
+enum `File.System.Canonical Tests` {}
+
+extension `File.System.Canonical Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -13,7 +15,7 @@ extension File.System.Canonical {
     }
 }
 
-extension File.System.Canonical.Test.Unit {
+extension `File.System.Canonical Tests`.Test.Unit {
     @Test
     func `Resolve existing directory`() throws {
         try File.Directory.temporary { directory in
@@ -119,7 +121,7 @@ extension File.System.Canonical.Test.Unit {
 }
 
 #if !os(Windows)
-    extension File.System.Canonical.Test.`Edge Case` {
+    extension `File.System.Canonical Tests`.Test.`Edge Case` {
         @Test
         func `Resolve symbolic link loop reports loop`() throws {
             try File.Directory.temporary { directory in

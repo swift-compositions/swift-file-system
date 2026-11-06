@@ -11,7 +11,9 @@ import Testing
     import Glibc
 #endif
 
-extension File.System {
+enum `File.System Tests` {}
+
+extension `File.System Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -21,7 +23,7 @@ extension File.System {
     }
 }
 
-extension File.System.Test.Unit {
+extension `File.System Tests`.Test.Unit {
     @Test
     func `Same recognizes one object through distinct paths`() throws {
         try File.Directory.temporary { directory in
@@ -45,7 +47,7 @@ extension File.System.Test.Unit {
 
 #if os(macOS) || os(Linux)
 
-    extension File.System.Test.`Edge Case` {
+    extension `File.System Tests`.Test.`Edge Case` {
 
         private func createTempPath() -> Swift.String {
             "/tmp/edge-test-\(Int.random(in: (0..<Int.max)))"

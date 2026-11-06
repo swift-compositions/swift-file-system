@@ -4,7 +4,9 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Link.Read.Target {
+enum `File.System.Link.Read.Target Tests` {}
+
+extension `File.System.Link.Read.Target Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +16,7 @@ extension File.System.Link.Read.Target {
     }
 }
 
-extension File.System.Link.Read.Target.Test.Unit {
+extension `File.System.Link.Read.Target Tests`.Test.Unit {
 
     #if !os(Windows)
 

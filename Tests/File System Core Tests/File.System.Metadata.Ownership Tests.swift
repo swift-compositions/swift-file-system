@@ -13,7 +13,9 @@ import Testing
     import Musl
 #endif
 
-extension File.System.Metadata.Ownership {
+enum `File.System.Metadata.Ownership Tests` {}
+
+extension `File.System.Metadata.Ownership Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -23,7 +25,7 @@ extension File.System.Metadata.Ownership {
     }
 }
 
-extension File.System.Metadata.Ownership.Test.Unit {
+extension `File.System.Metadata.Ownership Tests`.Test.Unit {
 
     @Test
     func `Ownership initialization`() {

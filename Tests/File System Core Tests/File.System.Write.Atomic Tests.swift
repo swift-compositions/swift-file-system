@@ -4,7 +4,7 @@ import Testing
 
 @testable import File_System_Core
 
-extension File.System.Write.Atomic {
+extension `File.System.Write.Atomic Tests` {
     @Suite
     struct Test {
         @Suite struct Unit {}
@@ -14,7 +14,7 @@ extension File.System.Write.Atomic {
     }
 }
 
-extension File.System.Write.Atomic.Test.Unit {
+extension `File.System.Write.Atomic Tests`.Test.Unit {
 
     @Test
     func `Write and read back bytes`() throws {
@@ -330,7 +330,7 @@ extension File.System.Write.Atomic.Test.Unit {
     }
 }
 
-extension File.System.Write.Atomic.Test.Integration {
+extension `File.System.Write.Atomic Tests`.Test.Integration {
 
     @Test
     func `createIntermediates creates directories with execute bit`() throws {

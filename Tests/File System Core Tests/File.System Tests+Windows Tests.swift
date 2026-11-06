@@ -8,7 +8,7 @@ import Testing
 
     import WinSDK
 
-    extension File.System.Test.`Edge Case` {
+    extension `File.System Tests`.Test.`Edge Case` {
 
         @Test
         func `Handle Windows drive letter paths`() throws {
