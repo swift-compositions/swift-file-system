@@ -7,9 +7,13 @@ enum `File.Path.Temporary Tests` {}
 extension `File.Path.Temporary Tests` {
     @Suite
     struct Test {
-        @Suite struct Deterministic {}
-        @Suite struct Sibling {}
     }
+}
+
+extension `File.Path.Temporary Tests`.Test {
+    @Suite struct Deterministic {}
+
+    @Suite struct Sibling {}
 }
 
 extension `File.Path.Temporary Tests`.Test.Sibling {

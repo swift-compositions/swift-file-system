@@ -98,14 +98,23 @@ private func walkDirectories(
     return count
 }
 
-@Suite
-struct `Overload Resolution` {
+enum `Overload Resolution Tests` {}
+
+extension `Overload Resolution Tests` {
+    @Suite
+    struct `Overload Resolution` {
+    }
+}
+
+extension `Overload Resolution Tests`.`Overload Resolution` {
     @Suite struct `Non Throwing Closure` {}
+
     @Suite struct `Throwing Closure` {}
+
     @Suite struct `Never Elimination` {}
 }
 
-extension `Overload Resolution`.`Non Throwing Closure` {
+extension `Overload Resolution Tests`.`Overload Resolution`.`Non Throwing Closure` {
     @Test
     func `Contents iterate infers Never`() throws {
         try File.Directory.temporary { dir in
@@ -138,7 +147,7 @@ extension `Overload Resolution`.`Non Throwing Closure` {
     }
 }
 
-extension `Overload Resolution`.`Throwing Closure` {
+extension `Overload Resolution Tests`.`Overload Resolution`.`Throwing Closure` {
     @Test
     func `Contents iterate propagates the closure error`() throws {
         try File.Directory.temporary { dir in
@@ -184,7 +193,7 @@ extension `Overload Resolution`.`Throwing Closure` {
     }
 }
 
-extension `Overload Resolution`.`Never Elimination` {
+extension `Overload Resolution Tests`.`Overload Resolution`.`Never Elimination` {
 
     @Test
     func `Contents list surfaces the directory error`() throws {

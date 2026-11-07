@@ -4,255 +4,259 @@ import Testing
 
 @testable import File_System_Core
 
-@Suite
-struct `File.System.Copy.recursive` {
+enum `File.System.Copy.Recursive Tests` {}
 
-    @Test
-    func `Copy empty directory`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
+extension `File.System.Copy.Recursive Tests` {
+    @Suite
+    struct `File.System.Copy.recursive` {
 
-            try File.System.Create.Directory.create(at: sourcePath)
+        @Test
+        func `Copy empty directory`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
 
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
+                try File.System.Create.Directory.create(at: sourcePath)
 
-            #expect(File.System.Stat.exists(at: destPath))
-            #expect((try? File.System.Stat.info(at: destPath))?.type == .directory)
-        }
-    }
-
-    @Test
-    func `Copy directory with single file`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
-
-            try File.System.Create.Directory.create(at: sourcePath)
-            let filePath = sourcePath / "test.txt"
-            let fileBytes = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
-
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
-
-            #expect(File.System.Stat.exists(at: destPath))
-
-            let copiedFile = destPath / "test.txt"
-            #expect(File.System.Stat.exists(at: copiedFile))
-
-            let copiedData = try File.System.Read.Full.read(from: copiedFile) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
-            }
-            #expect(copiedData == ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)))
-        }
-    }
-
-    @Test
-    func `Copy directory with nested subdirectories`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
-
-            let dirA = sourcePath / "a"
-            let dirB = dirA / "b"
-
-            try File.System.Create.Directory.create(
-                at: dirB,
-                createIntermediates: true
-            )
-
-            let filePath = dirB / "c.txt"
-            let fileBytes = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
-
-            let rootFile = sourcePath / "root.txt"
-            let rootFileBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(rootFileBytes.span, to: rootFile)
-
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
-
-            #expect(File.System.Stat.exists(at: destPath))
-            #expect(File.System.Stat.exists(at: destPath / "a"))
-            #expect(File.System.Stat.exists(at: destPath / "a" / "b"))
-            #expect(File.System.Stat.exists(at: destPath / "a" / "b" / "c.txt"))
-            #expect(File.System.Stat.exists(at: destPath / "root.txt"))
-
-            let copiedData = try File.System.Read.Full.read(from: destPath / "a" / "b" / "c.txt") {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
-            }
-            #expect(copiedData == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
-
-            let rootData = try File.System.Read.Full.read(from: destPath / "root.txt") {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
-            }
-            #expect(rootData == ([99] as [UInt8]).map(Byte.init(bitPattern:)))
-        }
-    }
-
-    @Test
-    func `Copy preserves source directory`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
-
-            try File.System.Create.Directory.create(at: sourcePath)
-            let filePath = sourcePath / "test.txt"
-            let fileBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
-
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
-
-            #expect(File.System.Stat.exists(at: sourcePath))
-            #expect(File.System.Stat.exists(at: filePath))
-        }
-    }
-
-    @Test
-    func `Copy with overwrite option`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
-
-            try File.System.Create.Directory.create(at: sourcePath)
-            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath / "new.txt")
-
-            try File.System.Create.Directory.create(at: destPath)
-            let destBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(destBytes.span, to: destPath / "old.txt")
-
-            let options = File.System.Copy.Options(overwrite: true)
-            try File.System.Copy.recursive(from: sourcePath, to: destPath, options: options)
-
-            #expect(File.System.Stat.exists(at: destPath / "new.txt"))
-            #expect(!File.System.Stat.exists(at: destPath / "old.txt"))
-        }
-    }
-
-    @Test
-    func `Copy without overwrite throws when destination exists`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
-
-            try File.System.Create.Directory.create(at: sourcePath)
-            try File.System.Create.Directory.create(at: destPath)
-
-            let options = File.System.Copy.Options(overwrite: false)
-            #expect(throws: File.System.Copy.Error.self) {
-                try File.System.Copy.recursive(from: sourcePath, to: destPath, options: options)
-            }
-        }
-    }
-
-    @Test
-    func `Options default values`() {
-        let options = File.System.Copy.Options()
-        #expect(options.overwrite == false)
-        #expect(options.copyAttributes == true)
-        #expect(options.followSymlinks == true)
-    }
-
-    @Test
-    func `Copy non-existent source throws sourceNotFound`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "non-existent"
-            let destPath = dir.path / "dest"
-
-            #expect(throws: File.System.Copy.Error.self) {
                 try File.System.Copy.recursive(from: sourcePath, to: destPath)
+
+                #expect(File.System.Stat.exists(at: destPath))
+                #expect((try? File.System.Stat.info(at: destPath))?.type == .directory)
             }
         }
-    }
 
-    @Test
-    func `Copy to existing directory without overwrite throws destinationExists`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
+        @Test
+        func `Copy directory with single file`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
 
-            try File.System.Create.Directory.create(at: sourcePath)
-            try File.System.Create.Directory.create(at: destPath)
+                try File.System.Create.Directory.create(at: sourcePath)
+                let filePath = sourcePath / "test.txt"
+                let fileBytes = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
-            #expect(throws: File.System.Copy.Error.destinationExists) {
                 try File.System.Copy.recursive(from: sourcePath, to: destPath)
-            }
-        }
-    }
 
-    @Test
-    func `Copy file delegates to file copy`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source.txt"
-            let destPath = dir.path / "dest.txt"
+                #expect(File.System.Stat.exists(at: destPath))
 
-            let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                let copiedFile = destPath / "test.txt"
+                #expect(File.System.Stat.exists(at: copiedFile))
 
-            try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
-
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
-
-            #expect(File.System.Stat.exists(at: destPath))
-            let data = try File.System.Read.Full.read(from: destPath) {
-                $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
-            }
-            #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
-        }
-    }
-
-    @Test
-    func `Copy directory with many files`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
-
-            try File.System.Create.Directory.create(at: sourcePath)
-
-            for i in 0..<10 {
-                let filePath = try sourcePath.appending("file\(i).txt")
-                let bytes: [Byte] = [Byte(UInt8(i))]
-                try File.System.Write.Atomic.write(bytes.span, to: filePath)
-            }
-
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
-
-            for i in 0..<10 {
-                let filePath = try destPath.appending("file\(i).txt")
-                #expect(File.System.Stat.exists(at: filePath))
-                let data = try File.System.Read.Full.read(from: filePath) {
+                let copiedData = try File.System.Read.Full.read(from: copiedFile) {
                     $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
                 }
-                #expect(data == [Byte(UInt8(i))])
+                #expect(copiedData == ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:)))
             }
         }
-    }
 
-    @Test
-    func `Copy deeply nested directory structure`() throws {
-        try File.Directory.temporary { dir in
-            let sourcePath = dir.path / "source"
-            let destPath = dir.path / "dest"
+        @Test
+        func `Copy directory with nested subdirectories`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
 
-            var currentPath = sourcePath
-            for i in 1...5 {
-                let component = File.Path.Component("\(i)")
-                currentPath = currentPath.appending(component)
+                let dirA = sourcePath / "a"
+                let dirB = dirA / "b"
+
+                try File.System.Create.Directory.create(
+                    at: dirB,
+                    createIntermediates: true
+                )
+
+                let filePath = dirB / "c.txt"
+                let fileBytes = ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
+
+                let rootFile = sourcePath / "root.txt"
+                let rootFileBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(rootFileBytes.span, to: rootFile)
+
+                try File.System.Copy.recursive(from: sourcePath, to: destPath)
+
+                #expect(File.System.Stat.exists(at: destPath))
+                #expect(File.System.Stat.exists(at: destPath / "a"))
+                #expect(File.System.Stat.exists(at: destPath / "a" / "b"))
+                #expect(File.System.Stat.exists(at: destPath / "a" / "b" / "c.txt"))
+                #expect(File.System.Stat.exists(at: destPath / "root.txt"))
+
+                let copiedData = try File.System.Read.Full.read(from: destPath / "a" / "b" / "c.txt") {
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
+                }
+                #expect(copiedData == ([10, 20, 30] as [UInt8]).map(Byte.init(bitPattern:)))
+
+                let rootData = try File.System.Read.Full.read(from: destPath / "root.txt") {
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
+                }
+                #expect(rootData == ([99] as [UInt8]).map(Byte.init(bitPattern:)))
             }
+        }
 
-            try File.System.Create.Directory.create(
-                at: currentPath,
-                createIntermediates: true
-            )
-            let currentBytes = ([42] as [UInt8]).map(Byte.init(bitPattern:))
-            try File.System.Write.Atomic.write(currentBytes.span, to: currentPath / "file.txt")
+        @Test
+        func `Copy preserves source directory`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
 
-            try File.System.Copy.recursive(from: sourcePath, to: destPath)
+                try File.System.Create.Directory.create(at: sourcePath)
+                let filePath = sourcePath / "test.txt"
+                let fileBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(fileBytes.span, to: filePath)
 
-            var destFile = destPath
-            for component: File.Path.Component in ["1", "2", "3", "4", "5", "file.txt"] {
-                destFile = destFile.appending(component)
+                try File.System.Copy.recursive(from: sourcePath, to: destPath)
+
+                #expect(File.System.Stat.exists(at: sourcePath))
+                #expect(File.System.Stat.exists(at: filePath))
             }
-            #expect(File.System.Stat.exists(at: destFile))
+        }
+
+        @Test
+        func `Copy with overwrite option`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
+
+                try File.System.Create.Directory.create(at: sourcePath)
+                let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath / "new.txt")
+
+                try File.System.Create.Directory.create(at: destPath)
+                let destBytes = ([99] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(destBytes.span, to: destPath / "old.txt")
+
+                let options = File.System.Copy.Options(overwrite: true)
+                try File.System.Copy.recursive(from: sourcePath, to: destPath, options: options)
+
+                #expect(File.System.Stat.exists(at: destPath / "new.txt"))
+                #expect(!File.System.Stat.exists(at: destPath / "old.txt"))
+            }
+        }
+
+        @Test
+        func `Copy without overwrite throws when destination exists`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
+
+                try File.System.Create.Directory.create(at: sourcePath)
+                try File.System.Create.Directory.create(at: destPath)
+
+                let options = File.System.Copy.Options(overwrite: false)
+                #expect(throws: File.System.Copy.Error.self) {
+                    try File.System.Copy.recursive(from: sourcePath, to: destPath, options: options)
+                }
+            }
+        }
+
+        @Test
+        func `Options default values`() {
+            let options = File.System.Copy.Options()
+            #expect(options.overwrite == false)
+            #expect(options.copyAttributes == true)
+            #expect(options.followSymlinks == true)
+        }
+
+        @Test
+        func `Copy non-existent source throws sourceNotFound`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "non-existent"
+                let destPath = dir.path / "dest"
+
+                #expect(throws: File.System.Copy.Error.self) {
+                    try File.System.Copy.recursive(from: sourcePath, to: destPath)
+                }
+            }
+        }
+
+        @Test
+        func `Copy to existing directory without overwrite throws destinationExists`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
+
+                try File.System.Create.Directory.create(at: sourcePath)
+                try File.System.Create.Directory.create(at: destPath)
+
+                #expect(throws: File.System.Copy.Error.destinationExists) {
+                    try File.System.Copy.recursive(from: sourcePath, to: destPath)
+                }
+            }
+        }
+
+        @Test
+        func `Copy file delegates to file copy`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source.txt"
+                let destPath = dir.path / "dest.txt"
+
+                let sourceBytes = ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:))
+
+                try File.System.Write.Atomic.write(sourceBytes.span, to: sourcePath)
+
+                try File.System.Copy.recursive(from: sourcePath, to: destPath)
+
+                #expect(File.System.Stat.exists(at: destPath))
+                let data = try File.System.Read.Full.read(from: destPath) {
+                    $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
+                }
+                #expect(data == ([1, 2, 3] as [UInt8]).map(Byte.init(bitPattern:)))
+            }
+        }
+
+        @Test
+        func `Copy directory with many files`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
+
+                try File.System.Create.Directory.create(at: sourcePath)
+
+                for i in 0..<10 {
+                    let filePath = try sourcePath.appending("file\(i).txt")
+                    let bytes: [Byte] = [Byte(UInt8(i))]
+                    try File.System.Write.Atomic.write(bytes.span, to: filePath)
+                }
+
+                try File.System.Copy.recursive(from: sourcePath, to: destPath)
+
+                for i in 0..<10 {
+                    let filePath = try destPath.appending("file\(i).txt")
+                    #expect(File.System.Stat.exists(at: filePath))
+                    let data = try File.System.Read.Full.read(from: filePath) {
+                        $0.withUnsafeBytes { unsafe $0.map(Byte.init(bitPattern:)) }
+                    }
+                    #expect(data == [Byte(UInt8(i))])
+                }
+            }
+        }
+
+        @Test
+        func `Copy deeply nested directory structure`() throws {
+            try File.Directory.temporary { dir in
+                let sourcePath = dir.path / "source"
+                let destPath = dir.path / "dest"
+
+                var currentPath = sourcePath
+                for i in 1...5 {
+                    let component = File.Path.Component("\(i)")
+                    currentPath = currentPath.appending(component)
+                }
+
+                try File.System.Create.Directory.create(
+                    at: currentPath,
+                    createIntermediates: true
+                )
+                let currentBytes = ([42] as [UInt8]).map(Byte.init(bitPattern:))
+                try File.System.Write.Atomic.write(currentBytes.span, to: currentPath / "file.txt")
+
+                try File.System.Copy.recursive(from: sourcePath, to: destPath)
+
+                var destFile = destPath
+                for component: File.Path.Component in ["1", "2", "3", "4", "5", "file.txt"] {
+                    destFile = destFile.appending(component)
+                }
+                #expect(File.System.Stat.exists(at: destFile))
+            }
         }
     }
 }

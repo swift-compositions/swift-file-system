@@ -95,7 +95,9 @@ struct `File.System.Metadata.Kind Tests` {
             #expect(buffer == ([6] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
+}
 
+extension `File.System.Metadata.Kind Tests` {
     @Suite
     struct `EdgeCase` {
         @Test

@@ -28,10 +28,14 @@
         try await file.read.full { span in span.count }
     }
 
-    @Suite
-    struct `File Read Overload Resolution` {}
+enum `File.Read Overload Resolution Tests` {}
 
-    extension `File Read Overload Resolution` {
+extension `File.Read Overload Resolution Tests` {
+        @Suite
+        struct `File Read Overload Resolution` {}
+}
+
+    extension `File.Read Overload Resolution Tests`.`File Read Overload Resolution` {
         @Test
         func `Non-throwing closure infers Never`() throws {
             try File.Directory.temporary { dir in

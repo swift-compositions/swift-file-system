@@ -81,7 +81,9 @@ struct `File.Directory.Entry.Kind Tests` {
             #expect(buffer == ([3] as [UInt8]).map(Byte.init(bitPattern:)))
         }
     }
+}
 
+extension `File.Directory.Entry.Kind Tests` {
     @Suite
     struct `EdgeCase` {
         @Test

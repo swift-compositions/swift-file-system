@@ -9,100 +9,104 @@
     import Span
     import Testing
 
-    @Suite
-    struct `File.System.IO — smoke tests` {
+enum `File.System.IO Tests` {}
 
-        @Test
-        func `open → stat → close via blocking strategy`() async throws {
-            let executor = Kernel.Thread.Executor()
-            defer { executor.shutdown() }
+extension `File.System.IO Tests` {
+        @Suite
+        struct `File.System.IO — smoke tests` {
 
-            let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
+            @Test
+            func `open → stat → close via blocking strategy`() async throws {
+                let executor = Kernel.Thread.Executor()
+                defer { executor.shutdown() }
 
-            let pathString = Kernel.Temporary.filePath(prefix: "fs-io-test")
-            let path = try File.Path(pathString)
+                let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
 
-            var fd: Kernel.Descriptor = .invalid
-            fd = try Kernel.File.Open.open(
-                path: path.view,
-                mode: .readWrite,
-                options: [.create, .execClose],
-                permissions: Kernel.File.Permissions(rawValue: 0o644)
-            )
-            defer {
-                try? try Kernel.File.Delete.delete(path.view)
+                let pathString = Kernel.Temporary.filePath(prefix: "fs-io-test")
+                let path = try File.Path(pathString)
+
+                var fd: Kernel.Descriptor = .invalid
+                fd = try Kernel.File.Open.open(
+                    path: path.view,
+                    mode: .readWrite,
+                    options: [.create, .execClose],
+                    permissions: Kernel.File.Permissions(rawValue: 0o644)
+                )
+                defer {
+                    try? try Kernel.File.Delete.delete(path.view)
+                }
+
+                let stats = try await io.stat(path)
+                #expect(stats.size.underlying == 0)
+
+                await io.close(consume fd)
             }
 
-            let stats = try await io.stat(path)
-            #expect(stats.size.underlying == 0)
+            @Test
+            func `default() chain returns a working IO on the host`() async throws {
+                let executor = Kernel.Thread.Executor()
+                defer { executor.shutdown() }
+                let io: IO<File.System.IO.Capabilities> = .default(on: executor)
 
-            await io.close(consume fd)
-        }
+                let pathString = Kernel.Temporary.filePath(prefix: "fs-io-default")
+                let path = try File.Path(pathString)
+                defer {
+                    try? try Kernel.File.Delete.delete(path.view)
+                }
+                var fd: Kernel.Descriptor = .invalid
+                fd = try Kernel.File.Open.open(
+                    path: path.view,
+                    mode: .readWrite,
+                    options: [.create, .execClose],
+                    permissions: Kernel.File.Permissions(rawValue: 0o644)
+                )
 
-        @Test
-        func `default() chain returns a working IO on the host`() async throws {
-            let executor = Kernel.Thread.Executor()
-            defer { executor.shutdown() }
-            let io: IO<File.System.IO.Capabilities> = .default(on: executor)
+                let stats = try await io.stat(path)
+                #expect(stats.size.underlying == 0)
 
-            let pathString = Kernel.Temporary.filePath(prefix: "fs-io-default")
-            let path = try File.Path(pathString)
-            defer {
-                try? try Kernel.File.Delete.delete(path.view)
-            }
-            var fd: Kernel.Descriptor = .invalid
-            fd = try Kernel.File.Open.open(
-                path: path.view,
-                mode: .readWrite,
-                options: [.create, .execClose],
-                permissions: Kernel.File.Permissions(rawValue: 0o644)
-            )
-
-            let stats = try await io.stat(path)
-            #expect(stats.size.underlying == 0)
-
-            await io.close(consume fd)
-        }
-
-        @Test
-        func `write → stat via blocking strategy`() async throws {
-            let executor = Kernel.Thread.Executor()
-            defer { executor.shutdown() }
-
-            let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
-
-            let pathString = Kernel.Temporary.filePath(prefix: "fs-io-rw")
-            let path = try File.Path(pathString)
-            defer {
-                try? try Kernel.File.Delete.delete(path.view)
+                await io.close(consume fd)
             }
 
-            var fd: Kernel.Descriptor = .invalid
-            fd = try Kernel.File.Open.open(
-                path: path.view,
-                mode: .readWrite,
-                options: [.create, .truncate, .execClose],
-                permissions: Kernel.File.Permissions(rawValue: 0o644)
-            )
+            @Test
+            func `write → stat via blocking strategy`() async throws {
+                let executor = Kernel.Thread.Executor()
+                defer { executor.shutdown() }
 
-            let payload: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
-            let writePtr = UnsafeMutableRawBufferPointer.allocate(
-                byteCount: payload.count,
-                alignment: 1
-            )
-            defer { unsafe writePtr.deallocate() }
-            for (i, byte) in payload.enumerated() { unsafe writePtr[i] = byte.underlying }
+                let io: IO<File.System.IO.Capabilities> = .blocking(on: executor)
 
-            let written = unsafe try await io.write(
-                to: fd,
-                from: unsafe .init(UnsafeRawBufferPointer(writePtr))
-            )
-            #expect(written == payload.count)
+                let pathString = Kernel.Temporary.filePath(prefix: "fs-io-rw")
+                let path = try File.Path(pathString)
+                defer {
+                    try? try Kernel.File.Delete.delete(path.view)
+                }
 
-            let stats = try await io.stat(path)
-            #expect(stats.size.underlying == UInt64(payload.count))
+                var fd: Kernel.Descriptor = .invalid
+                fd = try Kernel.File.Open.open(
+                    path: path.view,
+                    mode: .readWrite,
+                    options: [.create, .truncate, .execClose],
+                    permissions: Kernel.File.Permissions(rawValue: 0o644)
+                )
 
-            await io.close(consume fd)
+                let payload: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
+                let writePtr = UnsafeMutableRawBufferPointer.allocate(
+                    byteCount: payload.count,
+                    alignment: 1
+                )
+                defer { unsafe writePtr.deallocate() }
+                for (i, byte) in payload.enumerated() { unsafe writePtr[i] = byte.underlying }
+
+                let written = unsafe try await io.write(
+                    to: fd,
+                    from: unsafe .init(UnsafeRawBufferPointer(writePtr))
+                )
+                #expect(written == payload.count)
+
+                let stats = try await io.stat(path)
+                #expect(stats.size.underlying == UInt64(payload.count))
+
+                await io.close(consume fd)
+            }
         }
-    }
+}
 #endif
