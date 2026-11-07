@@ -20,7 +20,6 @@
 
         /// Follows a container's Documents through a metadata query on a serial queue of its own.
         final class Observer: @unchecked Sendable {
-            // `query`, `observations` and `last` are touched only on `queue`, which runs one operation at a time.
             let queue: OperationQueue
             let identifier: Swift.String?
             let yield: @Sendable (File.Ubiquitous.Status) -> Void

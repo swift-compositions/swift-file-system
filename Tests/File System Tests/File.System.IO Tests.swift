@@ -86,7 +86,7 @@
             )
 
             let payload: [Byte] = ([0xDE, 0xAD, 0xBE, 0xEF] as [UInt8]).map(Byte.init(bitPattern:))
-            let writePtr = unsafe UnsafeMutableRawBufferPointer.allocate(
+            let writePtr = UnsafeMutableRawBufferPointer.allocate(
                 byteCount: payload.count,
                 alignment: 1
             )

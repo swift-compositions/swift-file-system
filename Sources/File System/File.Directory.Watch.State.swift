@@ -190,7 +190,6 @@
                         permissions: Kernel.File.Permissions(rawValue: 0)
                     )
                 } catch {
-                    // Running out of descriptors is the watch's own failure, wherever it happens.
                     if case .handle(.limit) = error { throw .open(path, error) }
                     guard path == root else { return false }
                     throw .open(path, error)
@@ -243,7 +242,6 @@
                 do throws(Kernel.Event.Driver.Error) {
                     try handle?.source.deregister(id: id)
                 } catch {
-                    // The descriptor is closed with its registration either way.
                 }
             }
         }

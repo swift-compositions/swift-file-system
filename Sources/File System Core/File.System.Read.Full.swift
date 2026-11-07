@@ -88,8 +88,6 @@ extension File.System.Read.Full {
             )
         } catch {
             #if os(Windows)
-                // CreateFile refuses a directory with ERROR_ACCESS_DENIED, so on Windows the open
-                // fails where POSIX's succeeds and the stat below would say what it is.
                 if case .platform = error,
                     let found = try? Kernel.File.Stats.get(path: path.view),
                     case .directory = found.type

@@ -235,7 +235,7 @@ struct `File.System.Copy.recursive` {
 
             var currentPath = sourcePath
             for i in 1...5 {
-                let component = try File.Path.Component("\(i)")
+                let component = File.Path.Component("\(i)")
                 currentPath = currentPath.appending(component)
             }
 

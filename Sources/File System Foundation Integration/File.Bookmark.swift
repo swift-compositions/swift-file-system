@@ -87,7 +87,6 @@
             fileprivate static let creation: URL.BookmarkCreationOptions = .withSecurityScope
             fileprivate static let resolution: URL.BookmarkResolutionOptions = .withSecurityScope
         #else
-            // On iOS, tvOS, watchOS and visionOS a bookmark of a security-scoped URL carries its scope implicitly.
             fileprivate static let creation: URL.BookmarkCreationOptions = []
             fileprivate static let resolution: URL.BookmarkResolutionOptions = []
         #endif
