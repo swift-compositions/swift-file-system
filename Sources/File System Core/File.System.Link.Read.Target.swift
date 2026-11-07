@@ -7,15 +7,6 @@ extension File.System.Link.Read {
 }
 
 extension File.System.Link.Read.Target {
-
-    public enum Error: Swift.Error, Sendable {
-
-        case stat(Kernel.File.Stats.Error)
-
-        case readlink(Kernel.Link.Symbolic.Error)
-
-        case notASymlink(File.Path)
-    }
 }
 
 extension File.System.Link.Read.Target.Error {

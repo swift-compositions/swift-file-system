@@ -3,15 +3,11 @@ public import Kernel
 extension File {
 
     public enum System {
-
     }
 }
 
 extension File.System {
 
-    public enum Error {
-
-    }
 
     @inlinable
     public static func same(

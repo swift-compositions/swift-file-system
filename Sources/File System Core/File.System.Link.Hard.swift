@@ -6,11 +6,6 @@ extension File.System.Link {
 }
 
 extension File.System.Link.Hard {
-
-    public enum Error: Swift.Error, Sendable {
-
-        case link(Kernel.Link.Error)
-    }
 }
 
 extension File.System.Link.Hard.Error {

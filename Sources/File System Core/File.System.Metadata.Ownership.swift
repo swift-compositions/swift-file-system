@@ -17,13 +17,6 @@ extension File.System.Metadata {
 }
 
 extension File.System.Metadata.Ownership {
-
-    public enum Error: Swift.Error, Sendable {
-
-        case stat(Kernel.File.Stats.Error)
-
-        case chown(Kernel.File.Chown.Error)
-    }
 }
 
 extension File.System.Metadata.Ownership.Error {
