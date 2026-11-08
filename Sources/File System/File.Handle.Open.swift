@@ -17,15 +17,6 @@ extension File.Handle {
 }
 
 extension File.Handle.Open {
-
-    public enum Error<ClosureError: Swift.Error>: Swift.Error, Sendable {
-
-        case open(Kernel.File.Open.Error)
-
-        case operation(ClosureError)
-
-        case close(Kernel.Close.Error)
-    }
 }
 
 extension File.Handle.Open {
@@ -49,7 +40,6 @@ extension File.Handle.Open {
             do throws(Kernel.Close.Error) {
                 try handle.close()
             } catch {
-
             }
             throw .operation(error)
         }
@@ -81,7 +71,6 @@ extension File.Handle.Open {
             do throws(Kernel.Close.Error) {
                 try handle.close()
             } catch {
-
             }
             throw .operation(error)
         }
