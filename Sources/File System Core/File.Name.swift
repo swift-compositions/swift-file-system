@@ -84,7 +84,7 @@ extension File.Name {
             let span = view.span
             var bytes: [Path::Path.Char] = []
             bytes.reserveCapacity(span.count)
-            for i in 0..<span.count {
+            (0..<span.count).forEach { i in
                 bytes.append(span[i])
             }
             return File.Name(rawBytes: bytes)

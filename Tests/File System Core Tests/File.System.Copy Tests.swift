@@ -379,7 +379,7 @@ extension `File.System.Copy Tests`.Test.Unit {
                         let largeSize = 2 * 1024 * 1024
                         var largeContent = [Byte]()
                         largeContent.reserveCapacity(largeSize)
-                        for i in 0..<largeSize {
+                        (0..<largeSize).forEach { i in
                             largeContent.append(Byte(bitPattern: UInt8(i % 256)))
                         }
 

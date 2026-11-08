@@ -237,7 +237,7 @@ extension `File.System.Copy.Recursive Tests` {
                 let destPath = dir.path / "dest"
 
                 var currentPath = sourcePath
-                for i in 1...5 {
+                (1...5).forEach { i in
                     let component = File.Path.Component("\(i)")
                     currentPath = currentPath.appending(component)
                 }

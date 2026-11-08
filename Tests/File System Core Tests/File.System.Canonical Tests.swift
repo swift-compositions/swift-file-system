@@ -60,7 +60,7 @@ extension `File.System.Canonical Tests`.Test.Unit {
             try File.Directory.temporary { directory in
                 var rawTarget: [File.Path.Char] = []
                 rawTarget.reserveCapacity(directory.path.count + 3)
-                for index in 0..<directory.path.count {
+                (0..<directory.path.count).forEach { index in
                     rawTarget.append(directory.path.unit(at: index))
                 }
                 rawTarget.append(0x2F)

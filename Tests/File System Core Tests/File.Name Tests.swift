@@ -350,7 +350,7 @@ extension `File.Name Tests` {
             let bytes = name.withCodeUnits { span -> [UInt8] in
                 var collected: [UInt8] = []
                 collected.reserveCapacity(span.count)
-                for i in 0..<span.count { collected.append(span[i]) }
+                (0..<span.count).forEach { i in collected.append(span[i]) }
                 return collected
             }
             #expect(bytes == [0x66, 0x69, 0x6C, 0x65])
