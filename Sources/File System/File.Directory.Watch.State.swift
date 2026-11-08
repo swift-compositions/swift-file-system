@@ -5,15 +5,9 @@
         import Kernel
 
         extension File.Directory.Watch {
-
             /// The running watch: the event source, the directories it watches, and the directories
             /// waiting to be yielded. It runs on a thread of its own, which blocks in `poll`.
             internal actor State {
-
-                private static let interest: Kernel.Event.Interest = [.change, .rename, .delete, .revoke]
-
-                private static let gone: Kernel.Event.Interest = [.rename, .delete, .revoke]
-
                 nonisolated internal let executor: Kernel.Thread.Executor
 
                 nonisolated internal let wakeup: Kernel.Wakeup.Channel
@@ -33,10 +27,6 @@
                 private var started = false
 
                 private var events: [Kernel.Event] = Array(repeating: Kernel.Event.empty, count: 64)
-
-                nonisolated internal var unownedExecutor: UnownedSerialExecutor {
-                    unsafe executor.asUnownedSerialExecutor()
-                }
 
                 internal init(path: File.Path, options: Options) throws(File.Directory.Watch.Error) {
                     let source: Kernel.Event.Source
@@ -58,8 +48,17 @@
             }
         }
 
-        extension File.Directory.Watch.State {
+extension File.Directory.Watch.State {
+            private static let interest: Kernel.Event.Interest = [.change, .rename, .delete, .revoke]
 
+            private static let gone: Kernel.Event.Interest = [.rename, .delete, .revoke]
+
+            nonisolated internal var unownedExecutor: UnownedSerialExecutor {
+                unsafe executor.asUnownedSerialExecutor()
+            }
+}
+
+        extension File.Directory.Watch.State {
             /// The next directory to rescan, or nil once the task is cancelled.
             internal func next() -> Result<File.Directory?, File.Directory.Watch.Error> {
                 do throws(File.Directory.Watch.Error) {
@@ -130,7 +129,6 @@
         }
 
         extension File.Directory.Watch.State {
-
             /// Watches the subdirectories that appeared in a changed directory, drops the ones that
             /// went, and queues the directory itself.
             private func rescan(_ path: File.Path) throws(File.Directory.Watch.Error) {
@@ -218,7 +216,6 @@
         }
 
         extension File.Directory.Watch.State {
-
             /// Stops watching a directory and everything below it, closing their descriptors.
             private func drop(_ path: File.Path) {
                 for (watched, id) in ids where watched.hasPrefix(path) {
