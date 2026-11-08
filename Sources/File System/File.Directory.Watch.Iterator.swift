@@ -21,7 +21,7 @@
                 isolation actor: isolated (any Actor)? = #isolation
             ) async throws(File.Directory.Watch.Error) -> File.Directory? {
                 if state == nil {
-                    state = try State(path: path, options: options)
+                    state = try File.Directory.Watch.State(path: path, options: options)
                 }
                 guard let state else { return nil }
                 let result = await withTaskCancellationHandler {
