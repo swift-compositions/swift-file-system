@@ -70,7 +70,7 @@ extension File.Handle {
     }
 
     @inlinable
-    package mutating func writeAll(
+    mutating func writeAll(
         _ buffer: UnsafeRawBufferPointer
     ) throws(File.Handle.Error) {
         var totalWritten = 0

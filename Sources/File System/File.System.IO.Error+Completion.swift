@@ -6,7 +6,7 @@
         extension Completion.Failure {
 
             @usableFromInline
-            package var fileSystemError: File.System.IO.Error {
+            var fileSystemError: File.System.IO.Error {
                 switch self {
                 case .cancelled:
                     return .cancelled

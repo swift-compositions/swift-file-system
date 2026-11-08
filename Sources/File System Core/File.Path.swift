@@ -21,7 +21,7 @@ extension File.Path {
     }
 
     @usableFromInline
-    package var parentOrSelf: Path::Path {
+    var parentOrSelf: Path::Path {
         parent ?? self
     }
 }

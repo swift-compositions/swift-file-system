@@ -25,7 +25,7 @@
     extension File.Directory.Glob {
 
         @inlinable
-        package func matchPaths(
+        func matchPaths(
             include: [Glob.Pattern],
             excluding: [Glob.Pattern],
             options: Glob.Options
@@ -42,7 +42,7 @@
         }
 
         @inlinable
-        package func matchPaths(
+        func matchPaths(
             include: [Swift.String],
             excluding: [Swift.String],
             options: Glob.Options
