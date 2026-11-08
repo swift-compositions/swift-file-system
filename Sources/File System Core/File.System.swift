@@ -8,7 +8,6 @@ extension File {
 
 extension File.System {
 
-
     @inlinable
     public static func same(
         _ first: File.Path,

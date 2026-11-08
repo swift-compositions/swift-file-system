@@ -28,12 +28,12 @@
         try await file.read.full { span in span.count }
     }
 
-enum `File.Read Overload Resolution Tests` {}
+    enum `File.Read Overload Resolution Tests` {}
 
-extension `File.Read Overload Resolution Tests` {
+    extension `File.Read Overload Resolution Tests` {
         @Suite
         struct `File Read Overload Resolution` {}
-}
+    }
 
     extension `File.Read Overload Resolution Tests`.`File Read Overload Resolution` {
         @Test

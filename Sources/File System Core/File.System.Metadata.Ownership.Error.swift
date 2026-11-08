@@ -1,7 +1,6 @@
 import Binary
 public import Kernel
 
-
 extension File.System.Metadata.Ownership {
     public enum Error: Swift.Error, Sendable {
 

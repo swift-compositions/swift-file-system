@@ -16,7 +16,7 @@
             }
         }
 
-extension File.Directory.Watch.Iterator {
+        extension File.Directory.Watch.Iterator {
             public mutating func next(
                 isolation actor: isolated (any Actor)? = #isolation
             ) async throws(File.Directory.Watch.Error) -> File.Directory? {
@@ -31,7 +31,7 @@ extension File.Directory.Watch.Iterator {
                 }
                 return try result.get()
             }
-}
+        }
 
     #endif
 #endif

@@ -1,7 +1,6 @@
 public import Kernel
 import Strings
 
-
 extension File.System.Link.Read.Target {
     public enum Error: Swift.Error, Sendable {
 

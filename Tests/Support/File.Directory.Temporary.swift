@@ -39,19 +39,21 @@ extension File.Directory.Temporary {
         get throws {
             let path: Swift.String
             #if os(Windows)
-                path = if let temp = getEnvironmentVariable("TEMP") {
-                    temp
-                } else if let tmp = getEnvironmentVariable("TMP") {
-                    tmp
-                } else {
-                    "C:\\Temp"
-                }
+                path =
+                    if let temp = getEnvironmentVariable("TEMP") {
+                        temp
+                    } else if let tmp = getEnvironmentVariable("TMP") {
+                        tmp
+                    } else {
+                        "C:\\Temp"
+                    }
             #else
-                path = if let ptr = unsafe getenv("TMPDIR") {
-                    unsafe Swift.String(cString: ptr)
-                } else {
-                    "/tmp"
-                }
+                path =
+                    if let ptr = unsafe getenv("TMPDIR") {
+                        unsafe Swift.String(cString: ptr)
+                    } else {
+                        "/tmp"
+                    }
             #endif
             return try File.Directory(validating: path)
         }

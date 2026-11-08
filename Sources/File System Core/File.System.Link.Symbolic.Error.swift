@@ -1,6 +1,5 @@
 public import Kernel
 
-
 extension File.System.Link.Symbolic {
     public enum Error: Swift.Error, Sendable {
 

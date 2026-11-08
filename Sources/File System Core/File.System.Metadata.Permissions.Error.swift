@@ -1,7 +1,6 @@
 import Binary
 public import Kernel
 
-
 extension File.System.Metadata.Permissions {
     public enum Error: Swift.Error, Sendable {
 

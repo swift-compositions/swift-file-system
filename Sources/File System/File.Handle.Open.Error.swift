@@ -1,6 +1,5 @@
 public import Kernel
 
-
 extension File.Handle.Open {
     public enum Error<ClosureError: Swift.Error>: Swift.Error, Sendable {
 

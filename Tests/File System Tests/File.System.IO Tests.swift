@@ -9,9 +9,9 @@
     import Span
     import Testing
 
-enum `File.System.IO Tests` {}
+    enum `File.System.IO Tests` {}
 
-extension `File.System.IO Tests` {
+    extension `File.System.IO Tests` {
         @Suite
         struct `File.System.IO — smoke tests` {
 
@@ -108,5 +108,5 @@ extension `File.System.IO Tests` {
                 await io.close(consume fd)
             }
         }
-}
+    }
 #endif

@@ -48,7 +48,7 @@
             }
         }
 
-extension File.Directory.Watch.State {
+        extension File.Directory.Watch.State {
             private static let interest: Kernel.Event.Interest = [.change, .rename, .delete, .revoke]
 
             private static let gone: Kernel.Event.Interest = [.rename, .delete, .revoke]
@@ -56,7 +56,7 @@ extension File.Directory.Watch.State {
             nonisolated internal var unownedExecutor: UnownedSerialExecutor {
                 unsafe executor.asUnownedSerialExecutor()
             }
-}
+        }
 
         extension File.Directory.Watch.State {
             /// The next directory to rescan, or nil once the task is cancelled.
