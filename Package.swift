@@ -80,7 +80,7 @@ let package = Package(
                 .product(name: "Either", package: "swift-either"),
                 // Unconditional until SwiftPM resolves mixed trait requests (swift-institute/Issues#123);
                 // the code stays behind #if Watch and #if IO.
-                .product(name: "Executors", package: "swift-executors"),
+                .product(name: "Executors", package: "swift-executors", condition: .when(traits: ["IO", "Watch"])),
                 .product(name: "Thread Pool", package: "swift-threads", condition: .when(traits: ["Threads"])),
                 .product(name: "Glob", package: "swift-glob", condition: .when(traits: ["Glob"])),
                 .product(name: "IO Kernel", package: "swift-io-kernel", condition: .when(traits: ["IO"])),
@@ -145,7 +145,7 @@ let package = Package(
                     name: "Tagged",
                     package: "swift-tagged"
                 ),
-                .product(name: "Span", package: "swift-span"),
+                .product(name: "Span", package: "swift-span", condition: .when(traits: ["IO"])),
             ]
         ),
     ],
