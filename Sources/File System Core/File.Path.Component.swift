@@ -54,6 +54,6 @@ extension File.Path.Component {
     public func numbered(_ number: Int) -> File.Path.Component {
         guard number > 1 else { return self }
         let suffix = self.extension.map { "." + $0.string } ?? ""
-        return File.Path.Component("\(stem.string) \(number)\(suffix)")
+        return File.Path.Component(unchecked: "\(stem.string) \(number)\(suffix)")
     }
 }
