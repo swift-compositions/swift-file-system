@@ -36,11 +36,13 @@ extension File.Directory {
     extension File.Directory.Files {
 
         @inlinable
-        public func callAsFunction() async throws(Either<
+        public func callAsFunction(
+            on pool: Kernel.Thread.Pool
+        ) async throws(Either<
             Kernel.Thread.Pool.Error, File.Directory.Contents.Error
         >) -> [File] {
             let path = self.path
-            return try await Kernel.Thread.Pool.shared.run { () throws(File.Directory.Contents.Error) in
+            return try await pool.run { () throws(File.Directory.Contents.Error) in
                 try File.Directory.Contents.list(at: File.Directory(path))
                     .filter { $0.type == .file }
                     .compactMap { $0.pathIfValid.map { File($0) } }

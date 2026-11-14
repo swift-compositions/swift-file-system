@@ -51,28 +51,30 @@ extension File.Directory {
     extension File.Directory.Delete {
 
         @inlinable
-        public func callAsFunction() async throws(Either<
+        public func callAsFunction(
+            on pool: Kernel.Thread.Pool
+        ) async throws(Either<
             Kernel.Thread.Pool.Error, File.System.Delete.Error
         >) {
             let path = self.path
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in
+            try await pool.run { () throws(File.System.Delete.Error) in
                 try File.System.Delete.delete(at: path)
             }
         }
 
         @inlinable
-        public func recursive() async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
+        public func recursive(on pool: Kernel.Thread.Pool) async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
             let path = self.path
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in
+            try await pool.run { () throws(File.System.Delete.Error) in
                 try File.System.Delete.delete(at: path, recursive: true)
             }
         }
 
         @inlinable
-        public func ifExists() async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
+        public func ifExists(on pool: Kernel.Thread.Pool) async throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
             let path = self.path
             do throws(Either<Kernel.Thread.Pool.Error, File.System.Delete.Error>) {
-                try await Kernel.Thread.Pool.shared.run { () throws(File.System.Delete.Error) in
+                try await pool.run { () throws(File.System.Delete.Error) in
                     try File.System.Delete.delete(at: path)
                 }
             } catch {

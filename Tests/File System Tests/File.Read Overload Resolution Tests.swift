@@ -25,7 +25,7 @@
     private func byteCountAsync(
         of file: File
     ) async throws(Either<Kernel.Thread.Pool.Error, Either<File.System.Read.Full.Error, Never>>) -> Int {
-        try await file.read.full { span in span.count }
+        try await file.read.full(on: .shared) { span in span.count }
     }
 
     enum `File.Read Overload Resolution Tests` {}

@@ -18,7 +18,7 @@ let package = Package(
     ],
     traits: [
         .trait(name: "Watch", description: "Directory change notification"),
-        .trait(name: "Threads", description: "Asynchronous overloads that run on the thread pool"),
+        .trait(name: "Threads", description: "Asynchronous forms that run on the thread pool they are given"),
         .trait(name: "Glob", description: "Directory matching by glob pattern", enabledTraits: ["Threads"]),
         .trait(name: "IO", description: "The file system's capabilities for the IO executor model"),
     ],

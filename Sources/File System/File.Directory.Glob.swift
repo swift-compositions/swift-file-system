@@ -97,10 +97,11 @@
         public func callAsFunction(
             include: [Glob.Pattern],
             excluding: [Glob.Pattern] = [],
+            on pool: Kernel.Thread.Pool,
             options: Glob.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, Glob.Error>) -> [Match] {
             let glob = self
-            return try await Kernel.Thread.Pool.shared.run { () throws(Glob.Error) -> [Match] in
+            return try await pool.run { () throws(Glob.Error) -> [Match] in
                 try glob.callAsFunction(include: include, excluding: excluding, options: options)
             }
         }
@@ -128,10 +129,11 @@
         public func callAsFunction(
             include: [Swift.String],
             excluding: [Swift.String] = [],
+            on pool: Kernel.Thread.Pool,
             options: Glob.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, Glob.Error>) -> [Match] {
             let glob = self
-            return try await Kernel.Thread.Pool.shared.run { () throws(Glob.Error) -> [Match] in
+            return try await pool.run { () throws(Glob.Error) -> [Match] in
                 try glob.callAsFunction(include: include, excluding: excluding, options: options)
             }
         }
@@ -167,10 +169,11 @@
         public func directories(
             include: [Glob.Pattern],
             excluding: [Glob.Pattern] = [],
+            on pool: Kernel.Thread.Pool,
             options: Glob.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, Glob.Error>) -> [File.Directory] {
             let glob = self
-            return try await Kernel.Thread.Pool.shared.run {
+            return try await pool.run {
                 () throws(Glob.Error) -> [File.Directory] in
                 try glob.directories(include: include, excluding: excluding, options: options)
             }
@@ -197,10 +200,11 @@
         public func directories(
             include: [Swift.String],
             excluding: [Swift.String] = [],
+            on pool: Kernel.Thread.Pool,
             options: Glob.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, Glob.Error>) -> [File.Directory] {
             let glob = self
-            return try await Kernel.Thread.Pool.shared.run {
+            return try await pool.run {
                 () throws(Glob.Error) -> [File.Directory] in
                 try glob.directories(include: include, excluding: excluding, options: options)
             }
@@ -237,10 +241,11 @@
         public func files(
             include: [Glob.Pattern],
             excluding: [Glob.Pattern] = [],
+            on pool: Kernel.Thread.Pool,
             options: Glob.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, Glob.Error>) -> [File] {
             let glob = self
-            return try await Kernel.Thread.Pool.shared.run { () throws(Glob.Error) -> [File] in
+            return try await pool.run { () throws(Glob.Error) -> [File] in
                 try glob.files(include: include, excluding: excluding, options: options)
             }
         }
@@ -266,10 +271,11 @@
         public func files(
             include: [Swift.String],
             excluding: [Swift.String] = [],
+            on pool: Kernel.Thread.Pool,
             options: Glob.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, Glob.Error>) -> [File] {
             let glob = self
-            return try await Kernel.Thread.Pool.shared.run { () throws(Glob.Error) -> [File] in
+            return try await pool.run { () throws(Glob.Error) -> [File] in
                 try glob.files(include: include, excluding: excluding, options: options)
             }
         }

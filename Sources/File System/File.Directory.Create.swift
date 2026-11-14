@@ -48,21 +48,23 @@ extension File.Directory {
 
         @inlinable
         public func callAsFunction(
+            on pool: Kernel.Thread.Pool,
             options: File.System.Create.Directory.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
             let path = self.path
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Create.Directory.Error) in
+            try await pool.run { () throws(File.System.Create.Directory.Error) in
                 try File.System.Create.Directory.create(at: path, options: options)
             }
         }
 
         @inlinable
         public func recursive(
+            on pool: Kernel.Thread.Pool,
             options: File.System.Create.Directory.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Create.Directory.Error>) {
             let path = self.path
             let opts = options
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Create.Directory.Error) in
+            try await pool.run { () throws(File.System.Create.Directory.Error) in
                 try File.System.Create.Directory.create(
                     at: path,
                     options: opts,

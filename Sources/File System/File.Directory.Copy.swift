@@ -54,10 +54,11 @@ extension File.Directory {
         @inlinable
         public func to(
             _ destination: File.Path,
+            on pool: Kernel.Thread.Pool,
             options: File.System.Copy.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Copy.Error>) -> File.Directory {
             let source = self.path
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Copy.Error) in
+            try await pool.run { () throws(File.System.Copy.Error) in
                 try File.System.Copy.recursive(from: source, to: destination, options: options)
             }
             return File.Directory(destination)
@@ -67,10 +68,11 @@ extension File.Directory {
         @inlinable
         public func to(
             _ destination: File.Directory,
+            on pool: Kernel.Thread.Pool,
             options: File.System.Copy.Options = .init()
         ) async throws(Either<Kernel.Thread.Pool.Error, File.System.Copy.Error>) -> File.Directory {
             let source = self.path
-            try await Kernel.Thread.Pool.shared.run { () throws(File.System.Copy.Error) in
+            try await pool.run { () throws(File.System.Copy.Error) in
                 try File.System.Copy.recursive(from: source, to: destination.path, options: options)
             }
             return destination
