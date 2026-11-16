@@ -3,5 +3,6 @@ extension File.Path.Temporary {
         case parent
         case random
         case component(File.Path.Component.Error)
+        case directory(File.Path.Error)
     }
 }

@@ -14,6 +14,8 @@ extension `File.Path.Temporary Tests`.Test {
     @Suite struct Deterministic {}
 
     @Suite struct Sibling {}
+
+    @Suite struct Unique {}
 }
 
 extension `File.Path.Temporary Tests`.Test.Sibling {
@@ -138,5 +140,26 @@ extension `File.Path.Temporary Tests`.Test.Deterministic {
             #expect(asString.hasPrefix("/"))
             #expect(asString.contains("/p-anything.tmp"))
         #endif
+    }
+}
+
+extension `File.Path.Temporary Tests`.Test.Unique {
+    @Test
+    func `Path is in the temporary directory with the prefix and suffix`() throws {
+        let path = try File.Path.Temporary.unique(prefix: "p-", suffix: ".tmp")
+
+        let directory = try File.Path.Temporary.directory
+        #expect(path.description.hasPrefix(directory.description))
+        let component = try #require(path.components.last)
+        #expect(component.string.hasPrefix("p-"))
+        #expect(component.string.hasSuffix(".tmp"))
+    }
+
+    @Test
+    func `Successive paths are distinct`() throws {
+        let first = try File.Path.Temporary.unique(prefix: "p-")
+        let second = try File.Path.Temporary.unique(prefix: "p-")
+
+        #expect(first != second)
     }
 }
