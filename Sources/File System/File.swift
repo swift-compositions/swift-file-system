@@ -8,11 +8,11 @@ extension File {
         path.components.last ?? "."
     }
 
-    public var `extension`: File.Path.Component.Extension? {
+    public var `extension`: Path.Extension? {
         path.extension
     }
 
-    public var stem: File.Path.Component.Stem? {
+    public var stem: Path.Stem? {
         path.stem
     }
 
@@ -73,26 +73,4 @@ extension File.Link {
     }
 
     public var target: Target { Target(link: self) }
-}
-
-extension File.Link {
-
-    public struct Target: Sendable {
-        let link: File.Link
-    }
-}
-
-extension File.Link.Target {
-
-    public var path: File.Path {
-        get throws(File.System.Link.Read.Target.Error) {
-            try File.System.Link.Read.Target.target(of: link.path)
-        }
-    }
-
-    public var file: File {
-        get throws(File.System.Link.Read.Target.Error) {
-            File(try File.System.Link.Read.Target.target(of: link.path))
-        }
-    }
 }

@@ -66,9 +66,17 @@ extension File.Directory.Temporary {
 
         for entry in contents {
             guard let name = Swift.String(entry.name) else { continue }
-            if name.hasPrefix(targetPrefix), let component = try? File.Path.Component(name) {
+            if name.hasPrefix(targetPrefix) {
+                let component: File.Path.Component
+                do throws(File.Path.Component.Error) {
+                    component = try File.Path.Component(name)
+                } catch {
+                    continue
+                }
                 let path = base.path / component
-                try? File.System.Delete.delete(at: path, recursive: true)
+                do throws(File.System.Delete.Error) {
+                    try File.System.Delete.delete(at: path, recursive: true)
+                } catch {}
             }
         }
     }
@@ -102,7 +110,11 @@ extension File.Directory.Temporary.Scope {
         let path = base.path / dirName
 
         try File.System.Create.Directory.create(at: path)
-        defer { try? File.System.Delete.delete(at: path, recursive: true) }
+        defer {
+            do throws(File.System.Delete.Error) {
+                try File.System.Delete.delete(at: path, recursive: true)
+            } catch {}
+        }
 
         return try body(File.Directory(path))
     }
@@ -116,15 +128,13 @@ extension File.Directory.Temporary.Scope {
         let path = base.path / dirName
 
         try File.System.Create.Directory.create(at: path)
-
-        do {
-            let value = try await body(File.Directory(path))
-            try? File.System.Delete.delete(at: path, recursive: true)
-            return value
-        } catch {
-            try? File.System.Delete.delete(at: path, recursive: true)
-            throw error
+        defer {
+            do throws(File.System.Delete.Error) {
+                try File.System.Delete.delete(at: path, recursive: true)
+            } catch {}
         }
+
+        return try await body(File.Directory(path))
     }
 }
 

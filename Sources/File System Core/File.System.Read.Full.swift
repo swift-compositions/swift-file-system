@@ -9,70 +9,6 @@ extension File.System.Read {
 
 extension File.System.Read.Full {
 
-    public enum Error: Swift.Error, Sendable {
-
-        case open(Kernel.File.Open.Error)
-
-        case stat(Kernel.File.Stats.Error)
-
-        case read(Kernel.IO.Read.Error)
-
-        case isDirectory(File.Path)
-    }
-}
-
-extension File.System.Read.Full.Error {
-
-    public var isNotFound: Bool {
-        switch self {
-        case .open(let e):
-            if case .path(.notFound) = e { return true }
-            return false
-
-        default:
-            return false
-        }
-    }
-
-    public var isPermissionDenied: Bool {
-        switch self {
-        case .open(let e):
-            if case .platform(let p) = e, p.code.isPermissionDenied { return true }
-            return false
-
-        default:
-            return false
-        }
-    }
-
-    public var isDirectory: Bool {
-        switch self {
-        case .isDirectory:
-            return true
-
-        case .open(let e):
-            if case .path(.isDirectory) = e { return true }
-            return false
-
-        default:
-            return false
-        }
-    }
-
-    public var isTooManyOpenFiles: Bool {
-        switch self {
-        case .open(let e):
-            if case .handle(.limit) = e { return true }
-            return false
-
-        default:
-            return false
-        }
-    }
-}
-
-extension File.System.Read.Full {
-
     public static func read<R, E: Swift.Error>(
         from path: borrowing File.Path,
         body: (Swift.Span<Byte>) throws(E) -> R
@@ -88,11 +24,14 @@ extension File.System.Read.Full {
             )
         } catch {
             #if os(Windows)
-                if case .platform = error,
-                    let found = try? Kernel.File.Stats.get(path: path.view),
-                    case .directory = found.type
-                {
-                    throw .left(.isDirectory(copy path))
+                if case .platform = error {
+                    do throws(Kernel.File.Stats.Error) {
+                        let found = try Kernel.File.Stats.get(path: path.view)
+                        if case .directory = found.type {
+                            throw .left(.isDirectory(copy path))
+                        }
+                    } catch {
+                    }
                 }
             #endif
             throw .left(.open(error))

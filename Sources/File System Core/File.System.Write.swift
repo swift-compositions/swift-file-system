@@ -234,17 +234,22 @@ extension File.System.Write {
         #if os(Windows)
             _ = path
         #else
-            do {
-
-                var fd: Kernel.Descriptor = .invalid
+            let fd: Kernel.Descriptor
+            do throws(Kernel.File.Open.Error) {
                 fd = try Kernel.File.Open.open(
                     path: path.view,
                     mode: .read,
                     options: [.execClose],
                     permissions: .none
                 )
+            } catch {
+                throw .directory(
+                    path: path,
+                    "fsync directory failed: \(error)"
+                )
+            }
+            do throws(Kernel.File.Flush.Error) {
                 try Kernel.File.Flush.flush(fd)
-
             } catch {
                 throw .directory(
                     path: path,

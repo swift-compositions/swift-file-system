@@ -26,7 +26,7 @@ extension File.Path {
     }
 }
 
-extension File.Path.Property where Value == File.Path.Component.Extension {
+extension File.Path.Property where Value == Path.Extension {
 
     public static var `extension`: Self {
         Self(

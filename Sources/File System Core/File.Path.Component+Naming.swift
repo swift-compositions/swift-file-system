@@ -6,7 +6,7 @@ extension Path.Component {
     /// What follows the last dot, or `nil` when there is no dot, the only dot leads (`.profile`), or
     /// nothing follows it.
     @inlinable
-    public var `extension`: Extension? {
+    public var `extension`: Path.Extension? {
         let text = string
         guard let dot = text.lastIndex(of: "."), dot != text.startIndex else {
             return nil
@@ -15,19 +15,19 @@ extension Path.Component {
         guard afterDot != text.endIndex else {
             return nil
         }
-        return Extension(unchecked: Swift.String(text[afterDot...]))
+        return Path.Extension(unchecked: Swift.String(text[afterDot...]))
     }
 
     /// The name without its ``extension``.
     @inlinable
-    public var stem: Stem {
+    public var stem: Path.Stem {
         let text = string
         guard let dot = text.lastIndex(of: "."), dot != text.startIndex,
             text.index(after: dot) != text.endIndex
         else {
-            return Stem(unchecked: text)
+            return Path.Stem(unchecked: text)
         }
-        return Stem(unchecked: Swift.String(text[..<dot]))
+        return Path.Stem(unchecked: Swift.String(text[..<dot]))
     }
 }
 
@@ -49,30 +49,3 @@ extension Path.Component {
     }
 
 #endif
-
-extension Path.`Protocol` {
-
-    /// The last component's extension. Setting it renames the last component; setting `nil` removes
-    /// the extension.
-    @inlinable
-    public var `extension`: Path.Component.Extension? {
-        get { lastComponent?.extension }
-        set {
-            guard let last = lastComponent else { return }
-            let name = newValue.map { last.stem.string + "." + $0.string } ?? last.stem.string
-            let component: Path.Component
-            do throws(Path.Component.Error) {
-                component = try Path.Component(name)
-            } catch {
-                return
-            }
-            self = parent.map { $0.appending(component) } ?? Self(copying: component.view)
-        }
-    }
-
-    /// The last component's stem.
-    @inlinable
-    public var stem: Path.Component.Stem? {
-        lastComponent?.stem
-    }
-}

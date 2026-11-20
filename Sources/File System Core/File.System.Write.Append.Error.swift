@@ -1,0 +1,152 @@
+public import Kernel
+
+extension File.System.Write.Append {
+
+    public enum Error: Swift.Error, Sendable {
+
+        case open(Kernel.File.Open.Error)
+
+        case write(Kernel.IO.Write.Error)
+
+        case shortWrite(written: Int, expected: Int)
+    }
+}
+
+extension File.System.Write.Append.Error {
+
+    public var isNotFound: Bool {
+        switch self {
+        case .open(let e):
+            if case .path(.notFound) = e { return true }
+            return false
+
+        default:
+            return false
+        }
+    }
+
+    public var isPermissionDenied: Bool {
+        switch self {
+        case .open(let e):
+            if case .platform(let p) = e, p.code.isPermissionDenied { return true }
+            return false
+
+        default:
+            return false
+        }
+    }
+
+    public var isDirectory: Bool {
+        switch self {
+        case .open(let e):
+            if case .path(.isDirectory) = e { return true }
+            return false
+
+        default:
+            return false
+        }
+    }
+
+    public var isReadOnly: Bool {
+        switch self {
+        case .open(let e):
+            if case .platform(let p) = e, p.code.isReadOnly { return true }
+            return false
+
+        default:
+            return false
+        }
+    }
+
+    public var isNoSpace: Bool {
+        switch self {
+        case .open(let e):
+            if case .platform(let p) = e, p.code.isNoSpace { return true }
+            return false
+
+        case .write(let e):
+            if case .platform(let p) = e, p.code.isNoSpace { return true }
+            return false
+
+        case .shortWrite:
+            return false
+        }
+    }
+}
+
+extension File.System.Write.Append {
+
+    @usableFromInline
+    internal static func advance(
+        totalWritten: Int,
+        by writtenThisCall: Int,
+        expected: Int
+    ) throws(Self.Error) -> Int {
+        guard writtenThisCall > 0 else {
+            throw .shortWrite(written: totalWritten, expected: expected)
+        }
+        return totalWritten + writtenThisCall
+    }
+}
+
+extension File.System.Write.Append {
+
+    /// Appends `bytes` to the file at `path`, creating it when it does not exist: with `options.permissions`, or
+    /// 0644 when none are given. An existing file keeps its permissions.
+    public static func append(
+        _ bytes: borrowing Swift.Span<Byte>,
+        to path: borrowing File.Path,
+        options: File.System.Create.Options = .init()
+    ) throws(Self.Error) {
+
+        var descriptor: Kernel.Descriptor = .invalid
+        do throws(Kernel.File.Open.Error) {
+            descriptor = try Kernel.File.Open.open(
+                path: path.view,
+                mode: .write,
+                options: [.create, .append],
+                permissions: Kernel.File.Permissions(rawValue: options.permissions?.rawValue ?? 0o644)
+            )
+        } catch {
+            throw .open(error)
+        }
+
+        if bytes.count == 0 { return }
+
+        try bytes.withUnsafeBytes { (rawBuffer: UnsafeRawBufferPointer) throws(Self.Error) in
+            try unsafe writeAll(descriptor, from: rawBuffer)
+        }
+    }
+
+    private static func writeAll(
+        _ descriptor: borrowing Kernel.Descriptor,
+        from buffer: UnsafeRawBufferPointer
+    ) throws(Self.Error) {
+        var totalWritten = 0
+        while totalWritten < buffer.count {
+            let slice = unsafe UnsafeRawBufferPointer(
+                start: buffer.baseAddress?.advanced(by: totalWritten),
+                count: buffer.count - totalWritten
+            )
+            let written: Int
+            do throws(Kernel.IO.Write.Error) {
+                written = try unsafe Kernel.IO.Write.write(descriptor, from: slice)
+            } catch {
+
+                #if !os(Windows)
+                    if case .platform(let kernelError) = error,
+                        kernelError.code == Error::Error.Code.EINTR
+                    {
+                        continue
+                    }
+                #endif
+                throw .write(error)
+            }
+            totalWritten = try Self.advance(
+                totalWritten: totalWritten,
+                by: written,
+                expected: buffer.count
+            )
+        }
+    }
+}

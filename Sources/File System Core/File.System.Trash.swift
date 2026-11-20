@@ -7,26 +7,9 @@ extension File.System {
     public enum Trash {}
 }
 
-extension File.System.Trash {
-
-    public enum Error: Swift.Error, Sendable, Equatable {
-
-        /// Nothing is at the path.
-        case missing
-
-        /// The file may not be moved, or the trash may not be written.
-        case denied
-
-        /// No trash takes the file: none on this volume, or the path is not absolute.
-        case unavailable
-    }
-}
-
 #if os(Linux)
     internal import Environment
-    internal import ISO_8601
     internal import ISO_9945_Kernel_Time
-    internal import RFC_3986
     internal import Time
 
     extension File.System.Trash {
@@ -108,14 +91,35 @@ extension File.System.Trash {
         /// The `.trashinfo` for `path`, trashed now: its path percent-encoded with the slashes kept, and the date in
         /// local time as `YYYY-MM-DDThh:mm:ss`.
         static func record(_ path: File.Path, at instant: Time.Instant = ISO_9945.Kernel.Time.realtime()) -> [Byte] {
-            let encoded = RFC_3986.percentEncode(
-                Swift.Array(path.string.utf8),
-                allowing: RFC_3986.ByteSet.unreserved.union(RFC_3986.ByteSet(ascii: "/"))
-            )
             let text =
-                "[Trash Info]\nPath=" + Swift.String(decoding: encoded, as: UTF8.self)
+                "[Trash Info]\nPath=" + percentEncode(path.string.utf8)
                 + "\nDeletionDate=" + date(instant, in: .local) + "\n"
             return text.utf8.map(Byte.init(bitPattern:))
+        }
+
+        private static func percentEncode(_ bytes: Swift.String.UTF8View) -> Swift.String {
+            let digits: [UInt8] = [
+                0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+                0x38, 0x39, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46,
+            ]
+            var encoded: [UInt8] = []
+            encoded.reserveCapacity(bytes.count)
+            for byte in bytes {
+                let unreserved =
+                    (byte >= 0x41 && byte <= 0x5A)
+                    || (byte >= 0x61 && byte <= 0x7A)
+                    || (byte >= 0x30 && byte <= 0x39)
+                    || byte == 0x2D || byte == 0x2E || byte == 0x5F || byte == 0x7E
+                    || byte == 0x2F
+                if unreserved {
+                    encoded.append(byte)
+                } else {
+                    encoded.append(0x25)
+                    encoded.append(digits[Swift.Int(byte >> 4)])
+                    encoded.append(digits[Swift.Int(byte & 0x0F)])
+                }
+            }
+            return Swift.String(decoding: encoded, as: UTF8.self)
         }
 
         /// `instant` as `YYYY-MM-DDThh:mm:ss` in the zone `rule` gives for it.
@@ -123,19 +127,33 @@ extension File.System.Trash {
             let offset = rule.offset(at: instant).offset.underlying
             let magnitude = Swift.Int64(offset.magnitude.value.rawValue)
             let seconds = offset.polarity == .negative ? -magnitude : magnitude
+            let localSeconds = instant.secondsSinceUnixEpoch + seconds
+            let daySeconds: Swift.Int64 = 86_400
+            var days = localSeconds / daySeconds
+            var remainder = localSeconds % daySeconds
+            if remainder < 0 {
+                remainder += daySeconds
+                days -= 1
+            }
+            let z = days + 719_468
+            let era = (z >= 0 ? z : z - 146_096) / 146_097
+            let doe = z - era * 146_097
+            let yoe = (doe - doe / 1_460 + doe / 36_524 - doe / 146_096) / 365
+            let y = yoe + era * 400
+            let doy = doe - (365 * yoe + yoe / 4 - yoe / 100)
+            let mp = (5 * doy + 2) / 153
+            let day = Swift.Int(doy - (153 * mp + 2) / 5 + 1)
+            let month = Swift.Int(mp < 10 ? mp + 3 : mp - 9)
+            let year = Swift.Int(y + (month <= 2 ? 1 : 0))
+            let hour = Swift.Int(remainder / 3_600)
+            let minute = Swift.Int((remainder % 3_600) / 60)
+            let second = Swift.Int(remainder % 60)
             func padded(_ value: Swift.Int, _ width: Swift.Int) -> Swift.String {
                 let digits = Swift.String(value)
                 return Swift.String(repeating: "0", count: Swift.max(0, width - digits.count)) + digits
             }
-            do throws(ISO_8601.DateTime.Error) {
-                let local = try ISO_8601.DateTime(
-                    Time.Instant(secondsSinceUnixEpoch: instant.secondsSinceUnixEpoch + seconds)
-                )
-                return "\(padded(local.date.year, 4))-\(padded(local.date.month, 2))-\(padded(local.date.day, 2))T"
-                    + "\(padded(local.hour, 2)):\(padded(local.minute, 2)):\(padded(local.second, 2))"
-            } catch {
-                return "0000-01-01T00:00:00"
-            }
+            return "\(padded(year, 4))-\(padded(month, 2))-\(padded(day, 2))T"
+                + "\(padded(hour, 2)):\(padded(minute, 2)):\(padded(second, 2))"
         }
     }
 #endif

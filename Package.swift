@@ -50,9 +50,7 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-span.git", branch: "main", traits: ["Byte"]),
         .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-time.git", branch: "main"),
-        .package(url: "https://github.com/swift-iso/swift-iso-8601.git", branch: "main"),
         .package(url: "https://github.com/swift-iso/swift-iso-9945.git", branch: "main"),
-        .package(url: "https://github.com/swift-ietf/swift-rfc-3986.git", branch: "main"),
     ],
     targets: [
         .target(
@@ -60,15 +58,14 @@ let package = Package(
             dependencies: [
                 .product(name: "Environment", package: "swift-environment"),
                 .product(name: "Kernel", package: "swift-kernel"),
+                .product(name: "Kernel Core", package: "swift-kernel"),
+                .product(name: "Kernel File", package: "swift-kernel", condition: .when(platforms: [.windows])),
                 .product(name: "Path", package: "swift-path"),
                 .product(name: "Strings", package: "swift-strings"),
                 .product(name: "Either", package: "swift-either"),
                 .product(name: "Binary", package: "swift-binary"),
                 .product(name: "RFC 4648", package: "swift-rfc-4648"),
-                // The XDG trash's record: where the item was, percent-encoded, and when it was trashed, in local time.
-                .product(name: "ISO 8601", package: "swift-iso-8601", condition: .when(platforms: [.linux])),
                 .product(name: "ISO 9945 Kernel Time", package: "swift-iso-9945", condition: .when(platforms: [.linux])),
-                .product(name: "RFC 3986", package: "swift-rfc-3986", condition: .when(platforms: [.linux])),
                 .product(name: "Time", package: "swift-time", condition: .when(platforms: [.linux])),
             ]
         ),
@@ -153,17 +150,14 @@ let package = Package(
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    let ecosystem: [SwiftSetting] = [
-        .strictMemorySafety(),
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-        .enableExperimentalFeature("Lifetimes"),
-        .enableUpcomingFeature("InferIsolatedConformances"),
-    ]
-
-    let package: [SwiftSetting] = []
-
-    target.swiftSettings = (target.swiftSettings ?? []) + ecosystem + package
+    target.swiftSettings =
+        (target.swiftSettings ?? []) + [
+            .strictMemorySafety(),
+            .enableUpcomingFeature("ExistentialAny"),
+            .enableUpcomingFeature("InternalImportsByDefault"),
+            .enableUpcomingFeature("MemberImportVisibility"),
+            .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+            .enableUpcomingFeature("InferIsolatedConformances"),
+            .enableExperimentalFeature("Lifetimes"),
+        ]
 }
