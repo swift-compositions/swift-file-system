@@ -90,7 +90,7 @@ extension File.System {
 
         /// The `.trashinfo` for `path`, trashed now: its path percent-encoded with the slashes kept, and the date in
         /// local time as `YYYY-MM-DDThh:mm:ss`.
-        static func record(_ path: File.Path, at instant: Time.Instant = ISO_9945.Kernel.Time.realtime()) -> [Byte] {
+        static func record(_ path: File.Path, at instant: Time.Instant = ISO.`9945`.Kernel.Time.realtime()) -> [Byte] {
             let text =
                 "[Trash Info]\nPath=" + percentEncode(path.string.utf8)
                 + "\nDeletionDate=" + date(instant, in: .local) + "\n"
