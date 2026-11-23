@@ -134,7 +134,7 @@ extension `File.System.Read.Full Tests`.Test.Unit {
     @Test
     func `Read directory reports isDirectory, not an open failure`() throws {
         try File.Directory.temporary { dir in
-            do {
+            do throws(File.System.Read.Full.Error) {
                 _ = try File.System.Read.Full.bytes(at: dir.path)
                 Issue.record("reading a directory succeeded")
             } catch {
