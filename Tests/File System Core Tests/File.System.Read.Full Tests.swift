@@ -132,6 +132,18 @@ extension `File.System.Read.Full Tests`.Test.Unit {
     }
 
     @Test
+    func `Read directory reports isDirectory, not an open failure`() throws {
+        try File.Directory.temporary { dir in
+            do {
+                _ = try File.System.Read.Full.bytes(at: dir.path)
+                Issue.record("reading a directory succeeded")
+            } catch {
+                #expect(error.isDirectory)
+            }
+        }
+    }
+
+    @Test
     func `Async read file`() async throws {
         let content: [Byte] = ([1, 2, 3, 4, 5] as [UInt8]).map(Byte.init(bitPattern:))
         try File.Directory.temporary { dir in

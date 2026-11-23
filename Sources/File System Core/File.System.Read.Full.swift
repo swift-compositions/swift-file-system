@@ -23,17 +23,14 @@ extension File.System.Read.Full {
                 permissions: Kernel.File.Permissions(rawValue: 0)
             )
         } catch {
-            #if os(Windows)
-                if case .platform = error {
-                    do throws(Kernel.File.Stats.Error) {
-                        let found = try Kernel.File.Stats.get(path: path.view)
-                        if case .directory = found.type {
-                            throw .left(.isDirectory(copy path))
-                        }
-                    } catch {
-                    }
-                }
-            #endif
+            // Windows refuses to open a directory as a file; POSIX opens it and the
+            // stat below reports it. Either way a directory is reported as one.
+            if case .platform = error,
+                let found = try? Kernel.File.Stats.get(path: path.view),
+                case .directory = found.type
+            {
+                throw .left(.isDirectory(copy path))
+            }
             throw .left(.open(error))
         }
 
