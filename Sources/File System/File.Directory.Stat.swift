@@ -52,6 +52,18 @@ extension File.Directory.Stat {
     }
 }
 
+#if !os(Windows)
+    extension File.Directory.Stat {
+
+        /// The bytes this process may still write on the file system that holds the directory.
+        public var available: UInt64 {
+            get throws(Kernel.File.System.Stats.Error) {
+                try Kernel.File.System.Stats.get(path: path.view).available
+            }
+        }
+    }
+#endif
+
 extension File.Directory {
 
     public var stat: Stat {
